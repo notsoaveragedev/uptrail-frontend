@@ -1,7 +1,6 @@
-// Mirrors the theme variables in index.css so antd and Tailwind share one palette. See design_plan.md.
 export type ThemeMode = "dark" | "light";
 
-export type Palette = {
+type Palette = {
   canvas: string;
   panel: string;
   card: string;

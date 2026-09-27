@@ -1,9 +1,7 @@
-/* antd sits between Tailwind base and utilities, so utility classes can override antd. */
 @layer theme, base, antd, components, utilities;
 
 @import "tailwindcss";
 
-/* Colors point at the per-theme variables below, so one class works in dark and light. Mirrors theme/palette.ts. */
 @theme inline {
   --color-*: initial;
   --color-transparent: transparent;
@@ -53,7 +51,6 @@
   --font-sans: "Instrument Sans Variable", system-ui, sans-serif;
   --font-mono: "Martian Mono Variable", ui-monospace, monospace;
 
-  /* The fixed type scale from design_plan.md; Tailwind's default sizes are removed. */
   --text-*: initial;
   --text-caps: 0.625rem;
   --text-caps--line-height: 0.875rem;
@@ -68,6 +65,7 @@
   --text-display: 2rem;
   --text-display--line-height: 2.25rem;
 
+  --radius-xs: 0.125rem;
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
   --radius-lg: 0.625rem;
@@ -75,6 +73,19 @@
 
   --animate-progress: progress 1s ease-in-out infinite;
   --animate-flash: flash 1.6s ease-out;
+  --animate-tick: tick 1s ease-in-out infinite;
+
+  @keyframes tick {
+    0%,
+    100% {
+      opacity: 0.3;
+      transform: scaleY(0.4);
+    }
+    40% {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
 
   @keyframes flash {
     from {
@@ -191,7 +202,6 @@
 }
 
 @layer components {
-  /* Martian Mono is wide; the narrower width reads like an instrument readout and fits dense tables. */
   .font-mono {
     font-stretch: 87.5%;
   }

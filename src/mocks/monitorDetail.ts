@@ -1,41 +1,36 @@
-import { REGIONS } from "@/lib/monitors";
+import { LATENCY_THRESHOLD_MS } from "@/lib/format";
+import { DEFAULT_TIMEOUT_MS, regionCity } from "@/lib/monitors";
+import { uptimeStatus } from "@/lib/status";
 import type { Monitor, MonitorStatus, MonitorType, RegionCode } from "@/types/monitor";
 import type {
   AlertHistoryItem,
   AlertRule,
   ChartMarker,
-  CheckResult,
   DownBand,
   MonitorConfig,
   MonitorDetail,
   MonitorIncident,
+  RecentCheck,
   RegionStat,
   ResponseHistory,
   TimingHour,
   UptimeDay,
 } from "@/types/monitorDetail";
 import type { TimeRange } from "@/types/overview";
+import { hashString, RANGE_BUCKETS, seeded } from "./random";
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
-const TIMEOUT_MS = 10_000;
 const CHECK_ROUNDS = 12;
 const TYPICAL_MAX_MS = 420;
-
-const RANGE_BUCKETS: Record<TimeRange, { count: number; stepMinutes: number }> = {
-  "1h": { count: 60, stepMinutes: 1 },
-  "24h": { count: 288, stepMinutes: 5 },
-  "7d": { count: 168, stepMinutes: 60 },
-  "30d": { count: 180, stepMinutes: 240 },
-};
 
 const ASSERTIONS: Record<MonitorType, string[]> = {
   http: ["status_code in 200..299", "response_time < 1000 ms"],
   keyword: ['body contains "Book a call"', "status_code == 200"],
   json: ['json.status == "ok"', "json.checks.db == true", "response_time < 1500 ms"],
   ssl: ["ssl.days_left > 14", 'ssl.issuer contains "Let\'s Encrypt"'],
-  response_time: ["response_time < 800 ms", "status_code == 200"],
+  response_time: [`response_time < ${LATENCY_THRESHOLD_MS} ms`, "status_code == 200"],
 };
 
 const PAST_INCIDENTS = [
@@ -48,18 +43,6 @@ const PAST_INCIDENTS = [
 const DIPS = [99.95, 99.52, 97.9, 99.71, 99.2];
 
 const ASSIGNEES = ["Arjun Rao", "Meera Iyer", "Kabir Shah", "Ananya Das"];
-
-function seeded(seed: number) {
-  let value = seed;
-  return () => {
-    value = (value * 16807) % 2147483647;
-    return (value - 1) / 2147483646;
-  };
-}
-
-function hashId(id: string) {
-  return [...id].reduce((hash, char) => (hash * 31 + char.charCodeAt(0)) % 2147483647, 7) || 1;
-}
 
 function averageLatency(monitor: Monitor) {
   const average = monitor.latencyHistory.reduce((sum, value) => sum + value, 0) / monitor.latencyHistory.length;
@@ -80,7 +63,7 @@ function downBands(monitor: Monitor, rangeStart: number, now: number): DownBand[
 
 export function buildResponseHistory(monitor: Monitor, range: TimeRange): ResponseHistory {
   const { count, stepMinutes } = RANGE_BUCKETS[range];
-  const random = seeded(hashId(monitor.id) + count);
+  const random = seeded(hashString(monitor.id) + count);
   const now = Date.now();
   const end = Math.floor(now / 1000);
   const base = averageLatency(monitor);
@@ -137,7 +120,7 @@ function buildRegions(monitor: Monitor, random: () => number): RegionStat[] {
     const latency = Math.round(base * (0.85 + random() * 0.3) * (status === "degraded" ? 2.6 : 1));
     return {
       code,
-      city: REGIONS.find((region) => region.code === code)?.city ?? code,
+      city: regionCity(code),
       status,
       latencyMs: status === "down" || status === "paused" ? null : latency,
       p95Ms: Math.round(latency * (2 + random() * 0.6)),
@@ -155,7 +138,7 @@ function buildDays(monitor: Monitor, random: () => number): UptimeDay[] {
     const date = today.getTime() - (89 - index) * DAY;
     if (index === 89) return { date, uptime: monitor.uptime24h, incidents: monitor.status === "down" ? 1 : 0 };
     const uptime = special.get(index) ?? 100;
-    return { date, uptime, incidents: uptime < 99.9 ? (uptime < 98 ? 2 : 1) : 0 };
+    return { date, uptime, incidents: uptime < 99.9 ? (uptime < 99 ? 2 : 1) : 0 };
   });
 }
 
@@ -164,7 +147,7 @@ function checkStatus(monitor: Monitor, region: RegionCode, checkedAt: number): M
   return monitor.regions.find((item) => item.code === region)?.status ?? "up";
 }
 
-function buildChecks(monitor: Monitor, random: () => number): CheckResult[] {
+function buildChecks(monitor: Monitor, random: () => number): RecentCheck[] {
   const base = averageLatency(monitor);
   const latest = monitor.lastCheckedAt ?? Date.now();
 
@@ -179,7 +162,7 @@ function buildChecks(monitor: Monitor, random: () => number): CheckResult[] {
           checkedAt,
           region: code,
           statusCode: status === "down" ? (isGateway ? 502 : null) : 200,
-          responseMs: status === "down" ? (isGateway ? 1864 : TIMEOUT_MS) : responseMs,
+          responseMs: status === "down" ? (isGateway ? 1864 : DEFAULT_TIMEOUT_MS) : responseMs,
           status,
           error: checkError(status, isGateway, responseMs),
         };
@@ -203,7 +186,7 @@ function buildIncidents(monitor: Monitor, days: UptimeDay[], seed: number): Moni
       const startedAt = day.date + (9 + index * 3) * HOUR;
       return {
         id: `INC-${38 - index * 4}`,
-        severity: day.uptime !== null && day.uptime < 98 ? ("SEV 1" as const) : ("SEV 2" as const),
+        severity: uptimeStatus(day.uptime) === "down" ? ("SEV 1" as const) : ("SEV 2" as const),
         title: template.title,
         cause: template.cause,
         state: "Resolved" as const,
@@ -242,7 +225,7 @@ function buildRules(monitor: Monitor): AlertRule[] {
     {
       id: "rule_p95",
       name: "Slow p95",
-      expression: "p95(response_ms, 5m) > 800",
+      expression: `p95(response_ms, 5m) > ${LATENCY_THRESHOLD_MS}`,
       channels: [channel],
       isEnabled: true,
     },
@@ -285,7 +268,7 @@ function buildAlertHistory(monitor: Monitor, incidents: MonitorIncident[]): Aler
             rule: "Slow p95",
             firedAt: monitor.statusSince - 20 * MINUTE,
             state: monitor.status === "degraded" ? "firing" : "acknowledged",
-            detail: "p95 crossed 800 ms for 5 minutes",
+            detail: `p95 crossed ${LATENCY_THRESHOLD_MS} ms for 5 minutes`,
           },
         ]
       : [];
@@ -313,7 +296,7 @@ function buildConfig(monitor: Monitor): MonitorConfig {
     expectedStatus: "200–299",
     assertions: ASSERTIONS[monitor.type],
     intervalSec: monitor.intervalSec,
-    timeoutMs: TIMEOUT_MS,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
     regions: monitor.regions.map((region) => region.code),
     tags: monitor.tags,
     followRedirects: true,
@@ -333,7 +316,7 @@ function quarterUptime(days: UptimeDay[]) {
 }
 
 export function buildMonitorDetail(monitor: Monitor): MonitorDetail {
-  const seed = hashId(monitor.id);
+  const seed = hashString(monitor.id);
   const random = seeded(seed);
   const average = averageLatency(monitor);
   const days = buildDays(monitor, random);

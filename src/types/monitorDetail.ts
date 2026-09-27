@@ -1,3 +1,4 @@
+import type { Timings } from "./logs";
 import type { HttpMethod, MonitorStatus, RegionCode } from "./monitor";
 
 export type DetailTab = "overview" | "checks" | "incidents" | "alerts" | "settings";
@@ -21,11 +22,9 @@ export type ResponseHistory = {
   anomalies: ChartMarker[];
 };
 
-export type TimingPhase = "dns" | "connect" | "tls" | "ttfb" | "download";
-
 export type TimingHour = {
   hour: string;
-  phases: Record<TimingPhase, number>;
+  phases: Timings;
 };
 
 export type RegionStat = {
@@ -42,7 +41,7 @@ export type UptimeDay = {
   incidents: number;
 };
 
-export type CheckResult = {
+export type RecentCheck = {
   id: string;
   checkedAt: number;
   region: RegionCode;
@@ -108,7 +107,7 @@ export type MonitorDetail = {
   timing: TimingHour[];
   regions: RegionStat[];
   days: UptimeDay[];
-  checks: CheckResult[];
+  checks: RecentCheck[];
   incidents: MonitorIncident[];
   rules: AlertRule[];
   alertHistory: AlertHistoryItem[];

@@ -1,23 +1,18 @@
 import { Link, useParams } from "react-router";
 import { Card } from "@/components/ui/Card";
-import type { CheckResult } from "@/types/monitorDetail";
+import { paths } from "@/lib/paths";
+import type { RecentCheck } from "@/types/monitorDetail";
 import { ChecksTable } from "./ChecksTable";
 
-export function ChecksTab({ monitorId, checks }: { monitorId: string; checks: CheckResult[] }) {
-  const { orgSlug } = useParams();
+export function ChecksTab({ monitorId, checks }: { monitorId: string; checks: RecentCheck[] }) {
+  const { orgSlug = "" } = useParams();
   const failures = checks.filter((check) => check.status !== "up").length;
 
   return (
     <Card
-      title={
-        <>
-          Check results
-          <span className="font-mono text-xs font-normal text-subtle">
-            {checks.length} checks · {failures} failed
-          </span>
-        </>
-      }
-      extra={<Link to={`/o/${orgSlug}/logs?monitor=${monitorId}`}>Open in log explorer</Link>}
+      title="Check results"
+      meta={`${checks.length} checks · ${failures} failed`}
+      extra={<Link to={paths.logs(orgSlug, { monitor: monitorId })}>Open in log explorer</Link>}
       className="overflow-hidden"
     >
       <ChecksTable

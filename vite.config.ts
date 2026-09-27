@@ -11,7 +11,6 @@ export default defineConfig({
   build: {
     rolldownOptions: {
       output: {
-        // Vendors change far less often than app code, so they get their own long-cached chunks.
         codeSplitting: {
           groups: [
             { name: "react", test: /node_modules[\\/](react|react-dom|react-router|scheduler)[\\/]/, priority: 2 },

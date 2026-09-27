@@ -5,9 +5,9 @@ import { AuthHeading } from "@/components/auth/AuthHeading";
 import { AuthNotice } from "@/components/auth/AuthNotice";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useToast } from "@/hooks/useToast";
-import { readDemoState } from "@/lib/demoState";
 import { fakeRequest } from "@/lib/fakeRequest";
 import { DEFAULT_APP_PATH } from "@/lib/safeRedirect";
+import { readEnum } from "@/lib/searchParams";
 
 const STATES = ["valid", "signed-out", "expired", "revoked", "member", "mismatch"] as const;
 
@@ -17,7 +17,7 @@ export function InvitePage() {
   const confirm = useConfirm();
   const { token } = useParams();
   const [searchParams] = useSearchParams();
-  const state = readDemoState(searchParams, STATES, "valid");
+  const state = readEnum(searchParams, "state", STATES, "valid");
   const [isAccepting, startAccepting] = useTransition();
   const next = encodeURIComponent(`/invite/${token}`);
   const route = `POST /invites/${token}/accept`;

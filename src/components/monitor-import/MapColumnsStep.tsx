@@ -1,5 +1,7 @@
-import { Alert, Button, Select } from "antd";
+import { Alert, Button } from "antd";
+import { useId } from "react";
 import { LuArrowLeft, LuArrowRight, LuMoveRight } from "react-icons/lu";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 import {
   IMPORT_FIELDS,
   missingRequiredFields,
@@ -20,6 +22,7 @@ type MapColumnsStepProps = {
 };
 
 export function MapColumnsStep({ file, mapping, onChange, onBack, onContinue }: MapColumnsStepProps) {
+  const idPrefix = useId();
   const missing = missingRequiredFields(mapping);
   const firstRecord = file.records[0] ?? {};
   const headerOptions = [
@@ -49,7 +52,7 @@ export function MapColumnsStep({ file, mapping, onChange, onBack, onContinue }: 
           {IMPORT_FIELDS.map((field) => {
             const header = mapping[field.key];
             const isMissing = field.isRequired && !header;
-            const labelId = `map-${field.key}`;
+            const labelId = `${idPrefix}-${field.key}`;
             return (
               <div
                 role="row"
@@ -63,16 +66,15 @@ export function MapColumnsStep({ file, mapping, onChange, onBack, onContinue }: 
                   )}
                 </span>
                 <LuMoveRight aria-hidden className="size-4 text-subtle" />
-                <span role="cell" className="flex flex-col gap-1">
-                  <Select
+                <span role="cell">
+                  <CustomSelect
+                    size="middle"
                     aria-labelledby={labelId}
                     value={header ?? SKIP}
                     options={headerOptions}
-                    status={isMissing ? "error" : undefined}
+                    error={isMissing ? `Map a column to ${field.label.toLowerCase()}` : null}
                     onChange={(value) => onChange(field.key, value === SKIP ? null : value)}
-                    className="w-full"
                   />
-                  {isMissing && <span className="text-xs text-down">Map a column to {field.label.toLowerCase()}</span>}
                 </span>
                 <span role="cell" className="truncate font-mono text-xs text-subtle">
                   {header ? firstRecord[header] || "—" : "—"}

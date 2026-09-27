@@ -3,9 +3,9 @@ import { useEffect, useTransition } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { AuthNotice } from "@/components/auth/AuthNotice";
 import { useToast } from "@/hooks/useToast";
-import { readDemoState } from "@/lib/demoState";
 import { fakeRequest } from "@/lib/fakeRequest";
 import { DEFAULT_APP_PATH } from "@/lib/safeRedirect";
+import { readEnum } from "@/lib/searchParams";
 
 const STATES = ["verifying", "sent", "success", "expired"] as const;
 
@@ -13,13 +13,19 @@ export function VerifyEmailPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-  const state = readDemoState(searchParams, STATES, "verifying");
+  const state = readEnum(searchParams, "state", STATES, "verifying");
   const email = searchParams.get("email") ?? "arjun@pixelcraft.io";
   const [isSending, startSending] = useTransition();
 
   useEffect(() => {
     if (state !== "verifying") return;
-    fakeRequest(1200).then(() => setSearchParams({ state: "success" }, { replace: true }));
+    let isCancelled = false;
+    fakeRequest(1200).then(() => {
+      if (!isCancelled) setSearchParams({ state: "success" }, { replace: true });
+    });
+    return () => {
+      isCancelled = true;
+    };
   }, [state, setSearchParams]);
 
   function resend() {

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Tabs } from "antd";
-import { useParams, useSearchParams } from "react-router";
+import { useParams } from "react-router";
 import { monitorDetailQuery } from "@/api/monitorDetail";
 import { monitorsQuery } from "@/api/monitors";
 import { SectionErrorBoundary } from "@/components/errors/SectionErrorBoundary";
@@ -12,16 +12,18 @@ import { MonitorDetailSkeleton } from "@/components/monitor-detail/MonitorDetail
 import { MonitorHeader } from "@/components/monitor-detail/MonitorHeader";
 import { OverviewTab } from "@/components/monitor-detail/OverviewTab";
 import { SettingsTab } from "@/components/monitor-detail/SettingsTab";
-import { DETAIL_RANGES, DETAIL_TABS } from "@/lib/monitorDetail";
+import { CountBadge } from "@/components/ui/CountBadge";
+import { useSearchParam } from "@/hooks/useSearchParam";
+import { DETAIL_TABS } from "@/lib/monitorDetail";
+import { TIME_RANGES } from "@/lib/timeRange";
 import { InAppNotFoundPage } from "@/pages/NotFoundPage";
 import type { Monitor } from "@/types/monitor";
-import type { TimeRange } from "@/types/overview";
+import type { DetailTab } from "@/types/monitorDetail";
 
 export function MonitorDetailPage() {
   const { orgSlug = "", monitorId } = useParams();
-  const { data: monitors, error } = useQuery(monitorsQuery(orgSlug));
+  const { data: monitors } = useQuery(monitorsQuery(orgSlug));
 
-  if (error) throw error;
   if (!monitors) return <MonitorDetailSkeleton />;
 
   const monitor = monitors.find((item) => item.id === monitorId);
@@ -32,23 +34,9 @@ export function MonitorDetailPage() {
 
 function MonitorDetail({ monitor }: { monitor: Monitor }) {
   const { orgSlug = "" } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { data: detail, error } = useQuery(monitorDetailQuery(orgSlug, monitor));
-  const tab = DETAIL_TABS.find((value) => value === searchParams.get("tab")) ?? "overview";
-  const range = DETAIL_RANGES.find((value) => value === searchParams.get("range")) ?? "24h";
-
-  function updateParam(key: string, value: string, fallback: string) {
-    setSearchParams(
-      (params) => {
-        if (value === fallback) params.delete(key);
-        else params.set(key, value);
-        return params;
-      },
-      { replace: key === "range" },
-    );
-  }
-
-  if (error) throw error;
+  const { data: detail } = useQuery(monitorDetailQuery(orgSlug, monitor));
+  const [tab, setTab] = useSearchParam("tab", DETAIL_TABS, "overview");
+  const [range, setRange] = useSearchParam("range", TIME_RANGES, "24h", { replace: true });
 
   const activeIncident = detail?.incidents.find((incident) => incident.resolvedAt === null);
 
@@ -63,19 +51,12 @@ function MonitorDetail({ monitor }: { monitor: Monitor }) {
           {activeIncident && monitor.status === "down" && <IncidentBanner incident={activeIncident} />}
           <Tabs
             activeKey={tab}
-            onChange={(value) => updateParam("tab", value, "overview")}
+            onChange={(value) => setTab(value as DetailTab)}
             items={[
               {
                 key: "overview",
                 label: "Overview",
-                children: (
-                  <OverviewTab
-                    monitor={monitor}
-                    detail={detail}
-                    range={range}
-                    onRangeChange={(value: TimeRange) => updateParam("range", value, "24h")}
-                  />
-                ),
+                children: <OverviewTab monitor={monitor} detail={detail} range={range} onRangeChange={setRange} />,
               },
               {
                 key: "checks",
@@ -109,7 +90,7 @@ function TabLabel({ label, count }: { label: string; count: number }) {
   return (
     <span className="flex items-center gap-2">
       {label}
-      <span className="rounded-sm bg-hover px-1.5 font-mono text-xs text-muted">{count}</span>
+      <CountBadge count={count} isMuted />
     </span>
   );
 }

@@ -3,6 +3,7 @@ import { LayoutErrorBoundary, RootErrorBoundary } from "@/components/errors/Rout
 import { FullPageLoader } from "@/components/ui/FullPageLoader";
 import { RootLayout } from "@/layouts/RootLayout";
 import { lazyPage } from "@/lib/lazyPage";
+import { DEFAULT_APP_PATH } from "@/lib/safeRedirect";
 import { InAppNotFoundPage, NotFoundPage } from "@/pages/NotFoundPage";
 
 export const router = createBrowserRouter([
@@ -11,7 +12,7 @@ export const router = createBrowserRouter([
     ErrorBoundary: RootErrorBoundary,
     HydrateFallback: FullPageLoader,
     children: [
-      { path: "/", element: <Navigate to="/o/pixelcraft" replace /> },
+      { path: "/", element: <Navigate to={DEFAULT_APP_PATH} replace /> },
       {
         lazy: lazyPage(() => import("@/layouts/AuthLayout"), "AuthLayout"),
         children: [
@@ -60,6 +61,7 @@ export const router = createBrowserRouter([
                 path: "monitors/:monitorId",
                 lazy: lazyPage(() => import("@/pages/monitors/MonitorDetailPage"), "MonitorDetailPage"),
               },
+              { path: "logs", lazy: lazyPage(() => import("@/pages/logs/LogsPage"), "LogsPage") },
               {
                 path: "monitors/:monitorId/edit",
                 lazy: lazyPage(() => import("@/pages/monitors/EditMonitorPage"), "EditMonitorPage"),

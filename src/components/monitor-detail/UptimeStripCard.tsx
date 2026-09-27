@@ -1,9 +1,9 @@
 import { Tooltip } from "antd";
 import { StatusIcon } from "@/components/monitors/StatusIcon";
 import { Card } from "@/components/ui/Card";
-import { formatUptime } from "@/lib/format";
-import { dayStatus, formatDay } from "@/lib/monitorDetail";
-import { STATUS_FILL } from "@/lib/status";
+import { UptimeValue } from "@/components/monitors/UptimeValue";
+import { formatDay, formatUptime } from "@/lib/format";
+import { STATUS_FILL, UPTIME_THRESHOLDS, uptimeStatus } from "@/lib/status";
 import type { UptimeDay } from "@/types/monitorDetail";
 
 function describe(day: UptimeDay) {
@@ -14,31 +14,25 @@ function describe(day: UptimeDay) {
 
 export function UptimeStripCard({ days, uptime }: { days: UptimeDay[]; uptime: number | null }) {
   const labels = [0, 30, 60].map((index) => formatDay(days[index].date));
-  const badDays = days.filter((day) => dayStatus(day.uptime) !== "up").length;
+  const badDays = days.filter((day) => uptimeStatus(day.uptime) !== "up").length;
 
   return (
     <Card
-      title={
-        <>
-          Uptime · last 90 days
-          <span className="font-mono text-sm font-normal text-muted">
-            {uptime === null ? "—" : formatUptime(uptime)}
-          </span>
-        </>
-      }
+      title="Uptime · last 90 days"
+      meta={<UptimeValue value={uptime} className="text-sm" />}
       extra={
         <ul className="hidden items-center gap-4 text-xs text-muted sm:flex">
           <li className="flex items-center gap-1.5">
             <StatusIcon status="up" className="size-3.5" />
-            Operational ≥ 99.9%
+            Operational ≥ {UPTIME_THRESHOLDS.up}%
           </li>
           <li className="flex items-center gap-1.5">
             <StatusIcon status="degraded" className="size-3.5" />
-            Degraded ≥ 98%
+            Degraded ≥ {UPTIME_THRESHOLDS.degraded}%
           </li>
           <li className="flex items-center gap-1.5">
             <StatusIcon status="down" className="size-3.5" />
-            Down &lt; 98%
+            Down &lt; {UPTIME_THRESHOLDS.degraded}%
           </li>
         </ul>
       }
@@ -46,13 +40,13 @@ export function UptimeStripCard({ days, uptime }: { days: UptimeDay[]; uptime: n
       <div className="px-4 pb-4">
         <div className="flex h-8 gap-0.5">
           {days.map((day) => {
-            const status = dayStatus(day.uptime);
+            const status = uptimeStatus(day.uptime);
             return (
               <Tooltip key={day.date} title={<span className="font-mono">{describe(day)}</span>}>
                 <span
                   role="img"
                   aria-label={describe(day)}
-                  className={`flex-1 rounded-[1px] opacity-85 hover:opacity-100 ${status ? STATUS_FILL[status] : "bg-line-strong"}`}
+                  className={`flex-1 rounded-xs opacity-85 hover:opacity-100 ${status ? STATUS_FILL[status] : "bg-line-strong"}`}
                 />
               </Tooltip>
             );
@@ -66,8 +60,8 @@ export function UptimeStripCard({ days, uptime }: { days: UptimeDay[]; uptime: n
         </div>
         <p className="sr-only">
           {badDays === 0
-            ? "Every day in the last 90 met 99.9% uptime."
-            : `${badDays} of the last 90 days fell below 99.9% uptime.`}
+            ? `Every day in the last 90 met ${UPTIME_THRESHOLDS.up}% uptime.`
+            : `${badDays} of the last 90 days fell below ${UPTIME_THRESHOLDS.up}% uptime.`}
         </p>
       </div>
     </Card>

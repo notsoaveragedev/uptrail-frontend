@@ -1,5 +1,6 @@
 import { Button, Tooltip } from "antd";
 import { LuCloud, LuX } from "react-icons/lu";
+import { formatTime } from "@/lib/format";
 import { STEPS } from "@/lib/monitorForm";
 
 type WizardHeaderProps = {
@@ -24,7 +25,7 @@ export function WizardHeader({ step, savedAt, onClose }: WizardHeaderProps) {
           <LuCloud aria-hidden className="size-3.5" />
           Draft saved ·{" "}
           <time dateTime={new Date(savedAt).toISOString()} className="font-mono">
-            {new Date(savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })}
+            {formatTime(savedAt)}
           </time>
         </span>
       )}

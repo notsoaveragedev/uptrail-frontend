@@ -1,15 +1,18 @@
-import { formatInterval, MONITOR_TYPE_LABELS } from "@/lib/monitors";
+import { csvRow } from "./csv";
+import { formatInterval, MONITOR_TYPE_LABELS } from "./monitors";
+import { readEnum, readList, readSort, type SortState } from "./searchParams";
+import { STATUS_RANK } from "./status";
 import type { Monitor, MonitorStatus, MonitorType } from "@/types/monitor";
 
 export type SortKey = "status" | "name" | "latency" | "uptime" | "checked";
 
-export type MonitorFilters = {
+type MonitorFilters = {
   query: string;
   statuses: MonitorStatus[];
   types: MonitorType[];
   projects: string[];
   tags: string[];
-  sort: { key: SortKey; isDescending: boolean };
+  sort: SortState<SortKey>;
   page: number;
   view: "table" | "cards";
 };
@@ -24,24 +27,22 @@ export const SORT_LABELS: Record<SortKey, string> = {
   checked: "Last checked",
 };
 
-const STATUS_RANK: Record<MonitorStatus, number> = { down: 0, degraded: 1, paused: 2, up: 3 };
+export const DEFAULT_SORT: SortState<SortKey> = { key: "status", isDescending: false };
 
-function readList<Value extends string>(params: URLSearchParams, key: string) {
-  return (params.get(key)?.split(",").filter(Boolean) ?? []) as Value[];
-}
+const SORT_KEYS = Object.keys(SORT_LABELS) as SortKey[];
+
+const VIEWS: MonitorFilters["view"][] = ["table", "cards"];
 
 export function readFilters(params: URLSearchParams): MonitorFilters {
-  const sort = params.get("sort") ?? "status";
-  const key = sort.replace(/^-/, "") as SortKey;
   return {
     query: params.get("q") ?? "",
-    statuses: readList<MonitorStatus>(params, "status"),
-    types: readList<MonitorType>(params, "type"),
+    statuses: readList(params, "status") as MonitorStatus[],
+    types: readList(params, "type") as MonitorType[],
     projects: readList(params, "project"),
     tags: readList(params, "tag"),
-    sort: { key: key in SORT_LABELS ? key : "status", isDescending: sort.startsWith("-") },
+    sort: readSort(params, SORT_KEYS, DEFAULT_SORT),
     page: Math.max(1, Number(params.get("page")) || 1),
-    view: params.get("view") === "cards" ? "cards" : "table",
+    view: readEnum(params, "view", VIEWS, "table"),
   };
 }
 
@@ -97,26 +98,12 @@ function exportRow(monitor: Monitor) {
   };
 }
 
-function csvCell(value: string) {
-  return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
-}
-
 const EXPORT_HEADERS = ["name", "url", "type", "method", "interval", "regions", "project", "tags", "status"];
 
 export function toCsv(monitors: Monitor[]) {
-  const rows = monitors.map((monitor) => Object.values(exportRow(monitor)).map(csvCell).join(","));
-  return [EXPORT_HEADERS.join(","), ...rows].join("\n");
+  return [csvRow(EXPORT_HEADERS), ...monitors.map((monitor) => csvRow(Object.values(exportRow(monitor))))].join("\n");
 }
 
 export function toJson(monitors: Monitor[]) {
   return JSON.stringify(monitors.map(exportRow), null, 2);
-}
-
-export function downloadFile(content: string, fileName: string, type: string) {
-  const url = URL.createObjectURL(new Blob([content], { type }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  link.click();
-  URL.revokeObjectURL(url);
 }

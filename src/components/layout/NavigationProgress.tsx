@@ -1,6 +1,5 @@
 import { useNavigation } from "react-router";
 
-// Thin bar at the top while a lazy route's code (or data) is loading.
 export function NavigationProgress() {
   const isNavigating = useNavigation().state !== "idle";
   if (!isNavigating) return null;

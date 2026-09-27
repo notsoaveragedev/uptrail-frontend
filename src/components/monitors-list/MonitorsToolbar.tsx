@@ -7,10 +7,9 @@ import { StatusIcon } from "@/components/monitors/StatusIcon";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { useMonitorFilters } from "@/hooks/useMonitorFilters";
 import { countBy, SORT_LABELS, type SortKey } from "@/lib/monitorList";
-import { MONITOR_TYPE_LABELS, TAGS } from "@/lib/monitors";
+import { MONITOR_TYPE_LABELS, MONITOR_TYPE_VALUES, PROJECT_OPTIONS, TAGS } from "@/lib/monitors";
 import { STATUS_LABELS, STATUSES } from "@/lib/status";
-import { projects } from "@/mocks/workspace";
-import type { Monitor, MonitorType } from "@/types/monitor";
+import type { Monitor } from "@/types/monitor";
 import { FacetFilter } from "./FacetFilter";
 
 export function MonitorsToolbar({ monitors }: { monitors: Monitor[] }) {
@@ -56,7 +55,7 @@ export function MonitorsToolbar({ monitors }: { monitors: Monitor[] }) {
         label="Type"
         selected={filters.types}
         onChange={(values) => setParam("type", values)}
-        options={(Object.keys(MONITOR_TYPE_LABELS) as MonitorType[]).map((type) => ({
+        options={MONITOR_TYPE_VALUES.map((type) => ({
           value: type,
           label: MONITOR_TYPE_LABELS[type],
           count: typeCounts[type],
@@ -66,9 +65,7 @@ export function MonitorsToolbar({ monitors }: { monitors: Monitor[] }) {
         label="Project"
         selected={filters.projects}
         onChange={(values) => setParam("project", values)}
-        options={projects
-          .filter((project) => project.value !== "all")
-          .map((project) => ({ value: project.value, label: project.label, count: projectCounts[project.value] }))}
+        options={PROJECT_OPTIONS.map((project) => ({ ...project, count: projectCounts[project.value] }))}
       />
       <FacetFilter
         label="Tags"

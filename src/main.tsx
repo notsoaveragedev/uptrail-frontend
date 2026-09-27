@@ -13,7 +13,6 @@ import { queryClient } from "@/lib/queryClient";
 import { router } from "@/router";
 import { ThemeProvider } from "@/theme/ThemeProvider";
 
-// antd tokens are written in px; this converts antd's generated CSS to rem (1rem = 16px).
 const px2rem = px2remTransformer({ rootValue: 16 });
 
 createRoot(document.getElementById("root")!).render(

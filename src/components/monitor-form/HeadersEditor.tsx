@@ -1,4 +1,5 @@
 import { Button, Tooltip } from "antd";
+import { useId } from "react";
 import { LuLock, LuLockOpen, LuPlus, LuTrash2 } from "react-icons/lu";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { newHeaderRow, type HeaderRow, type MonitorFieldProps } from "@/lib/monitorForm";
@@ -7,6 +8,7 @@ const ROW_GRID = "grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)_2rem_2rem] items-s
 
 export function HeadersEditor({ values, errors, onChange }: MonitorFieldProps) {
   const headers = values.headers;
+  const labelId = useId();
 
   function updateRow(id: string, patch: Partial<HeaderRow>) {
     onChange({ headers: headers.map((row) => (row.id === id ? { ...row, ...patch } : row)) });
@@ -15,14 +17,14 @@ export function HeadersEditor({ values, errors, onChange }: MonitorFieldProps) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span id="headers-label" className="font-medium text-ink">
+        <span id={labelId} className="font-medium text-ink">
           Headers
         </span>
         <span className="text-xs text-muted">Secret values are encrypted at rest</span>
       </div>
 
       {headers.length > 0 && (
-        <div role="group" aria-labelledby="headers-label" className="flex flex-col gap-2">
+        <div role="group" aria-labelledby={labelId} className="flex flex-col gap-2">
           <div className={`${ROW_GRID} text-caps font-semibold tracking-wider text-subtle uppercase`}>
             <span>Key</span>
             <span>Value</span>

@@ -1,21 +1,10 @@
-import { MONITORS } from "@/mocks/monitors";
+import { LATENCY_THRESHOLD_MS } from "@/lib/format";
 import type { Monitor } from "@/types/monitor";
 import type { Overview, ResponseSeries, TimeRange } from "@/types/overview";
+import { monitorStore } from "./monitorStore";
+import { RANGE_BUCKETS, seeded } from "./random";
 
-function seeded(seed: number) {
-  let value = seed;
-  return () => {
-    value = (value * 16807) % 2147483647;
-    return (value - 1) / 2147483646;
-  };
-}
-
-const RANGE_BUCKETS: Record<TimeRange, { count: number; stepMinutes: number }> = {
-  "1h": { count: 60, stepMinutes: 1 },
-  "24h": { count: 288, stepMinutes: 5 },
-  "7d": { count: 168, stepMinutes: 60 },
-  "30d": { count: 180, stepMinutes: 240 },
-};
+const OVERVIEW_MONITOR_COUNT = 10;
 
 function responseSeries(range: TimeRange): ResponseSeries {
   const { count, stepMinutes } = RANGE_BUCKETS[range];
@@ -48,7 +37,7 @@ export function buildOverview(range: TimeRange): Overview {
       openIncidentsPrevious: 3,
       mttrMinutes: 14,
     },
-    monitors: MONITORS.slice(0, 10),
+    monitors: monitorStore.list().slice(0, OVERVIEW_MONITOR_COUNT),
     totalMonitors: 42,
     statusCounts: { up: 38, degraded: 2, down: 1, paused: 1 },
     anomalies: ["p95 spiked to 1.18 s at 14:05", "BOM latency is up 40% since 13:50"],
@@ -103,7 +92,7 @@ export function buildOverview(range: TimeRange): Overview {
       },
       {
         id: "al2",
-        rule: "p95(latency) > 800 for 5m",
+        rule: `p95(latency) > ${LATENCY_THRESHOLD_MS} for 5m`,
         monitorName: "Search service",
         time: "12m ago",
         state: "acknowledged",

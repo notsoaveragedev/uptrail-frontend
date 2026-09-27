@@ -3,6 +3,7 @@ import { useId } from "react";
 import type { IconType } from "react-icons";
 import { LuHash, LuMail, LuWebhook } from "react-icons/lu";
 import { FieldShell } from "@/components/ui/FieldShell";
+import { toggleItem } from "@/lib/list";
 import { alertRuleFor, CHANNELS, type ChannelId, type MonitorFieldProps } from "@/lib/monitorForm";
 
 const CHANNEL_ICONS: Record<ChannelId, IconType> = { email: LuMail, slack: LuHash, discord: LuWebhook };
@@ -11,10 +12,6 @@ export function AlertsStep({ values, errors, onChange }: MonitorFieldProps) {
   const switchId = useId();
   const channelsLabelId = useId();
   const channelsMessageId = useId();
-
-  function toggleChannel(id: ChannelId, isChecked: boolean) {
-    onChange({ channels: isChecked ? [...values.channels, id] : values.channels.filter((channel) => channel !== id) });
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -54,7 +51,7 @@ export function AlertsStep({ values, errors, onChange }: MonitorFieldProps) {
                 <label key={channel.id} className="flex cursor-pointer items-center gap-3 px-4 py-3 hover:bg-hover">
                   <Checkbox
                     checked={values.channels.includes(channel.id)}
-                    onChange={(event) => toggleChannel(channel.id, event.target.checked)}
+                    onChange={() => onChange({ channels: toggleItem(values.channels, channel.id) })}
                   />
                   <Icon aria-hidden className="size-4 text-muted" />
                   <span className="flex flex-col">

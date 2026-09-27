@@ -6,8 +6,8 @@ import { NewPasswordField } from "@/components/auth/NewPasswordField";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { useForm } from "@/hooks/useForm";
 import { useToast } from "@/hooks/useToast";
-import { readDemoState } from "@/lib/demoState";
 import { fakeRequest } from "@/lib/fakeRequest";
+import { readEnum } from "@/lib/searchParams";
 import { resetPasswordSchema } from "@/lib/schemas";
 
 const STATES = ["valid", "expired"] as const;
@@ -16,7 +16,7 @@ export function ResetPasswordPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const [searchParams] = useSearchParams();
-  const state = readDemoState(searchParams, STATES, "valid");
+  const state = readEnum(searchParams, "state", STATES, "valid");
 
   const { formProps, fieldErrors, formError, isPending } = useForm({
     schema: resetPasswordSchema,

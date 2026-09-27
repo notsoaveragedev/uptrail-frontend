@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router";
 import { SectionErrorBoundary } from "@/components/errors/SectionErrorBoundary";
 import { Card } from "@/components/ui/Card";
+import { paths } from "@/lib/paths";
 import type { Monitor } from "@/types/monitor";
 import type { MonitorDetail } from "@/types/monitorDetail";
 import type { TimeRange } from "@/types/overview";
@@ -21,7 +22,7 @@ type OverviewTabProps = {
 };
 
 export function OverviewTab({ monitor, detail, range, onRangeChange }: OverviewTabProps) {
-  const { orgSlug } = useParams();
+  const { orgSlug = "" } = useParams();
 
   return (
     <div className="flex flex-col gap-4">
@@ -49,7 +50,7 @@ export function OverviewTab({ monitor, detail, range, onRangeChange }: OverviewT
       <SectionErrorBoundary>
         <Card
           title="Recent checks"
-          extra={<Link to={`/o/${orgSlug}/logs?monitor=${monitor.id}`}>View all checks</Link>}
+          extra={<Link to={paths.logs(orgSlug, { monitor: monitor.id })}>View all checks</Link>}
           className="overflow-hidden"
         >
           <ChecksTable checks={detail.checks.slice(0, RECENT_CHECKS)} />

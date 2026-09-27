@@ -1,6 +1,6 @@
 import { Tooltip } from "antd";
 import { Card } from "@/components/ui/Card";
-import { TIMING_PHASES } from "@/lib/monitorDetail";
+import { TIMING_PHASES } from "@/lib/timing";
 import type { TimingHour } from "@/types/monitorDetail";
 
 function total(hour: TimingHour) {
@@ -52,7 +52,7 @@ export function TimingBreakdownCard({ timing }: { timing: TimingHour[] }) {
         <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
           {averages.map((phase) => (
             <li key={phase.key} className="flex items-center gap-1.5">
-              <span className={`size-2 rounded-[1px] ${phase.fill}`} />
+              <span className={`size-2 rounded-xs ${phase.fill}`} />
               {phase.label}
               <span className="font-mono text-ink">{phase.average}</span>
               <span className="font-mono text-subtle">ms</span>

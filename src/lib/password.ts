@@ -1,4 +1,4 @@
-export type PasswordRule = {
+type PasswordRule = {
   label: string;
   passed: boolean;
 };
@@ -7,7 +7,7 @@ const STRENGTH_LABELS = ["Too weak", "Weak", "Fair", "Good", "Strong"];
 
 const BREACHED_PASSWORDS = ["password123", "Password123", "Qwerty12345", "Welcome2024"];
 
-export function getPasswordRules(password: string): PasswordRule[] {
+function getPasswordRules(password: string): PasswordRule[] {
   return [
     { label: "At least 8 characters", passed: password.length >= 8 },
     { label: "Upper and lowercase letters", passed: /[a-z]/.test(password) && /[A-Z]/.test(password) },

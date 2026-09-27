@@ -1,15 +1,18 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LuFileSpreadsheet, LuFileJson } from "react-icons/lu";
-import { Link, useBlocker, useParams, useSearchParams } from "react-router";
+import { Link, useParams, useSearchParams } from "react-router";
 import { addMonitors, monitorsQuery } from "@/api/monitors";
 import { ImportStep } from "@/components/monitor-import/ImportStep";
 import { ImportSteps } from "@/components/monitor-import/ImportSteps";
 import { MapColumnsStep } from "@/components/monitor-import/MapColumnsStep";
-import { ReviewStep } from "@/components/monitor-import/ReviewStep";
+import { ImportReviewStep } from "@/components/monitor-import/ImportReviewStep";
 import { UploadStep } from "@/components/monitor-import/UploadStep";
+import { MetaList } from "@/components/ui/MetaList";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useToast } from "@/hooks/useToast";
+import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
 import { fakeRequest } from "@/lib/fakeRequest";
 import {
   autoMapColumns,
@@ -22,6 +25,7 @@ import {
   type ImportRow,
   type ParsedFile,
 } from "@/lib/importMonitors";
+import { paths } from "@/lib/paths";
 import type { Monitor } from "@/types/monitor";
 
 type Step = "upload" | "map" | "review" | "import";
@@ -48,9 +52,8 @@ export function ImportMonitorsPage() {
   const [excludedIds, setExcludedIds] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState({ total: 0, completed: 0, currentName: "", isDone: false });
   const isUnmounted = useRef(false);
-  const isConfirmingLeave = useRef(false);
 
-  const monitorsPath = `/o/${orgSlug}/monitors`;
+  const monitorsPath = paths.monitors(orgSlug);
   const errorsById = useMemo(() => validateRows(rows, monitors ?? []), [rows, monitors]);
   const steps = (
     file?.format === "json"
@@ -58,25 +61,11 @@ export function ImportMonitorsPage() {
       : (["upload", "map", "review", "import"] as const)
   ).map((key) => ({ key, label: STEP_LABELS[key] }));
 
-  const hasUnsavedWork = file !== null && !progress.isDone;
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) => hasUnsavedWork && currentLocation.pathname !== nextLocation.pathname,
-  );
-
-  useEffect(() => {
-    if (blocker.state !== "blocked" || isConfirmingLeave.current) return;
-    isConfirmingLeave.current = true;
-    void confirm({
-      title: "Leave this import?",
-      description: "The file and any fixes you made will be discarded.",
-      confirmLabel: "Leave",
-      isDanger: true,
-    }).then((shouldLeave) => {
-      isConfirmingLeave.current = false;
-      if (shouldLeave) blocker.proceed();
-      else blocker.reset();
-    });
-  }, [blocker, confirm]);
+  useUnsavedChangesGuard({
+    isDirty: file !== null && !progress.isDone,
+    title: "Leave this import?",
+    description: "The file and any fixes you made will be discarded.",
+  });
 
   useEffect(() => {
     isUnmounted.current = false;
@@ -168,19 +157,15 @@ export function ImportMonitorsPage() {
     <>
       <title>Import monitors · Uptrail</title>
       <div className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 tabIndex={-1} className="text-lg font-semibold tracking-tight outline-none">
-              Import monitors
-            </h1>
-            <p className="mt-1 text-muted">
-              Bring monitors over from another tool with a CSV or JSON file. Nothing is created until you confirm.
-            </p>
-          </div>
-          <Link to={monitorsPath} className="text-muted hover:text-ink">
-            Cancel
-          </Link>
-        </div>
+        <PageHeader
+          title="Import monitors"
+          meta="Bring monitors over from another tool with a CSV or JSON file. Nothing is created until you confirm."
+          actions={
+            <Link to={monitorsPath} className="text-muted hover:text-ink">
+              Cancel
+            </Link>
+          }
+        />
 
         <section aria-label="Import monitors" className="flex flex-col rounded-lg border border-line bg-card">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
@@ -201,7 +186,7 @@ export function ImportMonitorsPage() {
           )}
 
           {step === "review" && file && (
-            <ReviewStep
+            <ImportReviewStep
               rows={rows}
               errorsById={errorsById}
               excludedIds={excludedIds}
@@ -233,11 +218,12 @@ export function ImportMonitorsPage() {
 function FileChip({ file }: { file: ParsedFile }) {
   const Icon = file.format === "json" ? LuFileJson : LuFileSpreadsheet;
   return (
-    <span className="flex min-w-0 items-center gap-2 text-xs text-muted">
-      <Icon aria-hidden className="size-3.5 shrink-0 text-subtle" />
-      <span className="truncate font-mono text-ink">{file.fileName}</span>
-      <span className="text-faint">·</span>
+    <MetaList className="min-w-0 text-xs text-muted">
+      <span className="flex min-w-0 items-center gap-2">
+        <Icon aria-hidden className="size-3.5 shrink-0 text-subtle" />
+        <span className="truncate font-mono text-ink">{file.fileName}</span>
+      </span>
       <span className="shrink-0 font-mono">{file.records.length} rows</span>
-    </span>
+    </MetaList>
   );
 }

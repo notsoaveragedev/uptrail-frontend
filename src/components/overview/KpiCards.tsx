@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import type { IconType } from "react-icons";
 import { LuActivity, LuGauge, LuShieldCheck, LuSiren } from "react-icons/lu";
 import { CheckTrail } from "@/components/monitors/CheckTrail";
-import { STATUS_FILL, STATUS_LABELS, STATUSES } from "@/lib/status";
+import { StatusDot } from "@/components/ui/StatusDot";
+import { STATUS_FILL, STATUS_LABELS, STATUSES, TONE_BADGE } from "@/lib/status";
 import type { MonitorStatus } from "@/types/monitor";
 import type { Kpis, StatusCounts } from "@/types/overview";
 
@@ -45,7 +46,7 @@ export function KpiCards({ kpis, counts, totalMonitors }: KpiCardsProps) {
           <span className="flex gap-3">
             {STATUSES.map((status) => (
               <span key={status} title={STATUS_LABELS[status]} className="flex items-center gap-1.5">
-                <span className={`size-1.5 rounded-full ${STATUS_FILL[status]}`} />
+                <StatusDot fill={STATUS_FILL[status]} />
                 {counts[status]}
               </span>
             ))}
@@ -99,9 +100,5 @@ function KpiCard({ icon: Icon, label, sublabel, value, unit, visual, caption, pi
 }
 
 function DeltaPill({ tone, children }: { tone: "good" | "bad"; children: ReactNode }) {
-  return (
-    <span className={`rounded-sm px-1.5 py-0.5 ${tone === "good" ? "bg-up-soft text-up" : "bg-down-soft text-down"}`}>
-      {children}
-    </span>
-  );
+  return <span className={`rounded-sm px-1.5 py-0.5 ${TONE_BADGE[tone === "good" ? "up" : "down"]}`}>{children}</span>;
 }

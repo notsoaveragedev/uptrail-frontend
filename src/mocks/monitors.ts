@@ -1,20 +1,10 @@
+import { statusTrail } from "@/lib/status";
 import type { HttpMethod, Monitor, MonitorStatus, MonitorType, RegionCode } from "@/types/monitor";
+import { seeded } from "./random";
 
 const CHECK_COUNT = 30;
 const HISTORY_COUNT = 24;
 const HOUR = 3_600_000;
-
-function seeded(seed: number) {
-  let value = seed;
-  return () => {
-    value = (value * 16807) % 2147483647;
-    return (value - 1) / 2147483646;
-  };
-}
-
-function checks(fill: MonitorStatus, overrides: Record<number, MonitorStatus> = {}) {
-  return Array.from({ length: CHECK_COUNT }, (_, index) => overrides[index] ?? fill);
-}
 
 function history(base: number, seed: number) {
   const random = seeded(seed);
@@ -69,7 +59,7 @@ function monitor(seed: Seed, index: number): Monitor {
       ["BOM", "FRA", "IAD"],
       status === "paused" ? { BOM: "paused", FRA: "paused", IAD: "paused" } : seed.regionOverrides,
     ),
-    checks: checks(status === "paused" ? "paused" : "up", seed.checkOverrides),
+    checks: statusTrail(CHECK_COUNT, status === "paused" ? "paused" : "up", seed.checkOverrides),
     latencyHistory: history(base, index * 17 + 3),
     lastCheckedAt: secondsAgo(seed.lastCheckedSec),
   };

@@ -1,6 +1,6 @@
 export type JsonTokenKind = "key" | "string" | "literal" | "plain";
 
-export type JsonToken = { kind: JsonTokenKind; text: string };
+type JsonToken = { kind: JsonTokenKind; text: string };
 
 const TOKEN_PATTERN = /("(?:\\.|[^"\\])*")(\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g;
 

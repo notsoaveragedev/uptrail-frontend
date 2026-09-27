@@ -1,13 +1,13 @@
+import type { Timings } from "@/types/logs";
 import type { HttpMethod, RegionCode } from "@/types/monitor";
-
-export type TimingPhase = "DNS" | "Connect" | "TLS" | "TTFB" | "Download";
+import { hashString, seeded } from "./random";
 
 export type TestResult = {
   ok: boolean;
   statusCode: number | null;
   statusText: string;
   totalMs: number;
-  timings: { phase: TimingPhase; ms: number }[];
+  timings: Timings;
   body: string;
   sizeBytes: number;
   region: RegionCode;
@@ -15,20 +15,6 @@ export type TestResult = {
 };
 
 type TestRequest = { url: string; method: HttpMethod; timeoutMs: number; region: RegionCode };
-
-function hash(text: string) {
-  let value = 2166136261;
-  for (const char of text) value = Math.imul(value ^ char.charCodeAt(0), 16777619);
-  return value >>> 0;
-}
-
-function seeded(seed: number) {
-  let value = seed % 2147483647 || 1;
-  return () => {
-    value = (value * 16807) % 2147483647;
-    return (value - 1) / 2147483646;
-  };
-}
 
 function between(random: () => number, min: number, max: number) {
   return Math.round(min + random() * (max - min));
@@ -38,14 +24,14 @@ function result(
   request: TestRequest,
   statusCode: number | null,
   statusText: string,
-  timings: TestResult["timings"],
+  timings: Timings,
   body: string,
 ): TestResult {
   return {
     ok: statusCode !== null && statusCode < 400,
     statusCode,
     statusText,
-    totalMs: timings.reduce((total, timing) => total + timing.ms, 0),
+    totalMs: Object.values(timings).reduce((total, ms) => total + ms, 0),
     timings,
     body,
     sizeBytes: new TextEncoder().encode(body).length,
@@ -73,7 +59,7 @@ function successBody(request: TestRequest, random: () => number) {
 }
 
 export function runFakeTest(request: TestRequest): TestResult {
-  const random = seeded(hash(`${request.method} ${request.url} ${request.region}`));
+  const random = seeded(hashString(`${request.method} ${request.url} ${request.region}`));
   const isHttps = request.url.startsWith("https://");
   const dns = between(random, 3, 14);
   const connect = between(random, 12, 40);
@@ -84,30 +70,24 @@ export function runFakeTest(request: TestRequest): TestResult {
       request,
       null,
       "Timed out",
-      [
-        { phase: "DNS", ms: dns },
-        { phase: "Connect", ms: connect },
-        { phase: "TLS", ms: tls },
-        { phase: "TTFB", ms: Math.max(request.timeoutMs - dns - connect - tls, 0) },
-        { phase: "Download", ms: 0 },
-      ],
+      { dns, connect, tls, ttfb: Math.max(request.timeoutMs - dns - connect - tls, 0), download: 0 },
       "",
     );
   }
 
-  const timings: TestResult["timings"] = [
-    { phase: "DNS", ms: dns },
-    { phase: "Connect", ms: connect },
-    { phase: "TLS", ms: tls },
-    { phase: "TTFB", ms: between(random, 90, 320) },
-    { phase: "Download", ms: between(random, 4, 30) },
-  ];
+  const timings: Timings = {
+    dns,
+    connect,
+    tls,
+    ttfb: between(random, 90, 320),
+    download: between(random, 4, 30),
+  };
 
   if (request.url.includes("fail")) {
     const body = {
       error: "upstream_unavailable",
       message: "No healthy upstream",
-      request_id: `req_${hash(request.url).toString(16)}`,
+      request_id: `req_${hashString(request.url).toString(16)}`,
     };
     return result(request, 503, "Service Unavailable", timings, JSON.stringify(body, null, 2));
   }

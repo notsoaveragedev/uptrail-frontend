@@ -1,3 +1,4 @@
+import { LATENCY_THRESHOLD_MS } from "@/lib/format";
 import type { AppNotification, Organization } from "@/types/workspace";
 
 export const currentUser = {
@@ -12,13 +13,6 @@ export const organizations: Organization[] = [
   { slug: "shopnest", name: "Shopnest", initials: "SN", role: "Viewer" },
 ];
 
-export const projects = [
-  { value: "all", label: "All projects" },
-  { value: "shopnest", label: "Shopnest" },
-  { value: "pixelcraft", label: "Pixelcraft" },
-  { value: "bluepeak", label: "Bluepeak" },
-];
-
 export const notifications: AppNotification[] = [
   {
     id: "n1",
@@ -31,7 +25,7 @@ export const notifications: AppNotification[] = [
   {
     id: "n2",
     title: "Search service degraded",
-    detail: "p95 1.24 s, above the 800 ms threshold",
+    detail: `p95 1.24 s, above the ${LATENCY_THRESHOLD_MS} ms threshold`,
     time: "12m",
     tone: "degraded",
     isUnread: true,

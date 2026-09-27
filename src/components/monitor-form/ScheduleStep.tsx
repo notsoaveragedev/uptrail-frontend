@@ -2,8 +2,9 @@ import { Checkbox, Segmented } from "antd";
 import { useId } from "react";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { FieldShell } from "@/components/ui/FieldShell";
-import { INTERVALS, monthlyChecks, PROJECT_OPTIONS, type MonitorFieldProps } from "@/lib/monitorForm";
-import { formatInterval, REGIONS, TAGS } from "@/lib/monitors";
+import { toggleItem } from "@/lib/list";
+import { INTERVALS, monthlyChecks, type MonitorFieldProps } from "@/lib/monitorForm";
+import { formatInterval, PROJECT_OPTIONS, REGIONS, TAGS } from "@/lib/monitors";
 import type { RegionCode } from "@/types/monitor";
 
 export function ScheduleStep({ values, errors, onChange }: MonitorFieldProps) {
@@ -11,8 +12,8 @@ export function ScheduleStep({ values, errors, onChange }: MonitorFieldProps) {
   const regionsLabelId = useId();
   const regionsMessageId = useId();
 
-  function toggleRegion(code: RegionCode, isChecked: boolean) {
-    const regions = isChecked ? [...values.regions, code] : values.regions.filter((region) => region !== code);
+  function toggleRegion(code: RegionCode) {
+    const regions = toggleItem(values.regions, code);
     onChange({ regions: REGIONS.map((region) => region.code).filter((region) => regions.includes(region)) });
   }
 
@@ -54,7 +55,7 @@ export function ScheduleStep({ values, errors, onChange }: MonitorFieldProps) {
                   isChecked ? "border-line-strong bg-hover" : "border-line hover:border-line-strong"
                 }`}
               >
-                <Checkbox checked={isChecked} onChange={(event) => toggleRegion(region.code, event.target.checked)} />
+                <Checkbox checked={isChecked} onChange={() => toggleRegion(region.code)} />
                 <span className="font-mono text-xs font-semibold text-ink">{region.code}</span>
                 <span className="text-muted">{region.city}</span>
               </label>

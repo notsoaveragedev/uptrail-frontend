@@ -1,14 +1,13 @@
 import type { IconType } from "react-icons";
 import { LuBraces, LuGauge, LuGlobe, LuShieldCheck, LuTextSearch } from "react-icons/lu";
 import { z } from "zod";
-import { runFakeTest } from "@/mocks/monitorTest";
-import { projects } from "@/mocks/workspace";
 import type { HttpMethod, Monitor, MonitorType, RegionCode } from "@/types/monitor";
-import { formatInterval, REGIONS } from "./monitors";
+import { LATENCY_THRESHOLD_MS } from "./format";
+import { DEFAULT_TIMEOUT_MS, formatInterval, HTTP_METHODS, MONITOR_TYPE_VALUES, projectLabel } from "./monitors";
 
 export type HeaderRow = { id: string; key: string; value: string; isSecret: boolean };
 
-export type JsonOperator = "eq" | "neq" | "contains" | "gt" | "lt";
+type JsonOperator = "eq" | "neq" | "contains" | "gt" | "lt";
 
 export type ChannelId = "email" | "slack" | "discord";
 
@@ -86,8 +85,6 @@ export const MONITOR_TYPES: { value: MonitorType; label: string; description: st
   },
 ];
 
-export const METHODS: HttpMethod[] = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"];
-
 export const JSON_OPERATORS: { value: JsonOperator; label: string; symbol: string }[] = [
   { value: "eq", label: "equals", symbol: "==" },
   { value: "neq", label: "does not equal", symbol: "!=" },
@@ -103,8 +100,6 @@ export const CHANNELS: { id: ChannelId; label: string; detail: string }[] = [
   { id: "slack", label: "#oncall", detail: "Slack · pixelcraft.slack.com" },
   { id: "discord", label: "Discord webhook", detail: "#status-alerts" },
 ];
-
-export const PROJECT_OPTIONS = projects.filter((project) => project.value !== "all");
 
 export const MAX_TIMEOUT_MS = 30_000;
 
@@ -123,7 +118,7 @@ export const DEFAULT_VALUES: MonitorFormValues = {
   method: "GET",
   headers: [],
   body: "",
-  timeoutMs: "10000",
+  timeoutMs: String(DEFAULT_TIMEOUT_MS),
   followRedirects: true,
   expectedStatus: "200-299",
   keyword: "",
@@ -131,7 +126,7 @@ export const DEFAULT_VALUES: MonitorFormValues = {
   jsonPath: "$.status",
   jsonOperator: "eq",
   jsonValue: "",
-  maxLatencyMs: "800",
+  maxLatencyMs: String(LATENCY_THRESHOLD_MS),
   sslWarnDays: "14",
   intervalSec: 60,
   regions: ["BOM", "FRA", "IAD"],
@@ -178,7 +173,7 @@ function wholeNumber(label: string, min: number, max: number) {
 
 const expectedStatus = z.string().regex(STATUS_CODES_PATTERN, "Use status codes or ranges, like 200-299, 301.");
 
-const typeSchema = z.object({ type: z.enum(["http", "keyword", "json", "ssl", "response_time"]) });
+const typeSchema = z.object({ type: z.enum(MONITOR_TYPE_VALUES) });
 
 const requestSchema = z
   .object({
@@ -188,7 +183,7 @@ const requestSchema = z
       .trim()
       .min(1, "Enter the URL to check.")
       .refine(isHttpUrl, "Enter a valid URL. It must start with http:// or https://"),
-    method: z.enum(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"]),
+    method: z.enum(HTTP_METHODS),
     headers: z.array(
       z
         .object({ key: z.string(), value: z.string() })
@@ -266,7 +261,7 @@ export function isSameForm(a: MonitorFormValues, b: MonitorFormValues) {
 
 export function alertRuleFor(values: MonitorFormValues) {
   if (values.type === "ssl") return `ssl_days_remaining < ${values.sslWarnDays || 14}`;
-  if (values.type === "response_time") return `latency_ms > ${values.maxLatencyMs || 800} for 5m`;
+  if (values.type === "response_time") return `latency_ms > ${values.maxLatencyMs || LATENCY_THRESHOLD_MS} for 5m`;
   return `status == "down" for 2m`;
 }
 
@@ -274,8 +269,8 @@ export function monthlyChecks(values: MonitorFormValues) {
   return Math.round((30 * 24 * 3600) / values.intervalSec) * values.regions.length;
 }
 
-export type ReviewRow = { label: string; value: string; isMono?: boolean };
-export type ReviewSection = { step: StepKey; title: string; rows: ReviewRow[] };
+type ReviewRow = { label: string; value: string; isMono?: boolean };
+type ReviewSection = { step: StepKey; title: string; rows: ReviewRow[] };
 
 function headersSummary(headers: HeaderRow[]) {
   const filled = headers.filter((row) => row.key.trim());
@@ -300,10 +295,6 @@ function assertionRows(values: MonitorFormValues): ReviewRow[] {
   if (values.type === "ssl")
     return [{ label: "Warn before expiry", value: `${values.sslWarnDays} days`, isMono: true }];
   return [status];
-}
-
-function projectLabel(value: string) {
-  return PROJECT_OPTIONS.find((project) => project.value === value)?.label ?? value;
 }
 
 function channelLabels(channels: ChannelId[]) {
@@ -400,89 +391,4 @@ export function configFromMonitor(monitor: Monitor): MonitorFormValues {
     project: monitor.project,
     tags: monitor.tags,
   };
-}
-
-export function updatedMonitor(monitor: Monitor, values: MonitorFormValues): Monitor {
-  return {
-    ...monitor,
-    name: values.name.trim(),
-    url: values.url.trim(),
-    type: values.type,
-    method: values.method,
-    intervalSec: values.intervalSec,
-    project: values.project,
-    tags: values.tags,
-    regions: values.regions.map(
-      (code) => monitor.regions.find((region) => region.code === code) ?? { code, status: monitor.status },
-    ),
-  };
-}
-
-export function createdMonitor(values: MonitorFormValues): Monitor {
-  const now = Date.now();
-  const region = values.regions[0] ?? "BOM";
-  const firstCheck = runFakeTest({
-    url: values.url.trim(),
-    method: values.method,
-    timeoutMs: Number(values.timeoutMs),
-    region,
-  });
-  const status = firstCheck.ok ? "up" : "down";
-  const base: Monitor = {
-    id: `mon_${crypto.randomUUID().slice(0, 8)}`,
-    name: "",
-    url: "",
-    type: values.type,
-    method: values.method,
-    intervalSec: values.intervalSec,
-    project: values.project,
-    tags: [],
-    status,
-    statusSince: now,
-    latencyMs: firstCheck.ok ? firstCheck.totalMs : null,
-    uptime24h: firstCheck.ok ? 100 : 0,
-    uptime30d: firstCheck.ok ? 100 : 0,
-    regions: [],
-    checks: [status],
-    latencyHistory: [firstCheck.totalMs, firstCheck.totalMs],
-    lastCheckedAt: now,
-  };
-  return { ...updatedMonitor(base, values), status };
-}
-
-export type MonitorDraft = { values: MonitorFormValues; step: number; savedAt: number };
-
-function draftKey(orgSlug: string) {
-  return `uptrail:monitor-draft:${orgSlug}`;
-}
-
-export function readDraft(orgSlug: string): MonitorDraft | null {
-  try {
-    const draft = JSON.parse(localStorage.getItem(draftKey(orgSlug)) ?? "null") as MonitorDraft | null;
-    if (!draft?.values || typeof draft.savedAt !== "number") return null;
-    const step = Math.min(Math.max(Number(draft.step) || 0, 0), STEPS.length - 1);
-    return { values: { ...DEFAULT_VALUES, ...draft.values }, step, savedAt: draft.savedAt };
-  } catch {
-    return null;
-  }
-}
-
-export function writeDraft(orgSlug: string, draft: MonitorDraft) {
-  try {
-    localStorage.setItem(draftKey(orgSlug), JSON.stringify(draft));
-  } catch {
-    return;
-  }
-}
-
-export function removeDraft(orgSlug: string) {
-  try {
-    localStorage.removeItem(draftKey(orgSlug));
-  } catch {
-    return;
-  }
-}
-
-export function regionCity(code: RegionCode) {
-  return REGIONS.find((region) => region.code === code)?.city ?? code;
 }

@@ -2,7 +2,8 @@ import { Switch } from "antd";
 import { useId } from "react";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { CustomSelect } from "@/components/ui/CustomSelect";
-import { MAX_TIMEOUT_MS, methodHasBody, METHODS, type MonitorFieldProps } from "@/lib/monitorForm";
+import { MAX_TIMEOUT_MS, methodHasBody, type MonitorFieldProps } from "@/lib/monitorForm";
+import { HTTP_METHODS } from "@/lib/monitors";
 import { BodyEditor } from "./BodyEditor";
 import { HeadersEditor } from "./HeadersEditor";
 
@@ -30,7 +31,7 @@ export function RequestStep({ values, errors, onChange }: MonitorFieldProps) {
             aria-label="HTTP method"
             value={values.method}
             onChange={(method) => onChange({ method })}
-            options={METHODS.map((method) => ({ value: method, label: method }))}
+            options={HTTP_METHODS.map((method) => ({ value: method, label: method }))}
             className="w-full font-mono"
             popupMatchSelectWidth={false}
           />

@@ -2,22 +2,19 @@ import { LuCircleCheck } from "react-icons/lu";
 import { Link, useParams } from "react-router";
 import { Card } from "@/components/ui/Card";
 import { useNow } from "@/hooks/useNow";
-import { formatDateTime, formatSpan, INCIDENT_STATE_TONE } from "@/lib/monitorDetail";
+import { StatusDot } from "@/components/ui/StatusDot";
+import { formatDateTime, formatElapsed } from "@/lib/format";
+import { INCIDENT_STATE_TONE } from "@/lib/monitorDetail";
+import { paths } from "@/lib/paths";
+import { TONE_BADGE } from "@/lib/status";
 import type { MonitorIncident } from "@/types/monitorDetail";
 
 export function IncidentsTab({ incidents }: { incidents: MonitorIncident[] }) {
-  const { orgSlug } = useParams();
+  const { orgSlug = "" } = useParams();
   const now = useNow(30_000);
 
   return (
-    <Card
-      title={
-        <>
-          Incidents <span className="font-mono text-xs font-normal text-subtle">last 90 days</span>
-        </>
-      }
-      extra={<Link to={`/o/${orgSlug}/incidents`}>All incidents</Link>}
-    >
+    <Card title="Incidents" meta="last 90 days" extra={<Link to={paths.incidents(orgSlug)}>All incidents</Link>}>
       {incidents.length === 0 ? (
         <p className="flex items-center gap-2 px-4 pb-4 text-muted">
           <LuCircleCheck aria-hidden className="size-4 text-up" />
@@ -28,11 +25,11 @@ export function IncidentsTab({ incidents }: { incidents: MonitorIncident[] }) {
           {incidents.map((incident) => (
             <li key={incident.id} className="border-b border-line last:border-b-0">
               <Link
-                to={`/o/${orgSlug}/incidents/${incident.id}`}
+                to={paths.incident(orgSlug, incident.id)}
                 className="grid grid-cols-[4rem_minmax(0,1fr)_7rem_6rem] items-center gap-4 px-4 py-3 text-ink hover:bg-hover hover:text-ink sm:grid-cols-[4rem_minmax(0,1fr)_7rem_6rem_7rem]"
               >
                 <span
-                  className={`w-fit rounded-sm px-1.5 py-0.5 font-mono text-xs ${incident.severity === "SEV 1" ? "bg-down-soft text-down" : "bg-degraded-soft text-degraded"}`}
+                  className={`w-fit rounded-sm px-1.5 py-0.5 font-mono text-xs ${TONE_BADGE[incident.severity === "SEV 1" ? "down" : "degraded"]}`}
                 >
                   {incident.severity}
                 </span>
@@ -44,11 +41,11 @@ export function IncidentsTab({ incidents }: { incidents: MonitorIncident[] }) {
                   <span className="truncate text-muted">{incident.cause}</span>
                 </span>
                 <span className={`flex items-center gap-1.5 ${INCIDENT_STATE_TONE[incident.state]}`}>
-                  <span className="size-1.5 rounded-full bg-current" />
+                  <StatusDot />
                   {incident.state}
                 </span>
                 <span className="text-right font-mono text-xs text-muted">
-                  {formatSpan((incident.resolvedAt ?? now) - incident.startedAt)}
+                  {formatElapsed((incident.resolvedAt ?? now) - incident.startedAt)}
                   {incident.resolvedAt === null && <span className="block text-down">ongoing</span>}
                 </span>
                 <span className="hidden text-right font-mono text-xs text-subtle sm:block">

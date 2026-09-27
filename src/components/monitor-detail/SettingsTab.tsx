@@ -3,15 +3,16 @@ import type { ReactNode } from "react";
 import { LuLock, LuPencil } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router";
 import { Card } from "@/components/ui/Card";
-import { formatInterval, REGIONS } from "@/lib/monitors";
+import { formatInterval, regionCity } from "@/lib/monitors";
+import { paths } from "@/lib/paths";
 import type { MonitorConfig } from "@/types/monitorDetail";
 
 const MASK = "••••••••••••";
 
 export function SettingsTab({ monitorId, config }: { monitorId: string; config: MonitorConfig }) {
-  const { orgSlug } = useParams();
+  const { orgSlug = "" } = useParams();
   const navigate = useNavigate();
-  const editMonitor = () => navigate(`/o/${orgSlug}/monitors/${monitorId}/edit`);
+  const editMonitor = () => navigate(paths.monitorEdit(orgSlug, monitorId));
 
   return (
     <div className="flex flex-col gap-4">
@@ -86,7 +87,7 @@ export function SettingsTab({ monitorId, config }: { monitorId: string; config: 
                 {config.regions.map((code) => (
                   <li key={code}>
                     <span className="font-mono text-xs">{code}</span>{" "}
-                    <span className="text-muted">{REGIONS.find((region) => region.code === code)?.city}</span>
+                    <span className="text-muted">{regionCity(code)}</span>
                   </li>
                 ))}
               </ul>

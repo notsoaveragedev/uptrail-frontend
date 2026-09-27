@@ -1,6 +1,7 @@
 import { Dropdown } from "antd";
 import { LuCheck, LuChevronsUpDown, LuPlus } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router";
+import { paths } from "@/lib/paths";
 import { organizations } from "@/mocks/workspace";
 
 export function OrgSwitcher() {
@@ -26,7 +27,7 @@ export function OrgSwitcher() {
   return (
     <Dropdown
       trigger={["click"]}
-      menu={{ items, onClick: ({ key }) => key !== "new" && navigate(`/o/${key}`) }}
+      menu={{ items, onClick: ({ key }) => key !== "new" && navigate(paths.overview(key)) }}
       popupRender={(menu) => <div className="w-56">{menu}</div>}
     >
       <button

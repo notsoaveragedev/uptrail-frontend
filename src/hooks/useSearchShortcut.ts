@@ -1,21 +1,12 @@
-import { useEffect, useEffectEvent } from "react";
-
-function isTypingTarget(target: EventTarget | null) {
-  const element = target as HTMLElement | null;
-  return !!element && (element.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(element.tagName));
-}
+import { isTypingTarget } from "@/lib/dom";
+import { useWindowKeydown } from "./useWindowKeydown";
 
 export function useSearchShortcut(onToggle: () => void) {
-  const handleKeyDown = useEffectEvent((event: KeyboardEvent) => {
+  useWindowKeydown((event) => {
     const isModK = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
     const isSlash = event.key === "/" && !isTypingTarget(event.target);
     if (!isModK && !isSlash) return;
     event.preventDefault();
     onToggle();
   });
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
 }

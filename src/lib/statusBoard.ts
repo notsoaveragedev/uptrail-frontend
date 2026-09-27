@@ -1,6 +1,7 @@
 import type { MonitorStatus } from "@/types/monitor";
+import { statusTrail } from "./status";
 
-export type BoardMonitor = {
+type BoardMonitor = {
   name: string;
   url: string;
   status: MonitorStatus;
@@ -12,7 +13,7 @@ export type BoardMonitor = {
 const CHECK_COUNT = 40;
 
 function trail(fill: MonitorStatus, overrides: Record<number, MonitorStatus> = {}) {
-  return Array.from({ length: CHECK_COUNT }, (_, index) => overrides[index] ?? fill);
+  return statusTrail(CHECK_COUNT, fill, overrides);
 }
 
 export const BOARD_MONITORS: BoardMonitor[] = [

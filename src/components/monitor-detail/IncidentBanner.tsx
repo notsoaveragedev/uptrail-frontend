@@ -1,11 +1,13 @@
 import { LuCircleAlert } from "react-icons/lu";
 import { Link, useParams } from "react-router";
+import { MetaSeparator } from "@/components/ui/MetaList";
 import { useNow } from "@/hooks/useNow";
 import { formatDuration } from "@/lib/format";
+import { paths } from "@/lib/paths";
 import type { MonitorIncident } from "@/types/monitorDetail";
 
 export function IncidentBanner({ incident }: { incident: MonitorIncident }) {
-  const { orgSlug } = useParams();
+  const { orgSlug = "" } = useParams();
   const now = useNow();
 
   return (
@@ -18,26 +20,18 @@ export function IncidentBanner({ incident }: { incident: MonitorIncident }) {
         Incident {incident.id} · {incident.title}
       </span>
       <span className="text-down">Critical</span>
-      <Separator />
+      <MetaSeparator />
       <span className="text-down">{incident.state}</span>
-      <Separator />
+      <MetaSeparator />
       <span className="text-muted">{incident.cause}</span>
-      <Separator />
+      <MetaSeparator />
       <span className="text-muted">Assigned to {incident.assignee}</span>
       <span className="ml-auto flex items-center gap-4">
         <span className="font-mono text-xs text-down">{formatDuration(now - incident.startedAt)}</span>
-        <Link to={`/o/${orgSlug}/incidents/${incident.id}`} className="font-medium">
+        <Link to={paths.incident(orgSlug, incident.id)} className="font-medium">
           View incident →
         </Link>
       </span>
     </div>
-  );
-}
-
-function Separator() {
-  return (
-    <span aria-hidden className="text-faint">
-      ·
-    </span>
   );
 }

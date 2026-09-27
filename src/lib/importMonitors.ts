@@ -1,14 +1,14 @@
 import { z } from "zod";
-import { MONITOR_TYPE_LABELS, REGIONS } from "@/lib/monitors";
-import { projects } from "@/mocks/workspace";
-import type { HttpMethod, Monitor, MonitorType, RegionCode } from "@/types/monitor";
+import { parseCsv } from "@/lib/csv";
+import { HTTP_METHODS, MONITOR_TYPE_LABELS, MONITOR_TYPE_VALUES, PROJECT_OPTIONS, REGIONS } from "@/lib/monitors";
+import type { Monitor, MonitorType, RegionCode } from "@/types/monitor";
 
-export const MAX_IMPORT_BYTES = 1024 * 1024;
+const MAX_IMPORT_BYTES = 1024 * 1024;
 
 export type ImportField =
   "name" | "url" | "type" | "method" | "interval" | "regions" | "project" | "tags" | "expected_status";
 
-export type ImportFieldInfo = {
+type ImportFieldInfo = {
   key: ImportField;
   label: string;
   isRequired: boolean;
@@ -52,7 +52,7 @@ export const IMPORT_FIELDS: ImportFieldInfo[] = [
   },
 ];
 
-export type ImportValues = Record<ImportField, string>;
+type ImportValues = Record<ImportField, string>;
 
 export type ImportRow = {
   id: string;
@@ -71,10 +71,7 @@ export type ParsedFile = {
   records: Record<string, string>[];
 };
 
-const MONITOR_TYPES: MonitorType[] = ["http", "keyword", "json", "ssl", "response_time"];
-const HTTP_METHODS: HttpMethod[] = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"];
 const REGION_CODES = REGIONS.map((region) => region.code);
-const PROJECT_OPTIONS = projects.filter((project) => project.value !== "all");
 const DEFAULT_REGIONS: RegionCode[] = ["BOM", "FRA", "IAD"];
 const TYPE_ALIASES: Record<string, MonitorType> = {
   https: "http",
@@ -84,49 +81,6 @@ const TYPE_ALIASES: Record<string, MonitorType> = {
   responsetime: "response_time",
   latency: "response_time",
 };
-
-export function parseCsv(text: string) {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let field = "";
-  let isQuoted = false;
-
-  for (let index = 0; index < text.length; index++) {
-    const char = text[index];
-
-    if (isQuoted) {
-      if (char === '"' && text[index + 1] === '"') {
-        field += '"';
-        index++;
-      } else if (char === '"') {
-        isQuoted = false;
-      } else {
-        field += char;
-      }
-    } else if (char === '"') {
-      isQuoted = true;
-    } else if (char === ",") {
-      row.push(field);
-      field = "";
-    } else if (char === "\n" || char === "\r") {
-      if (char === "\r" && text[index + 1] === "\n") index++;
-      row.push(field);
-      rows.push(row);
-      row = [];
-      field = "";
-    } else {
-      field += char;
-    }
-  }
-
-  if (isQuoted) throw new Error("The CSV has an unclosed quote.");
-  if (field || row.length) {
-    row.push(field);
-    rows.push(row);
-  }
-
-  return rows.filter((cells) => cells.some((cell) => cell.trim()));
-}
 
 function csvToFile(fileName: string, text: string): ParsedFile {
   const [headerRow, ...dataRows] = parseCsv(text.replace(/^\uFEFF/, ""));
@@ -220,7 +174,7 @@ function splitList(value: string) {
 function parseType(value: string) {
   const key = value.trim().toLowerCase();
   if (!key) return "http";
-  return TYPE_ALIASES[key] ?? MONITOR_TYPES.find((type) => type === key) ?? null;
+  return TYPE_ALIASES[key] ?? MONITOR_TYPE_VALUES.find((type) => type === key) ?? null;
 }
 
 function parseMethod(value: string) {
@@ -229,7 +183,7 @@ function parseMethod(value: string) {
   return HTTP_METHODS.find((method) => method === key) ?? null;
 }
 
-export function parseInterval(value: string) {
+function parseInterval(value: string) {
   if (!value.trim()) return 60;
   const match = /^(\d+)\s*(s|m|h)?$/i.exec(value.trim());
   if (!match) return null;
@@ -276,7 +230,7 @@ const FIELD_SCHEMAS: Record<ImportField, z.ZodType<string>> = {
       message: "URL must start with http:// or https://",
     }),
   type: z.string().refine((value) => parseType(value) !== null, {
-    message: `Type must be one of ${MONITOR_TYPES.join(", ")}`,
+    message: `Type must be one of ${MONITOR_TYPE_VALUES.join(", ")}`,
   }),
   method: z.string().refine((value) => parseMethod(value) !== null, {
     message: `Method must be one of ${HTTP_METHODS.join(", ")}`,
@@ -307,7 +261,7 @@ const FIELD_SCHEMAS: Record<ImportField, z.ZodType<string>> = {
   }),
 };
 
-export function validateValues(values: ImportValues) {
+function validateValues(values: ImportValues) {
   const errors: RowErrors = {};
   for (const field of IMPORT_FIELDS) {
     const result = FIELD_SCHEMAS[field.key].safeParse(values[field.key]);

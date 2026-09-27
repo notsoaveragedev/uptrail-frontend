@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { removeDraft, writeDraft, type MonitorFormValues } from "@/lib/monitorForm";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { removeDraft, writeDraft } from "@/lib/monitorDraft";
+import type { MonitorFormValues } from "@/lib/monitorForm";
 
 type UseMonitorDraftOptions = {
   orgSlug: string;
@@ -9,29 +10,33 @@ type UseMonitorDraftOptions = {
   initialSavedAt: number | null;
 };
 
+const AUTOSAVE_DELAY_MS = 600;
+
+function snapshotOf(values: MonitorFormValues, step: number) {
+  return JSON.stringify({ values, step });
+}
+
 export function useMonitorDraft({ orgSlug, values, step, isDirty, initialSavedAt }: UseMonitorDraftOptions) {
   const [savedAt, setSavedAt] = useState(initialSavedAt);
-  const [initialSnapshot] = useState(() => (initialSavedAt ? JSON.stringify({ values, step }) : ""));
+  const [initialSnapshot] = useState(() => (initialSavedAt ? snapshotOf(values, step) : ""));
   const lastSavedRef = useRef(initialSnapshot);
-
-  useEffect(() => {
-    const snapshot = JSON.stringify({ values, step });
-    if (!isDirty || snapshot === lastSavedRef.current) return;
-    const timer = setTimeout(() => {
-      const now = Date.now();
-      writeDraft(orgSlug, { values, step, savedAt: now });
-      lastSavedRef.current = snapshot;
-      setSavedAt(now);
-    }, 600);
-    return () => clearTimeout(timer);
-  }, [orgSlug, values, step, isDirty]);
 
   function save() {
     const now = Date.now();
     writeDraft(orgSlug, { values, step, savedAt: now });
-    lastSavedRef.current = JSON.stringify({ values, step });
+    lastSavedRef.current = snapshotOf(values, step);
     setSavedAt(now);
   }
+
+  const autosave = useEffectEvent(() => {
+    if (snapshotOf(values, step) !== lastSavedRef.current) save();
+  });
+
+  useEffect(() => {
+    if (!isDirty) return;
+    const timer = setTimeout(autosave, AUTOSAVE_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [orgSlug, values, step, isDirty]);
 
   function clear() {
     removeDraft(orgSlug);

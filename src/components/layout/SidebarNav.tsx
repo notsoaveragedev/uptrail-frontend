@@ -1,5 +1,7 @@
 import { NavLink, useParams } from "react-router";
 import { NAV_GROUPS, SETTINGS_ITEM, type NavItem } from "@/lib/navigation";
+import { paths } from "@/lib/paths";
+import { TONE_BADGE } from "@/lib/status";
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -22,12 +24,12 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function SidebarLink({ item, onNavigate }: { item: NavItem; onNavigate?: () => void }) {
-  const { orgSlug } = useParams();
+  const { orgSlug = "" } = useParams();
   const Icon = item.icon;
 
   return (
     <NavLink
-      to={item.path ? `/o/${orgSlug}/${item.path}` : `/o/${orgSlug}`}
+      to={paths.section(orgSlug, item.path)}
       end={!item.path}
       onClick={onNavigate}
       className={({ isActive }) =>
@@ -41,9 +43,7 @@ function SidebarLink({ item, onNavigate }: { item: NavItem; onNavigate?: () => v
       <Icon aria-hidden className="size-4" />
       <span className="flex-1">{item.label}</span>
       {item.count !== undefined && (
-        <span
-          className={`rounded-sm px-1.5 font-mono text-xs ${item.isUrgent ? "bg-down-soft text-down" : "text-subtle"}`}
-        >
+        <span className={`rounded-sm px-1.5 font-mono text-xs ${item.isUrgent ? TONE_BADGE.down : "text-subtle"}`}>
           {item.count}
         </span>
       )}

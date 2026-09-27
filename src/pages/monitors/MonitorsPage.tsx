@@ -10,26 +10,23 @@ import { MonitorsHeader } from "@/components/monitors-list/MonitorsHeader";
 import { MonitorsTable } from "@/components/monitors-list/MonitorsTable";
 import { MonitorsToolbar } from "@/components/monitors-list/MonitorsToolbar";
 import { useMonitorFilters } from "@/hooks/useMonitorFilters";
+import { toggleItem } from "@/lib/list";
 import { filterMonitors } from "@/lib/monitorList";
+import { paths } from "@/lib/paths";
 import type { MonitorStatus } from "@/types/monitor";
 
 export function MonitorsPage() {
   const navigate = useNavigate();
   const { orgSlug = "" } = useParams();
-  const { data: monitors = [], isPending, error } = useQuery(monitorsQuery(orgSlug));
+  const { data: monitors = [], isPending } = useQuery(monitorsQuery(orgSlug));
   const { filters, hasFilters, setParam, clear } = useMonitorFilters();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
-  if (error) throw error;
 
   const visible = filterMonitors(monitors, filters);
   const liveSelection = selectedIds.filter((id) => monitors.some((monitor) => monitor.id === id));
 
   function toggleStatus(status: MonitorStatus) {
-    const next = filters.statuses.includes(status)
-      ? filters.statuses.filter((item) => item !== status)
-      : [...filters.statuses, status];
-    setParam("status", next);
+    setParam("status", toggleItem(filters.statuses, status));
   }
 
   const emptyState = hasFilters ? (
@@ -38,7 +35,7 @@ export function MonitorsPage() {
     </Empty>
   ) : (
     <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No monitors yet. Add a URL to start checking it.">
-      <Button type="primary" onClick={() => navigate(`/o/${orgSlug}/monitors/new`)}>
+      <Button type="primary" onClick={() => navigate(paths.monitorNew(orgSlug))}>
         Create monitor
       </Button>
     </Empty>
@@ -70,7 +67,7 @@ export function MonitorsPage() {
               isLoading={isPending}
               selectedIds={liveSelection}
               onSelect={setSelectedIds}
-              emptyText={<div className="py-8">{emptyState}</div>}
+              emptyText={<div className="py-8">{isPending ? <div className="h-40" /> : emptyState}</div>}
             />
           )}
         </SectionErrorBoundary>

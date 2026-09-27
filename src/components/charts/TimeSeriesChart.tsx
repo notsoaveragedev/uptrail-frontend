@@ -1,23 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import uPlot from "uplot";
 import "uplot/dist/uPlot.min.css";
+import { readCssVar, rootFontSize } from "@/lib/dom";
+import { formatDateTime } from "@/lib/format";
 import { useThemeMode } from "@/theme/ThemeContext";
+import type { ChartMarker, DownBand } from "@/types/monitorDetail";
 
-export type ChartSeries = {
+type ChartSeries = {
   label: string;
   values: (number | null)[];
   colorVar: string;
-};
-
-export type ChartBand = {
-  start: number;
-  end: number;
-  label: string;
-};
-
-export type ChartPoint = {
-  timestamp: number;
-  value: number;
 };
 
 type TimeSeriesChartProps = {
@@ -25,14 +17,14 @@ type TimeSeriesChartProps = {
   series: ChartSeries[];
   threshold?: number;
   thresholdLabel?: string;
-  bands?: ChartBand[];
-  markers?: ChartPoint[];
+  bands?: DownBand[];
+  markers?: ChartMarker[];
   height?: number;
   formatValue: (value: number) => string;
 };
 
-const NO_BANDS: ChartBand[] = [];
-const NO_MARKERS: ChartPoint[] = [];
+const NO_BANDS: DownBand[] = [];
+const NO_MARKERS: ChartMarker[] = [];
 
 type Cursor = {
   index: number;
@@ -40,28 +32,20 @@ type Cursor = {
   top: number;
 };
 
-function readVar(name: string) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-function formatTime(seconds: number) {
-  return new Date(seconds * 1000).toLocaleString([], {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+function axisFont() {
+  const sizePx = parseFloat(readCssVar("--text-xs")) * rootFontSize();
+  return `${sizePx}px ${readCssVar("--font-mono")}`;
 }
 
 function scaleFont(font: string) {
-  return font.replace(/^(\d+)px/, (_match, size: string) => `${Number(size) * devicePixelRatio}px`);
+  return font.replace(/^([\d.]+)px/, (_match, size: string) => `${Number(size) * devicePixelRatio}px`);
 }
 
 function formatPoint(value: number | null | undefined, formatValue: (value: number) => string) {
   return value == null ? "—" : formatValue(value);
 }
 
-function drawBands(chart: uPlot, bands: ChartBand[], color: string, font: string) {
+function drawBands(chart: uPlot, bands: DownBand[], color: string, font: string) {
   const { ctx, bbox } = chart;
   ctx.save();
   ctx.font = scaleFont(font);
@@ -86,7 +70,7 @@ function drawBands(chart: uPlot, bands: ChartBand[], color: string, font: string
   ctx.restore();
 }
 
-function drawMarkers(chart: uPlot, markers: ChartPoint[], color: string) {
+function drawMarkers(chart: uPlot, markers: ChartMarker[], color: string) {
   const { ctx } = chart;
   ctx.save();
   ctx.strokeStyle = color;
@@ -123,10 +107,10 @@ export function TimeSeriesChart({
     const container = containerRef.current;
     if (!container) return;
 
-    const font = `11px ${readVar("--font-mono")}`;
-    const axis = { stroke: readVar("--subtle"), font, ticks: { show: false } };
-    const thresholdColor = readVar("--down");
-    const markerColor = readVar("--degraded");
+    const font = axisFont();
+    const axis = { stroke: readCssVar("--subtle"), font, ticks: { show: false } };
+    const thresholdColor = readCssVar("--down");
+    const markerColor = readCssVar("--degraded");
 
     const chart = new uPlot(
       {
@@ -140,7 +124,7 @@ export function TimeSeriesChart({
           {
             ...axis,
             size: 56,
-            grid: { stroke: readVar("--grid"), width: 1 },
+            grid: { stroke: readCssVar("--grid"), width: 1 },
             values: (_chart, splits) => splits.map(formatValue),
           },
         ],
@@ -148,7 +132,7 @@ export function TimeSeriesChart({
           {},
           ...series.map((item) => ({
             label: item.label,
-            stroke: readVar(item.colorVar),
+            stroke: readCssVar(item.colorVar),
             width: 1.5,
             points: { show: false },
           })),
@@ -213,7 +197,7 @@ export function TimeSeriesChart({
             transform: `translate(${cursor.left > 400 ? "-110%" : "10%"}, -50%)`,
           }}
         >
-          <p className="font-mono text-xs text-subtle">{formatTime(timestamps[cursor.index])}</p>
+          <p className="font-mono text-xs text-subtle">{formatDateTime(timestamps[cursor.index] * 1000)}</p>
           {series.map((item) => (
             <p key={item.label} className="mt-1 flex items-center gap-2 text-xs">
               <span className="h-0.5 w-3 rounded-full" style={{ background: `var(${item.colorVar})` }} />

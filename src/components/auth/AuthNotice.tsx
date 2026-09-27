@@ -1,12 +1,12 @@
-import { Spin } from "antd";
 import type { ReactNode } from "react";
 import { LuCircleCheck, LuCircleX, LuClock, LuMail } from "react-icons/lu";
+import { Loader } from "@/components/ui/Loader";
 import { AuthHeading } from "./AuthHeading";
 
 type Tone = "pending" | "info" | "success" | "warning" | "error";
 
 const TONE_ICONS: Record<Tone, ReactNode> = {
-  pending: <Spin size="small" />,
+  pending: <Loader label="Working" />,
   info: <LuMail className="text-muted" />,
   success: <LuCircleCheck className="text-up" />,
   warning: <LuClock className="text-degraded" />,

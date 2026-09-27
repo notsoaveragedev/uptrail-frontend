@@ -1,9 +1,9 @@
 import { Table, type TableColumnsType, type TablePaginationConfig } from "antd";
 import { StatusLabel } from "@/components/monitors/StatusLabel";
-import { formatClock } from "@/lib/monitorDetail";
-import type { CheckResult } from "@/types/monitorDetail";
+import { formatClock } from "@/lib/format";
+import type { RecentCheck } from "@/types/monitorDetail";
 
-const COLUMNS: TableColumnsType<CheckResult> = [
+const COLUMNS: TableColumnsType<RecentCheck> = [
   {
     title: "Time",
     key: "time",
@@ -54,7 +54,7 @@ const COLUMNS: TableColumnsType<CheckResult> = [
 ];
 
 type ChecksTableProps = {
-  checks: CheckResult[];
+  checks: RecentCheck[];
   pagination?: false | TablePaginationConfig;
 };
 

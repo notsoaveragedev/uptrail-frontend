@@ -11,7 +11,6 @@ export function isChunkLoadError(error: unknown) {
   );
 }
 
-// A missing chunk usually means a new deploy. Browsers cache failed imports, so reload once, never in a loop.
 export async function importWithReload<Module>(load: () => Promise<Module>) {
   try {
     const module = await load();
@@ -27,7 +26,6 @@ export async function importWithReload<Module>(load: () => Promise<Module>) {
   }
 }
 
-// Route `lazy` loader: `lazy: lazyPage(() => import("@/pages/X"), "X")`.
 export function lazyPage<Module, Name extends keyof Module>(load: () => Promise<Module>, exportName: Name) {
   return async () => {
     const module = await importWithReload(load);

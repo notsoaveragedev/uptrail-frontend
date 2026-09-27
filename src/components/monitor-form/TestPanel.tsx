@@ -1,20 +1,14 @@
 import { Button, Collapse } from "antd";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { LuCircleCheck, LuCircleX, LuPlay } from "react-icons/lu";
-import { useNow } from "@/hooks/useNow";
+import { TimeAgo } from "@/components/monitors/TimeAgo";
 import { fakeRequest } from "@/lib/fakeRequest";
-import { formatAgo } from "@/lib/format";
 import { jsonTokens, type JsonTokenKind } from "@/lib/jsonTokens";
 import { isHttpUrl, type MonitorFormValues } from "@/lib/monitorForm";
-import { runFakeTest, type TestResult, type TimingPhase } from "@/mocks/monitorTest";
-
-const PHASE_FILL: Record<TimingPhase, string> = {
-  DNS: "bg-series-5",
-  Connect: "bg-faint",
-  TLS: "bg-series-2",
-  TTFB: "bg-series-1",
-  Download: "bg-series-4",
-};
+import { DEFAULT_TIMEOUT_MS } from "@/lib/monitors";
+import { TONE_BADGE } from "@/lib/status";
+import { TIMING_PHASES } from "@/lib/timing";
+import { runFakeTest, type TestResult } from "@/mocks/monitorTest";
 
 const TOKEN_TEXT: Record<JsonTokenKind, string> = {
   key: "text-series-2",
@@ -32,6 +26,8 @@ export function TestPanel({ values }: TestPanelProps) {
   const [isRunning, setIsRunning] = useState(false);
   const isUrlValid = isHttpUrl(values.url);
   const region = values.regions[0] ?? "BOM";
+  const titleId = useId();
+  const hintId = useId();
 
   async function runTest() {
     setIsRunning(true);
@@ -40,7 +36,7 @@ export function TestPanel({ values }: TestPanelProps) {
       runFakeTest({
         url: values.url.trim(),
         method: values.method,
-        timeoutMs: Number(values.timeoutMs) || 10_000,
+        timeoutMs: Number(values.timeoutMs) || DEFAULT_TIMEOUT_MS,
         region,
       }),
     );
@@ -49,11 +45,11 @@ export function TestPanel({ values }: TestPanelProps) {
 
   return (
     <aside
-      aria-labelledby="test-panel-title"
+      aria-labelledby={titleId}
       className="flex w-full shrink-0 flex-col gap-3.5 rounded-lg border border-line bg-card p-4 xl:sticky xl:top-6 xl:w-72"
     >
       <div className="flex items-center justify-between">
-        <h2 id="test-panel-title" className="text-md font-semibold">
+        <h2 id={titleId} className="text-md font-semibold">
           Test request
         </h2>
         <span className="text-xs text-muted">
@@ -68,12 +64,12 @@ export function TestPanel({ values }: TestPanelProps) {
           onClick={runTest}
           loading={isRunning}
           disabled={!isUrlValid}
-          aria-describedby={isUrlValid ? undefined : "test-panel-hint"}
+          aria-describedby={isUrlValid ? undefined : hintId}
         >
           {isRunning ? "Testing…" : "Test now"}
         </Button>
         {!isUrlValid && (
-          <span id="test-panel-hint" className="text-xs text-muted">
+          <span id={hintId} className="text-xs text-muted">
             {values.url.trim() ? "Fix the URL to run a test." : "Enter a URL to run a test."}
           </span>
         )}
@@ -93,12 +89,10 @@ export function TestPanel({ values }: TestPanelProps) {
 }
 
 function TestResultView({ result }: { result: TestResult }) {
-  const now = useNow(15_000);
-
   return (
     <div className="flex flex-col gap-3">
       <span className="text-caps font-semibold tracking-wider text-subtle uppercase">
-        Last result · {formatAgo(result.ranAt, now)}
+        Last result · <TimeAgo timestamp={result.ranAt} intervalMs={15_000} />
       </span>
 
       <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
@@ -109,19 +103,17 @@ function TestResultView({ result }: { result: TestResult }) {
       </div>
 
       <div aria-hidden className="flex h-2 gap-px overflow-hidden rounded-sm">
-        {result.timings
-          .filter((timing) => timing.ms > 0)
-          .map((timing) => (
-            <span key={timing.phase} style={{ flexGrow: timing.ms }} className={PHASE_FILL[timing.phase]} />
-          ))}
+        {TIMING_PHASES.filter((phase) => result.timings[phase.key] > 0).map((phase) => (
+          <span key={phase.key} style={{ flexGrow: result.timings[phase.key] }} className={phase.fill} />
+        ))}
       </div>
 
       <dl className="flex flex-col gap-1.5">
-        {result.timings.map((timing) => (
-          <div key={timing.phase} className="flex items-center gap-2 text-xs">
-            <span aria-hidden className={`size-2 rounded-[0.125rem] ${PHASE_FILL[timing.phase]}`} />
-            <dt className="flex-1 text-muted">{timing.phase}</dt>
-            <dd className="font-mono text-ink">{timing.ms} ms</dd>
+        {TIMING_PHASES.map((phase) => (
+          <div key={phase.key} className="flex items-center gap-2 text-xs">
+            <span aria-hidden className={`size-2 rounded-xs ${phase.fill}`} />
+            <dt className="flex-1 text-muted">{phase.label}</dt>
+            <dd className="font-mono text-ink">{result.timings[phase.key]} ms</dd>
           </div>
         ))}
       </dl>
@@ -136,7 +128,7 @@ function StatusPill({ result }: { result: TestResult }) {
   return (
     <span
       className={`flex h-6.5 items-center gap-1.5 rounded-md px-2 font-medium whitespace-nowrap ${
-        result.ok ? "bg-up-soft text-up" : "bg-down-soft text-down"
+        TONE_BADGE[result.ok ? "up" : "down"]
       }`}
     >
       <Icon aria-hidden className="size-3.5" />

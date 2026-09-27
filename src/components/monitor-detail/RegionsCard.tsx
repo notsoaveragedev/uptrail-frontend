@@ -1,6 +1,7 @@
+import { MonitorLatency } from "@/components/monitors/MonitorLatency";
 import { StatusLabel } from "@/components/monitors/StatusLabel";
 import { Card } from "@/components/ui/Card";
-import { latencyText } from "@/lib/monitorDetail";
+import { latencyText } from "@/lib/format";
 import { STATUS_FILL } from "@/lib/status";
 import type { RegionStat } from "@/types/monitorDetail";
 
@@ -31,13 +32,7 @@ export function RegionsCard({ regions }: { regions: RegionStat[] }) {
               />
             </span>
             <span className="flex flex-col items-end">
-              <span className={`font-mono ${region.latencyMs === null ? "text-down" : "text-ink"}`}>
-                {region.latencyMs === null
-                  ? region.status === "paused"
-                    ? "—"
-                    : "Timeout"
-                  : latencyText(region.latencyMs)}
-              </span>
+              <MonitorLatency ms={region.latencyMs} status={region.status} />
               <span className="font-mono text-xs text-subtle">p95 {latencyText(region.p95Ms)}</span>
             </span>
           </li>

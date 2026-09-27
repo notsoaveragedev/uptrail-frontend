@@ -3,8 +3,12 @@ import { fakeRequest } from "@/lib/fakeRequest";
 import { buildOverview } from "@/mocks/overview";
 import type { TimeRange } from "@/types/overview";
 
+export function overviewOrgKey(orgSlug: string) {
+  return ["overview", orgSlug] as const;
+}
+
 export function overviewKey(orgSlug: string, range: TimeRange) {
-  return ["overview", orgSlug, range] as const;
+  return [...overviewOrgKey(orgSlug), range] as const;
 }
 
 export function overviewQuery(orgSlug: string, range: TimeRange) {

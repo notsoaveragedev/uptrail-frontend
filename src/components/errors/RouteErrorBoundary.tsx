@@ -50,12 +50,10 @@ function RouteErrorBoundary({ isFullPage }: { isFullPage: boolean }) {
   );
 }
 
-// Top-level: nothing else rendered, so the screen fills the page.
 export function RootErrorBoundary() {
   return <RouteErrorBoundary isFullPage />;
 }
 
-// Inside a layout: the app shell stays usable around the error.
 export function LayoutErrorBoundary() {
   return <RouteErrorBoundary isFullPage={false} />;
 }

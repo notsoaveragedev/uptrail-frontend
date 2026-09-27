@@ -1,7 +1,6 @@
 import { theme, type MappingAlgorithm, type ThemeConfig } from "antd";
 import { palettes, type ThemeMode } from "./palette";
 
-// antd's dark algorithm darkens seed colors, but the Ember accent and status colors are already tuned for dark.
 const keepSeedColors: MappingAlgorithm = (seed, map = theme.darkAlgorithm(seed)) => ({
   ...map,
   colorPrimary: seed.colorPrimary,
@@ -53,7 +52,6 @@ export function getAntdTheme(mode: ThemeMode): ThemeConfig {
       controlItemBgActive: p.hover,
       controlItemBgActiveHover: p.hover,
 
-      // Fonts come from the CSS variables in index.css, so switching fonts is a one-place change.
       fontFamily: "var(--font-sans)",
       fontFamilyCode: "var(--font-mono)",
       fontSize: 13,
@@ -69,7 +67,6 @@ export function getAntdTheme(mode: ThemeMode): ThemeConfig {
       controlHeight: 32,
       controlHeightSM: 28,
       controlHeightLG: 40,
-      // Inputs show focus with a darker border only, no glow ring.
       controlOutline: "transparent",
       controlOutlineWidth: 0,
       lineWidthFocus: 2,

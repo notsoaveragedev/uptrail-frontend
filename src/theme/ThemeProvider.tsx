@@ -1,10 +1,11 @@
 import { App as AntApp, ConfigProvider } from "antd";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { Loader } from "@/components/ui/Loader";
+import { writeJson } from "@/lib/storage";
 import { getAntdTheme } from "./antdTheme";
 import { THEME_STORAGE_KEY, ThemeContext } from "./ThemeContext";
 import type { ThemeMode } from "./palette";
 
-// index.html sets data-theme before the first paint, so React starts from the same mode.
 function readInitialMode(): ThemeMode {
   return document.documentElement.dataset.theme === "light" ? "light" : "dark";
 }
@@ -13,11 +14,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ThemeMode>(readInitialMode);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, mode);
-    } catch {
-      // Storage can be blocked (private mode); the theme still applies for this session.
-    }
+    writeJson(THEME_STORAGE_KEY, mode);
   }, [mode]);
 
   const value = useMemo(() => {
@@ -32,7 +29,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeContext value={value}>
-      <ConfigProvider theme={antdTheme} modal={{ centered: true }}>
+      <ConfigProvider
+        theme={antdTheme}
+        modal={{ centered: true }}
+        spin={{
+          indicator: (
+            <span>
+              <Loader />
+            </span>
+          ),
+        }}
+        button={{ loadingIcon: <Loader size="sm" className="text-current" /> }}
+      >
         <AntApp notification={{ placement: "bottomRight", maxCount: 3, stack: { threshold: 3 } }}>{children}</AntApp>
       </ConfigProvider>
     </ThemeContext>

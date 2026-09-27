@@ -27,6 +27,6 @@ export type Monitor = {
 };
 
 export type MonitorChange =
-  | { action: "pause" | "resume" | "delete"; ids: string[] }
+  | { action: "check" | "pause" | "resume" | "delete"; ids: string[] }
   | { action: "move"; ids: string[]; project: string }
   | { action: "tag"; ids: string[]; tag: string };

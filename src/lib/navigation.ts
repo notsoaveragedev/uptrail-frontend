@@ -10,6 +10,7 @@ import {
   LuSiren,
   LuWrench,
 } from "react-icons/lu";
+import { paths } from "./paths";
 
 export type NavItem = {
   label: string;
@@ -45,6 +46,6 @@ export const SETTINGS_ITEM: NavItem = { label: "Settings", path: "settings", ico
 export const ALL_NAV_ITEMS = [...NAV_GROUPS.flatMap((group) => group.items), SETTINGS_ITEM];
 
 export function findNavItem(pathname: string, orgSlug: string) {
-  const rest = pathname.replace(`/o/${orgSlug}`, "").replace(/^\//, "");
+  const rest = pathname.replace(paths.overview(orgSlug), "").replace(/^\//, "");
   return ALL_NAV_ITEMS.find((item) => (item.path ? rest.startsWith(item.path) : rest === ""));
 }

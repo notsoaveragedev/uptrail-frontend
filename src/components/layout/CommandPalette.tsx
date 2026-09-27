@@ -4,6 +4,7 @@ import { LuCornerDownLeft, LuPlus, LuSearch, LuSearchX } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router";
 import { StatusIcon } from "@/components/monitors/StatusIcon";
 import { ALL_NAV_ITEMS } from "@/lib/navigation";
+import { paths } from "@/lib/paths";
 import { MONITORS } from "@/mocks/monitors";
 
 type CommandPaletteProps = {
@@ -32,7 +33,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
 function PaletteContent({ onClose }: { onClose: () => void }) {
   const navigate = useNavigate();
-  const { orgSlug } = useParams();
+  const { orgSlug = "" } = useParams();
   const [search, setSearch] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const listId = useId();
@@ -44,21 +45,21 @@ function PaletteContent({ onClose }: { onClose: () => void }) {
       group: "Actions",
       icon: <LuPlus />,
       title: "Create monitor",
-      path: `/o/${orgSlug}/monitors/new`,
+      path: paths.monitorNew(orgSlug),
     },
     ...ALL_NAV_ITEMS.map((item) => ({
       id: `nav-${item.label}`,
       group: "Go to",
       icon: <item.icon />,
       title: item.label,
-      path: item.path ? `/o/${orgSlug}/${item.path}` : `/o/${orgSlug}`,
+      path: paths.section(orgSlug, item.path),
     })),
     ...MONITORS.map((monitor) => ({
       id: monitor.id,
       group: "Monitors",
       icon: <StatusIcon status={monitor.status} />,
       title: monitor.name,
-      path: `/o/${orgSlug}/monitors/${monitor.id}`,
+      path: paths.monitor(orgSlug, monitor.id),
     })),
   ].filter((item) => item.title.toLowerCase().includes(query));
 

@@ -18,7 +18,6 @@ function SectionFallback({ resetErrorBoundary }: FallbackProps) {
   );
 }
 
-// Keeps one broken section (sidebar, widget, panel) from taking down the whole screen.
 export function SectionErrorBoundary({ children }: { children: ReactNode }) {
   return <ErrorBoundary FallbackComponent={SectionFallback}>{children}</ErrorBoundary>;
 }

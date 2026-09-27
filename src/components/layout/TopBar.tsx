@@ -2,6 +2,7 @@ import { Button } from "antd";
 import { LuMenu, LuSearch } from "react-icons/lu";
 import { Link, useLocation, useParams } from "react-router";
 import { findNavItem } from "@/lib/navigation";
+import { paths } from "@/lib/paths";
 import { organizations } from "@/mocks/workspace";
 import { NotificationsMenu } from "./NotificationsMenu";
 import { ThemeToggle } from "./ThemeToggle";
@@ -27,7 +28,7 @@ export function TopBar({ onOpenSearch, onOpenMenu }: TopBarProps) {
       />
 
       <nav aria-label="Breadcrumb" className="hidden min-w-0 items-center gap-2 text-muted sm:flex">
-        <Link to={`/o/${orgSlug}`} className="truncate text-muted hover:text-ink">
+        <Link to={paths.overview(orgSlug)} className="truncate text-muted hover:text-ink">
           {org.name}
         </Link>
         {page && (

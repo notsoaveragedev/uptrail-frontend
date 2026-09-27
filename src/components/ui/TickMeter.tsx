@@ -16,7 +16,7 @@ export function TickMeter({ value, total, fillClassName, label }: TickMeterProps
       className="flex gap-0.5"
     >
       {Array.from({ length: total }, (_, index) => (
-        <span key={index} className={`h-3 w-0.75 rounded-[1px] ${index < value ? fillClassName : "bg-line-strong"}`} />
+        <span key={index} className={`h-3 w-0.75 rounded-xs ${index < value ? fillClassName : "bg-line-strong"}`} />
       ))}
     </div>
   );

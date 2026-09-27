@@ -52,3 +52,7 @@ export const resetPasswordSchema = z
 export const linkAccountSchema = z.object({
   password: z.string().min(1, "Enter your password."),
 });
+
+export const savedViewSchema = z.object({
+  name: z.string().trim().min(1, "Name this view.").max(40, "Keep the name under 40 characters."),
+});

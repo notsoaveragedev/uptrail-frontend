@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { addMonitors, monitorsQuery } from "@/api/monitors";
 import { ReviewStep } from "@/components/monitor-form/ReviewStep";
@@ -13,8 +13,11 @@ import { useMonitorDraft } from "@/hooks/useMonitorDraft";
 import { useMonitorForm } from "@/hooks/useMonitorForm";
 import { useToast } from "@/hooks/useToast";
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
+import { readDraft } from "@/lib/monitorDraft";
+import { DEFAULT_VALUES, isSameForm, STEPS } from "@/lib/monitorForm";
 import { formatInterval } from "@/lib/monitors";
-import { createdMonitor, DEFAULT_VALUES, isSameForm, readDraft, STEPS } from "@/lib/monitorForm";
+import { paths } from "@/lib/paths";
+import { createdMonitor } from "@/mocks/monitorFactory";
 
 export function NewMonitorPage() {
   const { orgSlug = "" } = useParams();
@@ -32,7 +35,7 @@ export function NewMonitorPage() {
 
   const isDirty = !isSameForm(values, DEFAULT_VALUES);
   const draft = useMonitorDraft({ orgSlug, values, step, isDirty, initialSavedAt: restoredDraft?.savedAt ?? null });
-  const monitorsPath = `/o/${orgSlug}/monitors`;
+  const monitorsPath = paths.monitors(orgSlug);
   const { allowLeave } = useUnsavedChangesGuard({
     isDirty,
     title: "Leave the new monitor?",
@@ -44,11 +47,15 @@ export function NewMonitorPage() {
     headingRef.current?.focus();
   }, [step]);
 
+  const announceDraft = useEffectEvent(() => {
+    toast.info("Draft restored", "Picked up where you left off.", { label: "Discard draft", onClick: discardDraft });
+  });
+
   useEffect(() => {
     if (!restoredDraft || hasAnnouncedDraftRef.current) return;
     hasAnnouncedDraftRef.current = true;
-    toast.info("Draft restored", "Picked up where you left off.", { label: "Discard draft", onClick: discardDraft });
-  });
+    announceDraft();
+  }, [restoredDraft]);
 
   function discardDraft() {
     draft.clear();

@@ -1,5 +1,6 @@
 import { CheckTrail } from "@/components/monitors/CheckTrail";
 import { StatusIcon } from "@/components/monitors/StatusIcon";
+import { StatusDot } from "@/components/ui/StatusDot";
 import { BOARD_MONITORS } from "@/lib/statusBoard";
 
 export function StatusBoard() {
@@ -12,7 +13,7 @@ export function StatusBoard() {
         <div className="flex items-center justify-between font-mono text-xs text-subtle">
           <span>Live checks · every 30s</span>
           <span className="flex items-center gap-2 rounded-full border border-line bg-card px-2.5 py-1 text-up">
-            <span className="size-1.5 animate-pulse rounded-full bg-up" />
+            <StatusDot className="animate-pulse" />
             Live
           </span>
         </div>

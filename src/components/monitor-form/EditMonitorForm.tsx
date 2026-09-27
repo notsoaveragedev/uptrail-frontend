@@ -1,10 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, Tabs } from "antd";
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useNavigate } from "react-router";
 import { updateMonitor } from "@/api/monitors";
 import { CustomSelect } from "@/components/ui/CustomSelect";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { StatusDot } from "@/components/ui/StatusDot";
 import { useMonitorForm } from "@/hooks/useMonitorForm";
+import { useSearchParam } from "@/hooks/useSearchParam";
 import { useToast } from "@/hooks/useToast";
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
 import { displayUrl } from "@/lib/monitors";
@@ -14,13 +17,16 @@ import {
   EDIT_TABS,
   isSameForm,
   MONITOR_TYPES,
-  updatedMonitor,
   type StepKey,
 } from "@/lib/monitorForm";
+import { paths } from "@/lib/paths";
+import { updatedMonitor } from "@/mocks/monitorFactory";
 import type { Monitor } from "@/types/monitor";
 import { ChangeSummaryModal } from "./ChangeSummaryModal";
 import { StepFields } from "./StepFields";
 import { TestPanel } from "./TestPanel";
+
+const EDIT_TAB_KEYS = EDIT_TABS.map((item) => item.key);
 
 type EditMonitorFormProps = {
   orgSlug: string;
@@ -31,14 +37,13 @@ export function EditMonitorForm({ orgSlug, monitor }: EditMonitorFormProps) {
   const navigate = useNavigate();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [tab, setTab] = useSearchParam("tab", EDIT_TAB_KEYS, "request", { replace: true });
   const [initialValues] = useState(() => configFromMonitor(monitor));
   const { values, errors, update, validate } = useMonitorForm(initialValues);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const detailPath = `/o/${orgSlug}/monitors/${monitor.id}`;
-  const tab = EDIT_TABS.find((item) => item.key === searchParams.get("tab"))?.key ?? "request";
+  const detailPath = paths.monitor(orgSlug, monitor.id);
   const isDirty = !isSameForm(values, initialValues);
   const changes = changedFields(initialValues, values);
   const typeOption = MONITOR_TYPES.find((option) => option.value === values.type);
@@ -48,21 +53,10 @@ export function EditMonitorForm({ orgSlug, monitor }: EditMonitorFormProps) {
     description: `Your edits to ${monitor.name} haven't been saved.`,
   });
 
-  function changeTab(key: string) {
-    setSearchParams(
-      (params) => {
-        if (key === "request") params.delete("tab");
-        else params.set("tab", key);
-        return params;
-      },
-      { replace: true },
-    );
-  }
-
   function reviewChanges() {
     const invalidStep = validate(["type", ...EDIT_TABS.map((item) => item.key)]);
     if (!invalidStep) return setIsReviewOpen(true);
-    if (invalidStep !== "type") changeTab(invalidStep);
+    if (invalidStep !== "type") setTab(invalidStep);
     toast.error("Some fields need attention", `Check the ${stepLabel(invalidStep)} tab.`);
   }
 
@@ -76,28 +70,28 @@ export function EditMonitorForm({ orgSlug, monitor }: EditMonitorFormProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h1 tabIndex={-1} className="text-lg font-semibold tracking-tight outline-none">
-            Edit {monitor.name}
-          </h1>
-          <p className="truncate font-mono text-xs text-muted">
+      <PageHeader
+        title={`Edit ${monitor.name}`}
+        meta={
+          <p className="truncate font-mono text-xs">
             {monitor.method} {displayUrl(monitor.url)}
           </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {isDirty && (
-            <span role="status" className="mr-2 flex items-center gap-1.5 text-xs text-muted">
-              <span aria-hidden className="size-1.5 rounded-full bg-degraded" />
-              {changes.length} unsaved {changes.length === 1 ? "change" : "changes"}
-            </span>
-          )}
-          <Button onClick={() => navigate(detailPath)}>Cancel</Button>
-          <Button type="primary" disabled={!isDirty} onClick={reviewChanges}>
-            Save changes
-          </Button>
-        </div>
-      </div>
+        }
+        actions={
+          <>
+            {isDirty && (
+              <span role="status" className="mr-2 flex items-center gap-1.5 text-xs text-muted">
+                <StatusDot fill="bg-degraded" />
+                {changes.length} unsaved {changes.length === 1 ? "change" : "changes"}
+              </span>
+            )}
+            <Button onClick={() => navigate(detailPath)}>Cancel</Button>
+            <Button type="primary" disabled={!isDirty} onClick={reviewChanges}>
+              Save changes
+            </Button>
+          </>
+        }
+      />
 
       <div className="flex flex-col items-start gap-4 xl:flex-row">
         <section
@@ -116,7 +110,7 @@ export function EditMonitorForm({ orgSlug, monitor }: EditMonitorFormProps) {
           </div>
           <Tabs
             activeKey={tab}
-            onChange={changeTab}
+            onChange={(key) => setTab(key as StepKey)}
             className="px-5 pb-5"
             items={EDIT_TABS.map((item) => ({
               key: item.key,

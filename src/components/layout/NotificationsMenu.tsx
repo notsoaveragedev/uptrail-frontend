@@ -1,13 +1,8 @@
 import { Badge, Button, Dropdown } from "antd";
 import { LuBell } from "react-icons/lu";
+import { StatusDot } from "@/components/ui/StatusDot";
+import { TONE_TEXT } from "@/lib/status";
 import { notifications } from "@/mocks/workspace";
-
-const TONE_DOT = {
-  down: "bg-down",
-  degraded: "bg-degraded",
-  up: "bg-up",
-  info: "bg-maintenance",
-};
 
 export function NotificationsMenu() {
   const unreadCount = notifications.filter((notification) => notification.isUnread).length;
@@ -25,7 +20,7 @@ export function NotificationsMenu() {
           <ul className="max-h-96 divide-y divide-line overflow-y-auto">
             {notifications.map((notification) => (
               <li key={notification.id} className="flex gap-3 px-4 py-3">
-                <span className={`mt-1.5 size-1.5 shrink-0 rounded-full ${TONE_DOT[notification.tone]}`} />
+                <StatusDot className={`mt-1.5 ${TONE_TEXT[notification.tone]}`} />
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className={notification.isUnread ? "font-medium text-ink" : "text-muted"}>
                     {notification.title}

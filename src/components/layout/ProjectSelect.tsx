@@ -1,28 +1,21 @@
-import { Select } from "antd";
 import { LuFolder } from "react-icons/lu";
-import { useSearchParams } from "react-router";
-import { projects } from "@/mocks/workspace";
+import { CustomSelect } from "@/components/ui/CustomSelect";
+import { useStoredState } from "@/hooks/useStoredState";
+import { PROJECT_OPTIONS } from "@/lib/monitors";
+
+const OPTIONS = [{ value: "all", label: "All projects" }, ...PROJECT_OPTIONS];
 
 export function ProjectSelect() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const project = searchParams.get("project") ?? "all";
-
-  function change(value: string) {
-    setSearchParams((params) => {
-      if (value === "all") params.delete("project");
-      else params.set("project", value);
-      return params;
-    });
-  }
+  const [project, setProject] = useStoredState("uptrail:project", "all");
 
   return (
-    <Select
+    <CustomSelect
+      size="middle"
       aria-label="Project"
       value={project}
-      onChange={change}
-      options={projects}
+      onChange={setProject}
+      options={OPTIONS}
       prefix={<LuFolder className="size-4 text-subtle" />}
-      className="w-full"
     />
   );
 }

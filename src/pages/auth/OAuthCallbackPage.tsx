@@ -5,9 +5,9 @@ import { AuthNotice } from "@/components/auth/AuthNotice";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { useForm } from "@/hooks/useForm";
 import { useToast } from "@/hooks/useToast";
-import { readDemoState } from "@/lib/demoState";
 import { fakeRequest } from "@/lib/fakeRequest";
 import { DEFAULT_APP_PATH } from "@/lib/safeRedirect";
+import { readEnum } from "@/lib/searchParams";
 import { linkAccountSchema } from "@/lib/schemas";
 
 const STATES = ["signing-in", "error", "link"] as const;
@@ -16,7 +16,7 @@ export function OAuthCallbackPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-  const state = readDemoState(searchParams, STATES, "signing-in");
+  const state = readEnum(searchParams, "state", STATES, "signing-in");
   const provider = searchParams.get("provider") === "google" ? "google" : "github";
   const providerName = provider === "google" ? "Google" : "GitHub";
 
@@ -31,7 +31,13 @@ export function OAuthCallbackPage() {
 
   useEffect(() => {
     if (state !== "signing-in") return;
-    fakeRequest(1200).then(() => navigate(DEFAULT_APP_PATH, { replace: true }));
+    let isCancelled = false;
+    fakeRequest(1200).then(() => {
+      if (!isCancelled) navigate(DEFAULT_APP_PATH, { replace: true });
+    });
+    return () => {
+      isCancelled = true;
+    };
   }, [state, navigate]);
 
   if (state === "error") {

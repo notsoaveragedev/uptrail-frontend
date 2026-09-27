@@ -1,6 +1,7 @@
 import { Button, Segmented, Table, type TableColumnsType } from "antd";
 import { LuArrowLeft, LuCircleAlert, LuCircleCheck } from "react-icons/lu";
-import { useSearchParams } from "react-router";
+import { MetaList } from "@/components/ui/MetaList";
+import { useSearchParam } from "@/hooks/useSearchParam";
 import { hasErrors, IMPORT_FIELDS, type ImportField, type ImportRow, type RowErrors } from "@/lib/importMonitors";
 import { ImportCell } from "./ImportCell";
 import { StepFooter } from "./StepFooter";
@@ -22,7 +23,7 @@ const COLUMN_WIDTHS: Record<ImportField, number> = {
 
 const MONO_FIELDS: ImportField[] = ["url", "method", "interval", "regions", "expected_status"];
 
-type ReviewStepProps = {
+type ImportReviewStepProps = {
   rows: ImportRow[];
   errorsById: Map<string, RowErrors>;
   excludedIds: Set<string>;
@@ -33,7 +34,7 @@ type ReviewStepProps = {
   onImport: () => void;
 };
 
-export function ReviewStep({
+export function ImportReviewStep({
   rows,
   errorsById,
   excludedIds,
@@ -42,9 +43,8 @@ export function ReviewStep({
   onToggleRows,
   onBack,
   onImport,
-}: ReviewStepProps) {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const filter = FILTERS.find((value) => value === searchParams.get("show")) ?? "all";
+}: ImportReviewStepProps) {
+  const [filter, setFilter] = useSearchParam("show", FILTERS, "all", { replace: true });
 
   const isValid = (row: ImportRow) => !hasErrors(errorsById.get(row.id));
   const validRows = rows.filter(isValid);
@@ -53,17 +53,6 @@ export function ReviewStep({
   const errorCount = rows.length - validRows.length;
   const counts: Record<Filter, number> = { all: rows.length, valid: validRows.length, errors: errorCount };
   const visibleRows = rows.filter((row) => filter === "all" || (filter === "valid") === isValid(row));
-
-  function changeFilter(value: Filter) {
-    setSearchParams(
-      (params) => {
-        if (value === "all") params.delete("show");
-        else params.set("show", value);
-        return params;
-      },
-      { replace: true },
-    );
-  }
 
   const columns: TableColumnsType<ImportRow> = [
     {
@@ -93,26 +82,24 @@ export function ReviewStep({
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 pt-5 pb-3">
-        <p aria-live="polite" className="flex flex-wrap items-center gap-x-2 text-muted">
+        <MetaList aria-live="polite" className="text-muted">
           <span className="flex items-center gap-1.5">
             <LuCircleCheck aria-hidden className="size-3.5 text-up" />
             <span className="font-mono text-up">{validRows.length}</span> valid
           </span>
-          <span className="text-faint">·</span>
           <span className="flex items-center gap-1.5">
             <LuCircleAlert aria-hidden className="size-3.5 text-down" />
             <span className="font-mono text-down">{errorCount}</span> with errors
           </span>
-          <span className="text-faint">·</span>
           <span>
             <span className="font-mono text-ink">{excludedCount}</span> excluded
           </span>
-        </p>
+        </MetaList>
 
         <Segmented
           aria-label="Show rows"
           value={filter}
-          onChange={changeFilter}
+          onChange={setFilter}
           options={FILTERS.map((value) => ({
             value,
             label: (

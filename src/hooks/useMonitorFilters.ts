@@ -1,5 +1,6 @@
 import { useSearchParams } from "react-router";
-import { readFilters, type SortKey } from "@/lib/monitorList";
+import { DEFAULT_SORT, readFilters, type SortKey } from "@/lib/monitorList";
+import { sortText, writeParam } from "@/lib/searchParams";
 
 const FILTER_KEYS = ["q", "status", "type", "project", "tag"];
 
@@ -7,12 +8,10 @@ export function useMonitorFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
   const filters = readFilters(searchParams);
 
-  function setParam(key: string, value: string | string[] | null) {
+  function setParam(key: string, value: string | string[] | null, fallback?: string) {
     setSearchParams(
       (params) => {
-        const text = Array.isArray(value) ? value.join(",") : value;
-        if (text) params.set(key, text);
-        else params.delete(key);
+        writeParam(params, key, value, fallback);
         if (key !== "page") params.delete("page");
         return params;
       },
@@ -21,14 +20,12 @@ export function useMonitorFilters() {
   }
 
   function setSort(key: SortKey | null, isDescending = false) {
-    const isDefault = !key || (key === "status" && !isDescending);
-    setParam("sort", isDefault ? null : `${isDescending ? "-" : ""}${key}`);
+    setParam("sort", key && sortText({ key, isDescending }), sortText(DEFAULT_SORT));
   }
 
   function clear() {
     setSearchParams((params) => {
-      FILTER_KEYS.forEach((key) => params.delete(key));
-      params.delete("page");
+      [...FILTER_KEYS, "page"].forEach((key) => params.delete(key));
       return params;
     });
   }

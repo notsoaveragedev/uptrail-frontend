@@ -1,13 +1,17 @@
 import { Tag } from "antd";
 import { Link, useParams } from "react-router";
 import { Card } from "@/components/ui/Card";
-import { formatDateTime } from "@/lib/monitorDetail";
+import { StatusDot } from "@/components/ui/StatusDot";
+import { formatDateTime } from "@/lib/format";
+import { paths } from "@/lib/paths";
+import { TONE_BADGE } from "@/lib/status";
+import type { MonitorStatus } from "@/types/monitor";
 import type { AlertHistoryItem, AlertRule } from "@/types/monitorDetail";
 
-const ALERT_STATE: Record<AlertHistoryItem["state"], { label: string; className: string }> = {
-  firing: { label: "Firing", className: "bg-down-soft text-down" },
-  acknowledged: { label: "Acknowledged", className: "bg-degraded-soft text-degraded" },
-  resolved: { label: "Resolved", className: "bg-up-soft text-up" },
+const ALERT_STATE: Record<AlertHistoryItem["state"], { label: string; tone: MonitorStatus }> = {
+  firing: { label: "Firing", tone: "down" },
+  acknowledged: { label: "Acknowledged", tone: "degraded" },
+  resolved: { label: "Resolved", tone: "up" },
 };
 
 type AlertsTabProps = {
@@ -16,25 +20,18 @@ type AlertsTabProps = {
 };
 
 export function AlertsTab({ rules, history }: AlertsTabProps) {
-  const { orgSlug } = useParams();
+  const { orgSlug = "" } = useParams();
 
   return (
     <div className="grid gap-4 xl:grid-cols-2">
-      <Card
-        title={
-          <>
-            Attached rules <span className="font-mono text-xs font-normal text-subtle">{rules.length}</span>
-          </>
-        }
-        extra={<Link to={`/o/${orgSlug}/alerts`}>Manage rules</Link>}
-      >
+      <Card title="Attached rules" meta={rules.length} extra={<Link to={paths.alerts(orgSlug)}>Manage rules</Link>}>
         <ul className="flex flex-col border-t border-line">
           {rules.map((rule) => (
             <li key={rule.id} className="flex flex-col gap-2 border-b border-line px-4 py-3 last:border-b-0">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-medium">{rule.name}</span>
                 <span className={`flex items-center gap-1.5 text-xs ${rule.isEnabled ? "text-up" : "text-paused"}`}>
-                  <span className="size-1.5 rounded-full bg-current" />
+                  <StatusDot />
                   {rule.isEnabled ? "Enabled" : "Muted"}
                 </span>
               </div>
@@ -54,18 +51,12 @@ export function AlertsTab({ rules, history }: AlertsTabProps) {
         </ul>
       </Card>
 
-      <Card
-        title={
-          <>
-            Alert history <span className="font-mono text-xs font-normal text-subtle">{history.length}</span>
-          </>
-        }
-      >
+      <Card title="Alert history" meta={history.length}>
         <ul className="flex flex-col border-t border-line">
           {history.map((alert) => (
             <li key={alert.id} className="flex items-start gap-3 border-b border-line px-4 py-3 last:border-b-0">
               <span
-                className={`mt-0.5 w-24 shrink-0 rounded-sm px-1.5 py-0.5 text-center text-xs font-medium ${ALERT_STATE[alert.state].className}`}
+                className={`mt-0.5 w-24 shrink-0 rounded-sm px-1.5 py-0.5 text-center text-xs font-medium ${TONE_BADGE[ALERT_STATE[alert.state].tone]}`}
               >
                 {ALERT_STATE[alert.state].label}
               </span>

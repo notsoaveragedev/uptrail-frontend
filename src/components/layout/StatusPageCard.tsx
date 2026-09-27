@@ -1,4 +1,5 @@
 import { LuExternalLink } from "react-icons/lu";
+import { StatusDot } from "@/components/ui/StatusDot";
 
 export function StatusPageCard() {
   return (
@@ -14,7 +15,7 @@ export function StatusPageCard() {
         <LuExternalLink aria-hidden className="size-3 text-subtle" />
       </a>
       <span className="mt-1.5 flex items-center gap-1.5 text-xs text-degraded">
-        <span className="size-1.5 rounded-full bg-degraded" />
+        <StatusDot />
         Partial outage
       </span>
     </div>

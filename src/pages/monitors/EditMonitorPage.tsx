@@ -7,9 +7,8 @@ import { InAppNotFoundPage } from "@/pages/NotFoundPage";
 
 export function EditMonitorPage() {
   const { orgSlug = "", monitorId = "" } = useParams();
-  const { data: monitors, error } = useQuery(monitorsQuery(orgSlug));
+  const { data: monitors } = useQuery(monitorsQuery(orgSlug));
 
-  if (error) throw error;
   if (!monitors) return <EditMonitorSkeleton />;
 
   const monitor = monitors.find((item) => item.id === monitorId);
