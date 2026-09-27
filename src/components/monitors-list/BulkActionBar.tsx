@@ -1,11 +1,10 @@
 import { Button, Dropdown } from "antd";
-import { LuFolderInput, LuPause, LuPlay, LuTag, LuTrash2, LuX } from "react-icons/lu";
+import { LuFolderInput, LuPause, LuPlay, LuTag, LuTrash2 } from "react-icons/lu";
 import { useParams } from "react-router";
 import { useMonitorChange } from "@/api/monitors";
-import { CountBadge } from "@/components/ui/CountBadge";
+import { SelectionBar, SelectionBarDivider } from "@/components/ui/SelectionBar";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useToast } from "@/hooks/useToast";
-import { useWindowKeydown } from "@/hooks/useWindowKeydown";
 import { PROJECT_OPTIONS, TAGS } from "@/lib/monitors";
 import type { MonitorChange } from "@/types/monitor";
 
@@ -22,12 +21,6 @@ export function BulkActionBar({ selectedIds, onClear }: BulkActionBarProps) {
   const confirm = useConfirm();
   const { changeWithUndo } = useMonitorChange(orgSlug);
   const count = selectedIds.length;
-
-  useWindowKeydown((event) => {
-    if (event.key === "Escape" && count > 0) onClear();
-  });
-
-  if (count === 0) return null;
 
   function runWithUndo(message: string, change: MonitorChange) {
     const undo = changeWithUndo(change);
@@ -46,16 +39,7 @@ export function BulkActionBar({ selectedIds, onClear }: BulkActionBarProps) {
   }
 
   return (
-    <div
-      role="toolbar"
-      aria-label="Bulk actions"
-      className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 rounded-lg border border-line-strong bg-tooltip p-1.5 shadow-overlay lg:left-[calc(50%+7.5rem)]"
-    >
-      <span className="flex items-center gap-2 px-2 text-muted">
-        <CountBadge count={count} />
-        selected
-      </span>
-      <span className="mx-1 h-5 w-px bg-line" />
+    <SelectionBar count={count} onClear={onClear}>
       <Button
         type="text"
         icon={<LuPause />}
@@ -92,12 +76,10 @@ export function BulkActionBar({ selectedIds, onClear }: BulkActionBarProps) {
           Add tag
         </Button>
       </Dropdown>
-      <span className="mx-1 h-5 w-px bg-line" />
+      <SelectionBarDivider />
       <Button type="text" danger icon={<LuTrash2 />} onClick={remove}>
         Delete
       </Button>
-      <kbd className="kbd ml-1">Esc</kbd>
-      <Button type="text" aria-label="Clear selection" icon={<LuX />} onClick={onClear} />
-    </div>
+    </SelectionBar>
   );
 }

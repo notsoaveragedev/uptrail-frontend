@@ -41,6 +41,11 @@ export const router = createBrowserRouter([
         ],
       },
       {
+        path: "o/:orgSlug/dashboards/:dashboardId/tv",
+        ErrorBoundary: RootErrorBoundary,
+        lazy: lazyPage(() => import("@/pages/dashboards/DashboardTvPage"), "DashboardTvPage"),
+      },
+      {
         path: "o/:orgSlug",
         lazy: lazyPage(() => import("@/layouts/AppLayout"), "AppLayout"),
         children: [
@@ -62,6 +67,38 @@ export const router = createBrowserRouter([
                 lazy: lazyPage(() => import("@/pages/monitors/MonitorDetailPage"), "MonitorDetailPage"),
               },
               { path: "logs", lazy: lazyPage(() => import("@/pages/logs/LogsPage"), "LogsPage") },
+              {
+                path: "dashboards",
+                lazy: lazyPage(() => import("@/pages/dashboards/DashboardsPage"), "DashboardsPage"),
+              },
+              {
+                path: "dashboards/:dashboardId",
+                lazy: lazyPage(() => import("@/pages/dashboards/DashboardPage"), "DashboardPage"),
+              },
+              {
+                path: "alerts",
+                lazy: lazyPage(() => import("@/layouts/AlertsLayout"), "AlertsLayout"),
+                children: [
+                  { index: true, element: <Navigate to="rules" replace /> },
+                  { path: "rules", lazy: lazyPage(() => import("@/pages/alerts/AlertRulesPage"), "AlertRulesPage") },
+                  {
+                    path: "channels",
+                    lazy: lazyPage(() => import("@/pages/alerts/AlertChannelsPage"), "AlertChannelsPage"),
+                  },
+                  {
+                    path: "history",
+                    lazy: lazyPage(() => import("@/pages/alerts/AlertHistoryPage"), "AlertHistoryPage"),
+                  },
+                ],
+              },
+              {
+                path: "alerts/rules/new",
+                lazy: lazyPage(() => import("@/pages/alerts/AlertRulePage"), "AlertRulePage"),
+              },
+              {
+                path: "alerts/rules/:ruleId",
+                lazy: lazyPage(() => import("@/pages/alerts/AlertRulePage"), "AlertRulePage"),
+              },
               {
                 path: "monitors/:monitorId/edit",
                 lazy: lazyPage(() => import("@/pages/monitors/EditMonitorPage"), "EditMonitorPage"),

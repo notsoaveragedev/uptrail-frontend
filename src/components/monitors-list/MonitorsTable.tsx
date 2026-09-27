@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/monitors/StatusBadge";
 import { UptimeMeter } from "@/components/monitors/UptimeMeter";
 import { UptimeValue } from "@/components/monitors/UptimeValue";
 import { useMonitorFilters } from "@/hooks/useMonitorFilters";
+import { isRowControl } from "@/lib/dom";
 import { PAGE_SIZE, type SortKey } from "@/lib/monitorList";
 import { displayUrl, formatInterval, MONITOR_TYPE_LABELS } from "@/lib/monitors";
 import { paths } from "@/lib/paths";
@@ -134,7 +135,7 @@ export function MonitorsTable({ monitors, isLoading, selectedIds, onSelect, empt
       }
       onRow={(monitor) => ({
         onClick: (event) => {
-          if ((event.target as HTMLElement).closest("a, button, input, label, .ant-table-selection-column")) return;
+          if (isRowControl(event.target)) return;
           navigate(paths.monitor(orgSlug, monitor.id));
         },
       })}

@@ -56,3 +56,50 @@ export const linkAccountSchema = z.object({
 export const savedViewSchema = z.object({
   name: z.string().trim().min(1, "Name this view.").max(40, "Keep the name under 40 characters."),
 });
+
+const channelName = z.string().trim().min(1, "Name this channel.").max(40, "Keep the name under 40 characters.");
+
+const recipients = z
+  .string()
+  .trim()
+  .min(1, "Add at least one recipient.")
+  .refine(
+    (value) =>
+      value
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .every((item) => z.email().safeParse(item).success),
+    "Enter valid email addresses, separated by commas.",
+  );
+
+function webhookUrl(prefix: string, message: string) {
+  return z
+    .string()
+    .trim()
+    .min(1, "Paste the webhook URL.")
+    .refine((value) => value.startsWith(prefix), message);
+}
+
+export const alertChannelSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("email"), name: channelName, target: recipients }),
+  z.object({
+    type: z.literal("slack"),
+    name: channelName,
+    target: webhookUrl("https://hooks.slack.com/", "Use a Slack incoming webhook (https://hooks.slack.com/…)."),
+  }),
+  z.object({
+    type: z.literal("discord"),
+    name: channelName,
+    target: webhookUrl(
+      "https://discord.com/api/webhooks/",
+      "Use a Discord webhook (https://discord.com/api/webhooks/…).",
+    ),
+  }),
+  z.object({
+    type: z.literal("webhook"),
+    name: channelName,
+    target: webhookUrl("https://", "Use an https:// URL.").pipe(z.url("Enter a valid URL.")),
+    method: z.enum(["POST", "PUT"]),
+  }),
+]);

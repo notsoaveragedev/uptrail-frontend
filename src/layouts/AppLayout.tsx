@@ -27,6 +27,7 @@ export function AppLayout() {
   useSearchShortcut(toggleSearch);
 
   useEffect(() => {
+    document.querySelector("main")?.scrollTo({ top: 0 });
     document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true });
   }, [pathname]);
 

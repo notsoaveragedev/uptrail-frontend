@@ -10,3 +10,7 @@ export function readCssVar(name: string) {
 export function rootFontSize() {
   return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
 }
+
+export function isRowControl(target: EventTarget | null) {
+  return !!(target as HTMLElement | null)?.closest("a, button, input, label, .ant-table-selection-column");
+}

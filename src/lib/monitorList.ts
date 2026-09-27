@@ -75,15 +75,6 @@ export function filterMonitors(monitors: Monitor[], filters: MonitorFilters) {
     });
 }
 
-export function countBy(monitors: Monitor[], read: (monitor: Monitor) => string | string[]) {
-  const counts: Record<string, number> = {};
-  for (const monitor of monitors) {
-    const values = read(monitor);
-    for (const value of Array.isArray(values) ? values : [values]) counts[value] = (counts[value] ?? 0) + 1;
-  }
-  return counts;
-}
-
 function exportRow(monitor: Monitor) {
   return {
     name: monitor.name,
