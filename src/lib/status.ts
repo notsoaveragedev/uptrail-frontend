@@ -1,4 +1,4 @@
-import type { MonitorStatus } from "@/types/overview";
+import type { MonitorStatus } from "@/types/monitor";
 
 export const STATUSES: MonitorStatus[] = ["up", "degraded", "down", "paused"];
 
@@ -21,4 +21,11 @@ export const STATUS_FILL: Record<MonitorStatus, string> = {
   degraded: "bg-degraded",
   down: "bg-down",
   paused: "bg-line-strong",
+};
+
+export const STATUS_BADGE: Record<MonitorStatus, string> = {
+  up: "bg-up-soft text-up",
+  degraded: "bg-degraded-soft text-degraded",
+  down: "bg-down-soft text-down",
+  paused: "bg-paused-soft text-paused",
 };

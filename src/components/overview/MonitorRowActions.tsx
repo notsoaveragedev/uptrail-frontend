@@ -2,7 +2,7 @@ import { Button, Dropdown, Tooltip } from "antd";
 import { LuCopy, LuEllipsis, LuPause, LuPencil, LuPlay, LuRefreshCw, LuScrollText, LuTrash2 } from "react-icons/lu";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useToast } from "@/hooks/useToast";
-import type { Monitor } from "@/types/overview";
+import type { Monitor } from "@/types/monitor";
 
 export function MonitorRowActions({ monitor }: { monitor: Monitor }) {
   const toast = useToast();

@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Storefront home",
+    "url": "https://shop.shopnest.in",
+    "type": "http",
+    "method": "GET",
+    "interval": "1m",
+    "regions": ["BOM", "FRA", "IAD"],
+    "project": "shopnest",
+    "tags": ["production", "customer-facing"],
+    "expected_status": "200"
+  },
+  {
+    "name": "Wishlist API",
+    "url": "https://api.shopnest.in/v2/wishlist",
+    "type": "json_assert",
+    "method": "POST",
+    "interval": 30,
+    "regions": ["BOM", "SIN"],
+    "project": "shopnest",
+    "tags": ["production", "api"],
+    "expected_status": "200-299"
+  },
+  {
+    "name": "Image CDN",
+    "url": "https://img.pixelcraft.io/health",
+    "type": "ssl",
+    "method": "GET",
+    "interval": "1h",
+    "regions": ["IAD", "SFO"],
+    "project": "pixelcraft",
+    "tags": ["production"],
+    "expected_status": "200"
+  },
+  {
+    "name": "Client portal",
+    "url": "https://portal.bluepeak.co",
+    "type": "http",
+    "method": "GET",
+    "interval": "2m",
+    "regions": ["IAD", "FRA"],
+    "project": "bluepeak",
+    "tags": ["customer-facing"],
+    "expected_status": "200"
+  },
+  {
+    "name": "Reports export",
+    "url": "ftp://reports.bluepeak.co/daily",
+    "type": "http",
+    "method": "GET",
+    "interval": "15m",
+    "regions": ["IAD"],
+    "project": "bluepeak",
+    "tags": ["internal"],
+    "expected_status": "200"
+  }
+]

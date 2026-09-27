@@ -1,4 +1,4 @@
-import type { MonitorStatus } from "@/types/overview";
+import type { MonitorStatus } from "@/types/monitor";
 
 export type BoardMonitor = {
   name: string;

@@ -1,6 +1,6 @@
 import { LuCircleCheck, LuCirclePause, LuCircleX, LuTriangleAlert } from "react-icons/lu";
 import { STATUS_TEXT } from "@/lib/status";
-import type { MonitorStatus } from "@/types/overview";
+import type { MonitorStatus } from "@/types/monitor";
 
 const ICONS = {
   up: LuCircleCheck,

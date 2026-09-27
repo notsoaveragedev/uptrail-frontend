@@ -146,6 +146,16 @@ export function getAntdTheme(mode: ThemeMode): ThemeConfig {
         rowSelectedBg: p.hover,
         rowSelectedHoverBg: p.hover,
         cellPaddingBlock: 10,
+        headerSortActiveBg: p.panel,
+        headerSortHoverBg: p.hover,
+        bodySortBg: "transparent",
+      },
+      Tabs: {
+        itemColor: p.muted,
+        itemHoverColor: p.ink,
+        itemActiveColor: p.ink,
+        itemSelectedColor: p.ink,
+        inkBarColor: p.ink,
       },
       Tooltip: {
         colorBgSpotlight: p.tooltip,

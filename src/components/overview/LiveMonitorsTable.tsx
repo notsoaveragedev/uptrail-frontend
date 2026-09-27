@@ -7,8 +7,10 @@ import { StatusLabel } from "@/components/monitors/StatusLabel";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { useNow } from "@/hooks/useNow";
 import { formatAgo, formatLatency, formatUptime, uptimeTone } from "@/lib/format";
+import { displayUrl, MONITOR_TYPE_LABELS } from "@/lib/monitors";
 import { STATUS_FILL, STATUS_LABELS, STATUS_TEXT } from "@/lib/status";
-import type { Monitor, MonitorStatus, StatusCounts } from "@/types/overview";
+import type { Monitor, MonitorStatus } from "@/types/monitor";
+import type { StatusCounts } from "@/types/overview";
 import { MonitorRowActions } from "./MonitorRowActions";
 
 const FILTERS = ["all", "down", "degraded", "up", "paused"] as const;
@@ -59,7 +61,7 @@ export function LiveMonitorsTable({
       render: (_, monitor) => (
         <span className="flex flex-col">
           <span className="font-medium">{monitor.name}</span>
-          <span className="font-mono text-xs text-subtle">{monitor.url}</span>
+          <span className="font-mono text-xs text-subtle">{displayUrl(monitor.url)}</span>
         </span>
       ),
     },
@@ -67,7 +69,7 @@ export function LiveMonitorsTable({
       title: "Type",
       key: "type",
       width: 96,
-      render: (_, monitor) => <Tag className="m-0 font-mono text-xs">{monitor.type}</Tag>,
+      render: (_, monitor) => <Tag className="m-0 font-mono text-xs">{MONITOR_TYPE_LABELS[monitor.type]}</Tag>,
     },
     {
       title: "Checks · last 30",
@@ -88,8 +90,8 @@ export function LiveMonitorsTable({
       width: 120,
       align: "right",
       render: (_, monitor) => (
-        <span className={`font-mono ${uptimeTone(monitor.uptime)}`}>
-          {monitor.uptime === null ? "—" : formatUptime(monitor.uptime)}
+        <span className={`font-mono ${uptimeTone(monitor.uptime24h)}`}>
+          {monitor.uptime24h === null ? "—" : formatUptime(monitor.uptime24h)}
         </span>
       ),
     },

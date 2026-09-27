@@ -1,5 +1,5 @@
 import { STATUS_FILL } from "@/lib/status";
-import type { MonitorStatus } from "@/types/overview";
+import type { MonitorStatus } from "@/types/monitor";
 
 export function CheckTrail({ checks }: { checks: MonitorStatus[] }) {
   return (

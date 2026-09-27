@@ -1,0 +1,15 @@
+name,url,type,method,interval,regions,project,tags,expected_status
+Storefront home,https://shop.shopnest.in,http,GET,1m,BOM;FRA;IAD,shopnest,production;customer-facing,200
+Wishlist API,https://api.shopnest.in/v2/wishlist,json_assert,POST,30s,BOM;SIN,shopnest,production;api;tier-1,200-299
+Order webhooks,https://hooks.shopnest.in/orders,http,POST,5m,BOM|FRA,shopnest,payments,202
+"Search, suggestions",https://search.pixelcraft.io/suggest,response_time,GET,60,FRA;IAD,pixelcraft,api,200
+Image CDN,https://img.pixelcraft.io/health,ssl,GET,1h,IAD;SFO,pixelcraft,production,200
+Design docs,https://design.pixelcraft.io,keyword,GET,10m,FRA,pixelcraft,marketing,200
+Client portal,https://portal.bluepeak.co,http,GET,2m,IAD;FRA,bluepeak,customer-facing,200
+Reports export,ftp://reports.bluepeak.co/daily,http,GET,15m,IAD,bluepeak,internal,200
+Status widget,https://widget.bluepeak.co/v1,http,FETCH,1m,IAD,bluepeak,,200
+Payments health,https://pay.shopnest.in/health,http,GET,10s,BOM,shopnest,payments;tier-1,200
+Checkout API (legacy),https://api.shopnest.in/v2/checkout,http,POST,30s,BOM;FRA,shopnest,payments,200
+Analytics collector,https://collect.pixelcraft.io/ping,http,HEAD,5m,BOM;LON,pixelcraft,internal,204
+Careers page,https://jobs.bluepeak.co,keyword,GET,30m,FRA;IAD,bluepeak,marketing,200
+Partner API,https://partners.shopnest.in/api/v1,json,GET,5m,SIN;BOM,marketplace,api,200-299

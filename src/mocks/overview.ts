@@ -1,7 +1,6 @@
-import type { Monitor, MonitorStatus, Overview, ResponseSeries, TimeRange } from "@/types/overview";
-
-const CHECK_COUNT = 30;
-const HISTORY_COUNT = 24;
+import { MONITORS } from "@/mocks/monitors";
+import type { Monitor } from "@/types/monitor";
+import type { Overview, ResponseSeries, TimeRange } from "@/types/overview";
 
 function seeded(seed: number) {
   let value = seed;
@@ -10,186 +9,6 @@ function seeded(seed: number) {
     return (value - 1) / 2147483646;
   };
 }
-
-function checks(fill: MonitorStatus, overrides: Record<number, MonitorStatus> = {}) {
-  return Array.from({ length: CHECK_COUNT }, (_, index) => overrides[index] ?? fill);
-}
-
-function history(base: number, seed: number) {
-  const random = seeded(seed);
-  return Array.from({ length: HISTORY_COUNT }, () => Math.round(base * (0.85 + random() * 0.3)));
-}
-
-function secondsAgo(seconds: number) {
-  return Date.now() - seconds * 1000;
-}
-
-const allUp = (codes: string[]) => codes.map((code) => ({ code, status: "up" as const }));
-
-const monitors: Monitor[] = [
-  {
-    id: "mon_checkout",
-    name: "Checkout API",
-    url: "api.shopnest.in/v2/checkout",
-    type: "HTTP",
-    status: "down",
-    latencyMs: null,
-    uptime: 97.81,
-    regions: [
-      { code: "BOM", status: "down" },
-      { code: "FRA", status: "down" },
-      { code: "IAD", status: "up" },
-    ],
-    checks: checks("up", {
-      21: "degraded",
-      23: "degraded",
-      24: "down",
-      25: "down",
-      26: "down",
-      27: "down",
-      28: "down",
-      29: "down",
-    }),
-    latencyHistory: history(260, 3),
-    lastCheckedAt: secondsAgo(6),
-  },
-  {
-    id: "mon_search",
-    name: "Search service",
-    url: "search.pixelcraft.io/health",
-    type: "JSON",
-    status: "degraded",
-    latencyMs: 1240,
-    uptime: 99.62,
-    regions: [
-      { code: "BOM", status: "degraded" },
-      { code: "FRA", status: "up" },
-      { code: "IAD", status: "degraded" },
-    ],
-    checks: checks("up", {
-      19: "degraded",
-      22: "degraded",
-      23: "degraded",
-      26: "degraded",
-      28: "degraded",
-      29: "degraded",
-    }),
-    latencyHistory: history(1100, 20),
-    lastCheckedAt: secondsAgo(12),
-  },
-  {
-    id: "mon_marketing",
-    name: "Marketing site",
-    url: "www.bluepeak.co",
-    type: "Keyword",
-    status: "degraded",
-    latencyMs: 890,
-    uptime: 99.9,
-    regions: [
-      { code: "BOM", status: "up" },
-      { code: "FRA", status: "degraded" },
-      { code: "IAD", status: "up" },
-    ],
-    checks: checks("up", { 20: "degraded", 27: "degraded", 29: "degraded" }),
-    latencyHistory: history(820, 37),
-    lastCheckedAt: secondsAgo(21),
-  },
-  {
-    id: "mon_auth",
-    name: "Auth service",
-    url: "auth.pixelcraft.io/health",
-    type: "HTTP",
-    status: "up",
-    latencyMs: 142,
-    uptime: 100,
-    regions: allUp(["BOM", "FRA", "IAD"]),
-    checks: checks("up"),
-    latencyHistory: history(140, 54),
-    lastCheckedAt: secondsAgo(4),
-  },
-  {
-    id: "mon_payments",
-    name: "Payments webhook",
-    url: "hooks.shopnest.in/payments",
-    type: "HTTP",
-    status: "up",
-    latencyMs: 198,
-    uptime: 99.98,
-    regions: allUp(["BOM", "FRA", "IAD"]),
-    checks: checks("up", { 11: "degraded" }),
-    latencyHistory: history(200, 71),
-    lastCheckedAt: secondsAgo(15),
-  },
-  {
-    id: "mon_admin",
-    name: "Admin dashboard",
-    url: "admin.bluepeak.co",
-    type: "Keyword",
-    status: "up",
-    latencyMs: 326,
-    uptime: 99.99,
-    regions: allUp(["BOM", "FRA", "IAD"]),
-    checks: checks("up", { 17: "degraded" }),
-    latencyHistory: history(320, 88),
-    lastCheckedAt: secondsAgo(30),
-  },
-  {
-    id: "mon_cdn",
-    name: "Image CDN",
-    url: "cdn.pixelcraft.io",
-    type: "SSL",
-    status: "up",
-    latencyMs: 88,
-    uptime: 100,
-    regions: allUp(["BOM", "FRA", "IAD"]),
-    checks: checks("up"),
-    latencyHistory: history(90, 105),
-    lastCheckedAt: secondsAgo(9),
-  },
-  {
-    id: "mon_public_api",
-    name: "Public API v1",
-    url: "api.pixelcraft.io/v1/status",
-    type: "JSON",
-    status: "up",
-    latencyMs: 211,
-    uptime: 99.97,
-    regions: allUp(["BOM", "FRA", "IAD"]),
-    checks: checks("up", { 6: "degraded" }),
-    latencyHistory: history(210, 122),
-    lastCheckedAt: secondsAgo(18),
-  },
-  {
-    id: "mon_blog",
-    name: "Blog",
-    url: "blog.bluepeak.co",
-    type: "Keyword",
-    status: "up",
-    latencyMs: 402,
-    uptime: 100,
-    regions: allUp(["BOM", "FRA", "IAD"]),
-    checks: checks("up"),
-    latencyHistory: history(400, 139),
-    lastCheckedAt: secondsAgo(45),
-  },
-  {
-    id: "mon_staging",
-    name: "Staging API",
-    url: "staging-api.shopnest.in",
-    type: "HTTP",
-    status: "paused",
-    latencyMs: null,
-    uptime: null,
-    regions: [
-      { code: "BOM", status: "paused" },
-      { code: "FRA", status: "paused" },
-      { code: "IAD", status: "paused" },
-    ],
-    checks: checks("paused"),
-    latencyHistory: history(300, 156),
-    lastCheckedAt: secondsAgo(7200),
-  },
-];
 
 const RANGE_BUCKETS: Record<TimeRange, { count: number; stepMinutes: number }> = {
   "1h": { count: 60, stepMinutes: 1 },
@@ -229,7 +48,7 @@ export function buildOverview(range: TimeRange): Overview {
       openIncidentsPrevious: 3,
       mttrMinutes: 14,
     },
-    monitors,
+    monitors: MONITORS.slice(0, 10),
     totalMonitors: 42,
     statusCounts: { up: 38, degraded: 2, down: 1, paused: 1 },
     anomalies: ["p95 spiked to 1.18 s at 14:05", "BOM latency is up 40% since 13:50"],

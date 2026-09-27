@@ -3,7 +3,8 @@ import type { IconType } from "react-icons";
 import { LuActivity, LuGauge, LuShieldCheck, LuSiren } from "react-icons/lu";
 import { CheckTrail } from "@/components/monitors/CheckTrail";
 import { STATUS_FILL, STATUS_LABELS, STATUSES } from "@/lib/status";
-import type { Kpis, MonitorStatus, StatusCounts } from "@/types/overview";
+import type { MonitorStatus } from "@/types/monitor";
+import type { Kpis, StatusCounts } from "@/types/overview";
 
 type KpiCardsProps = {
   kpis: Kpis;

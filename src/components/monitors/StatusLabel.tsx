@@ -1,5 +1,5 @@
 import { STATUS_LABELS, STATUS_TEXT } from "@/lib/status";
-import type { MonitorStatus } from "@/types/overview";
+import type { MonitorStatus } from "@/types/monitor";
 import { StatusIcon } from "./StatusIcon";
 
 export function StatusLabel({ status }: { status: MonitorStatus }) {

@@ -4,7 +4,7 @@ import { LuCornerDownLeft, LuPlus, LuSearch, LuSearchX } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router";
 import { StatusIcon } from "@/components/monitors/StatusIcon";
 import { ALL_NAV_ITEMS } from "@/lib/navigation";
-import { buildOverview } from "@/mocks/overview";
+import { MONITORS } from "@/mocks/monitors";
 
 type CommandPaletteProps = {
   open: boolean;
@@ -53,7 +53,7 @@ function PaletteContent({ onClose }: { onClose: () => void }) {
       title: item.label,
       path: item.path ? `/o/${orgSlug}/${item.path}` : `/o/${orgSlug}`,
     })),
-    ...buildOverview("24h").monitors.map((monitor) => ({
+    ...MONITORS.map((monitor) => ({
       id: monitor.id,
       group: "Monitors",
       icon: <StatusIcon status={monitor.status} />,

@@ -1,22 +1,6 @@
-export type MonitorStatus = "up" | "degraded" | "down" | "paused";
-
-export type MonitorType = "HTTP" | "JSON" | "Keyword" | "SSL";
+import type { Monitor, MonitorStatus } from "./monitor";
 
 export type TimeRange = "1h" | "24h" | "7d" | "30d";
-
-export type Monitor = {
-  id: string;
-  name: string;
-  url: string;
-  type: MonitorType;
-  status: MonitorStatus;
-  latencyMs: number | null;
-  uptime: number | null;
-  regions: { code: string; status: MonitorStatus }[];
-  checks: MonitorStatus[];
-  latencyHistory: number[];
-  lastCheckedAt: number | null;
-};
 
 export type AttentionItem = {
   id: string;

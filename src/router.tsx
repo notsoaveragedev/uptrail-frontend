@@ -47,6 +47,23 @@ export const router = createBrowserRouter([
             ErrorBoundary: LayoutErrorBoundary,
             children: [
               { index: true, lazy: lazyPage(() => import("@/pages/app/OverviewPage"), "OverviewPage") },
+              { path: "monitors", lazy: lazyPage(() => import("@/pages/monitors/MonitorsPage"), "MonitorsPage") },
+              {
+                path: "monitors/new",
+                lazy: lazyPage(() => import("@/pages/monitors/NewMonitorPage"), "NewMonitorPage"),
+              },
+              {
+                path: "monitors/import",
+                lazy: lazyPage(() => import("@/pages/monitors/ImportMonitorsPage"), "ImportMonitorsPage"),
+              },
+              {
+                path: "monitors/:monitorId",
+                lazy: lazyPage(() => import("@/pages/monitors/MonitorDetailPage"), "MonitorDetailPage"),
+              },
+              {
+                path: "monitors/:monitorId/edit",
+                lazy: lazyPage(() => import("@/pages/monitors/EditMonitorPage"), "EditMonitorPage"),
+              },
               { path: "*", Component: InAppNotFoundPage },
             ],
           },

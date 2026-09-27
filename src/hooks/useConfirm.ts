@@ -21,7 +21,7 @@ export function useConfirm() {
         okText: confirmLabel,
         cancelText: "Cancel",
         okButtonProps: { danger: isDanger },
-        autoFocusButton: "cancel",
+        focusable: { autoFocusButton: "cancel" },
         onOk: () => resolve(true),
         onCancel: () => resolve(false),
       });
