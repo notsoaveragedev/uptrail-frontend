@@ -74,6 +74,13 @@
   --radius-xl: 0.875rem;
 
   --animate-progress: progress 1s ease-in-out infinite;
+  --animate-flash: flash 1.6s ease-out;
+
+  @keyframes flash {
+    from {
+      background-color: var(--hover);
+    }
+  }
 
   @keyframes progress {
     from {
@@ -201,4 +208,8 @@
       linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
     background-size: 2.5rem 2.5rem;
   }
+}
+
+.uplot .u-cursor-x {
+  border-right: 1px dashed var(--line-strong);
 }

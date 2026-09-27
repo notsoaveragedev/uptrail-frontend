@@ -11,7 +11,7 @@ export const router = createBrowserRouter([
     ErrorBoundary: RootErrorBoundary,
     HydrateFallback: FullPageLoader,
     children: [
-      { path: "/", element: <Navigate to="/login" replace /> },
+      { path: "/", element: <Navigate to="/o/pixelcraft" replace /> },
       {
         lazy: lazyPage(() => import("@/layouts/AuthLayout"), "AuthLayout"),
         children: [

@@ -1,20 +1,6 @@
-import type { ReactNode } from "react";
-import { LuCircleCheck, LuCirclePause, LuTriangleAlert } from "react-icons/lu";
-import { BOARD_MONITORS, type CheckStatus } from "@/lib/statusBoard";
-
-const CHECK_FILLS: Record<CheckStatus, string> = {
-  up: "bg-up",
-  degraded: "bg-degraded",
-  down: "bg-down",
-  paused: "bg-line-strong",
-};
-
-const STATUS_ICONS: Record<CheckStatus, ReactNode> = {
-  up: <LuCircleCheck className="text-up" />,
-  degraded: <LuTriangleAlert className="text-degraded" />,
-  down: <LuTriangleAlert className="text-down" />,
-  paused: <LuCirclePause className="text-paused" />,
-};
+import { CheckTrail } from "@/components/monitors/CheckTrail";
+import { StatusIcon } from "@/components/monitors/StatusIcon";
+import { BOARD_MONITORS } from "@/lib/statusBoard";
 
 export function StatusBoard() {
   return (
@@ -37,15 +23,13 @@ export function StatusBoard() {
               key={monitor.url}
               className={`flex items-center gap-4 px-4 py-3 ${monitor.status === "paused" ? "opacity-60" : ""}`}
             >
-              <span className="[&_svg]:size-4">{STATUS_ICONS[monitor.status]}</span>
+              <StatusIcon status={monitor.status} />
               <span className="flex w-44 min-w-0 flex-col">
                 <span className="truncate font-medium">{monitor.name}</span>
                 <span className="truncate font-mono text-xs text-subtle">{monitor.url}</span>
               </span>
-              <span className="flex flex-1 justify-center gap-0.5">
-                {monitor.checks.map((check, index) => (
-                  <span key={index} className={`h-4 w-0.75 rounded-[1px] ${CHECK_FILLS[check]}`} />
-                ))}
+              <span className="flex flex-1 justify-center">
+                <CheckTrail checks={monitor.checks} />
               </span>
               <span
                 className={`w-16 text-right font-mono text-xs ${monitor.status === "degraded" ? "text-degraded" : "text-ink"}`}

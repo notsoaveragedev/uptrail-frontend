@@ -1,17 +1,17 @@
-export type CheckStatus = "up" | "degraded" | "down" | "paused";
+import type { MonitorStatus } from "@/types/overview";
 
 export type BoardMonitor = {
   name: string;
   url: string;
-  status: CheckStatus;
+  status: MonitorStatus;
   latency: string;
   regions: string;
-  checks: CheckStatus[];
+  checks: MonitorStatus[];
 };
 
 const CHECK_COUNT = 40;
 
-function trail(fill: CheckStatus, overrides: Record<number, CheckStatus> = {}) {
+function trail(fill: MonitorStatus, overrides: Record<number, MonitorStatus> = {}) {
   return Array.from({ length: CHECK_COUNT }, (_, index) => overrides[index] ?? fill);
 }
 

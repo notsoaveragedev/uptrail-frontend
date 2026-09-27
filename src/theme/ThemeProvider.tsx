@@ -13,7 +13,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ThemeMode>(readInitialMode);
 
   useEffect(() => {
-    document.documentElement.dataset.theme = mode;
     try {
       localStorage.setItem(THEME_STORAGE_KEY, mode);
     } catch {
@@ -21,10 +20,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [mode]);
 
-  const value = useMemo(
-    () => ({ mode, toggleMode: () => setMode((current) => (current === "dark" ? "light" : "dark")) }),
-    [mode],
-  );
+  const value = useMemo(() => {
+    function toggleMode() {
+      const next = mode === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      setMode(next);
+    }
+    return { mode, toggleMode };
+  }, [mode]);
   const antdTheme = useMemo(() => getAntdTheme(mode), [mode]);
 
   return (

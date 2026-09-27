@@ -23,6 +23,7 @@
     "react-error-boundary": "^6.1.6",
     "react-icons": "^5.7.0",
     "react-router": "^8.4.0",
+    "uplot": "^1.6.32",
     "zod": "^4.6.5"
   },
   "devDependencies": {

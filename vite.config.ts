@@ -14,13 +14,8 @@ export default defineConfig({
         // Vendors change far less often than app code, so they get their own long-cached chunks.
         codeSplitting: {
           groups: [
-            { name: "react", test: /node_modules[\\/](react|react-dom|react-router|scheduler)[\\/]/, priority: 3 },
-            {
-              name: "antd",
-              test: /node_modules[\\/](antd|@ant-design|@rc-component|rc-[^\\/]+|@emotion)[\\/]/,
-              priority: 2,
-            },
-            { name: "vendor", test: /node_modules[\\/]/, priority: 1 },
+            { name: "react", test: /node_modules[\\/](react|react-dom|react-router|scheduler)[\\/]/, priority: 2 },
+            { name: "vendor", test: /node_modules[\\/](?!antd|@ant-design|@rc-component|uplot)/, priority: 1 },
           ],
         },
       },
