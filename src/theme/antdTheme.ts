@@ -1,0 +1,166 @@
+import { theme, type MappingAlgorithm, type ThemeConfig } from "antd";
+import { palettes, type ThemeMode } from "./palette";
+
+// antd's dark algorithm darkens seed colors, but the Ember accent and status colors are already tuned for dark.
+const keepSeedColors: MappingAlgorithm = (seed, map = theme.darkAlgorithm(seed)) => ({
+  ...map,
+  colorPrimary: seed.colorPrimary,
+  colorSuccess: seed.colorSuccess,
+  colorError: seed.colorError,
+  colorWarning: seed.colorWarning,
+  colorInfo: seed.colorInfo,
+  colorLink: seed.colorLink,
+});
+
+export function getAntdTheme(mode: ThemeMode): ThemeConfig {
+  const p = palettes[mode];
+
+  return {
+    algorithm: mode === "dark" ? [theme.darkAlgorithm, keepSeedColors] : theme.defaultAlgorithm,
+    token: {
+      colorPrimary: p.accent,
+      colorLink: p.accent,
+      colorPrimaryHover: p.accentHover,
+      colorPrimaryActive: p.accentHover,
+      colorLinkHover: p.accentHover,
+      colorSuccess: p.up,
+      colorError: p.down,
+      colorWarning: p.degraded,
+      colorInfo: p.maintenance,
+
+      colorTextBase: p.ink,
+      colorText: p.ink,
+      colorTextSecondary: p.muted,
+      colorTextTertiary: p.subtle,
+      colorTextQuaternary: p.faint,
+      colorTextPlaceholder: p.subtle,
+      colorTextDisabled: p.faint,
+
+      colorBgBase: p.canvas,
+      colorBgLayout: p.canvas,
+      colorBgContainer: p.card,
+      colorBgElevated: p.card,
+      colorBgSpotlight: p.tooltip,
+      colorBgMask: p.mask,
+      colorBorder: p.lineStrong,
+      colorBorderSecondary: p.line,
+      colorSplit: p.line,
+      colorFillSecondary: p.hover,
+      colorFillTertiary: p.hover,
+      colorFillQuaternary: p.panel,
+      colorBgTextHover: p.hover,
+      controlItemBgHover: p.hover,
+      controlItemBgActive: p.hover,
+      controlItemBgActiveHover: p.hover,
+
+      // Fonts come from the CSS variables in index.css, so switching fonts is a one-place change.
+      fontFamily: "var(--font-sans)",
+      fontFamilyCode: "var(--font-mono)",
+      fontSize: 13,
+      fontSizeSM: 11,
+      fontSizeLG: 15,
+      fontSizeHeading3: 22,
+      fontWeightStrong: 600,
+
+      borderRadiusXS: 2,
+      borderRadiusSM: 4,
+      borderRadius: 6,
+      borderRadiusLG: 10,
+      controlHeight: 32,
+      controlHeightSM: 28,
+      controlHeightLG: 40,
+      // Inputs show focus with a darker border only, no glow ring.
+      controlOutline: "transparent",
+      controlOutlineWidth: 0,
+      lineWidthFocus: 2,
+
+      boxShadow: p.overlayShadow,
+      boxShadowSecondary: p.overlayShadow,
+
+      motionDurationFast: "0.1s",
+      motionDurationMid: "0.15s",
+      motionDurationSlow: "0.2s",
+    },
+    components: {
+      Button: {
+        fontWeight: 500,
+        primaryColor: p.onAccent,
+        primaryShadow: "none",
+        defaultShadow: "none",
+        dangerShadow: "none",
+        defaultBg: p.card,
+        defaultBorderColor: p.line,
+        defaultHoverBg: p.hover,
+        defaultHoverBorderColor: p.lineStrong,
+        defaultHoverColor: p.ink,
+        defaultActiveBg: p.hover,
+        defaultActiveBorderColor: p.lineStrong,
+        defaultActiveColor: p.ink,
+        textHoverBg: p.hover,
+      },
+      Input: {
+        activeShadow: "none",
+        errorActiveShadow: "none",
+        warningActiveShadow: "none",
+        hoverBorderColor: p.lineStrong,
+        activeBorderColor: p.subtle,
+      },
+      Select: {
+        activeOutlineColor: "transparent",
+        hoverBorderColor: p.lineStrong,
+        activeBorderColor: p.subtle,
+        optionSelectedBg: p.hover,
+        optionSelectedColor: p.ink,
+        optionSelectedFontWeight: 500,
+        optionActiveBg: p.hover,
+      },
+      Checkbox: {
+        colorPrimary: p.accent,
+        colorPrimaryHover: p.accentHover,
+      },
+      Menu: {
+        itemHeight: 32,
+        itemBorderRadius: 6,
+        itemColor: p.muted,
+        itemHoverColor: p.ink,
+        itemHoverBg: p.hover,
+        itemSelectedBg: p.hover,
+        itemSelectedColor: p.ink,
+        itemActiveBg: p.hover,
+        activeBarBorderWidth: 0,
+      },
+      Segmented: {
+        trackBg: p.panel,
+        itemColor: p.muted,
+        itemHoverColor: p.ink,
+        itemHoverBg: "transparent",
+        itemSelectedBg: p.hover,
+        itemSelectedColor: p.ink,
+      },
+      Table: {
+        headerBg: p.panel,
+        headerColor: p.subtle,
+        headerSplitColor: "transparent",
+        borderColor: p.line,
+        rowHoverBg: p.hover,
+        rowSelectedBg: p.hover,
+        rowSelectedHoverBg: p.hover,
+        cellPaddingBlock: 10,
+      },
+      Tooltip: {
+        colorBgSpotlight: p.tooltip,
+        colorTextLightSolid: palettes.dark.ink,
+        fontSize: 11,
+      },
+      Modal: {
+        borderRadiusLG: 14,
+        contentBg: p.card,
+        headerBg: p.card,
+        titleFontSize: 15,
+      },
+      Dropdown: {
+        borderRadiusLG: 10,
+      },
+    },
+  };
+}
