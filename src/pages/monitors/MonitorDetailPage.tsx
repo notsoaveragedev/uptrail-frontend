@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Tabs } from "antd";
 import { useParams } from "react-router";
+import { incidentsQuery } from "@/api/incidents";
 import { monitorDetailQuery } from "@/api/monitorDetail";
 import { monitorsQuery } from "@/api/monitors";
 import { SectionErrorBoundary } from "@/components/errors/SectionErrorBoundary";
@@ -38,7 +39,10 @@ function MonitorDetail({ monitor }: { monitor: Monitor }) {
   const [tab, setTab] = useSearchParam("tab", DETAIL_TABS, "overview");
   const [range, setRange] = useSearchParam("range", TIME_RANGES, "24h", { replace: true });
 
-  const activeIncident = detail?.incidents.find((incident) => incident.resolvedAt === null);
+  const { data: incidentCount = 0 } = useQuery({
+    ...incidentsQuery(orgSlug),
+    select: (incidents) => incidents.filter((incident) => incident.monitorIds.includes(monitor.id)).length,
+  });
 
   return (
     <>
@@ -48,7 +52,7 @@ function MonitorDetail({ monitor }: { monitor: Monitor }) {
       ) : (
         <div className="flex flex-col gap-4">
           <MonitorHeader monitor={monitor} />
-          {activeIncident && monitor.status === "down" && <IncidentBanner incident={activeIncident} />}
+          <IncidentBanner monitorId={monitor.id} />
           <Tabs
             activeKey={tab}
             onChange={(value) => setTab(value as DetailTab)}
@@ -65,8 +69,8 @@ function MonitorDetail({ monitor }: { monitor: Monitor }) {
               },
               {
                 key: "incidents",
-                label: <TabLabel label="Incidents" count={detail.incidents.length} />,
-                children: <IncidentsTab incidents={detail.incidents} />,
+                label: <TabLabel label="Incidents" count={incidentCount} />,
+                children: <IncidentsTab monitorId={monitor.id} />,
               },
               {
                 key: "alerts",

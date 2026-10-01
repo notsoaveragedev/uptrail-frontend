@@ -70,17 +70,6 @@ export function buildOverview(range: TimeRange): Overview {
         action: { label: "View certificate", to: "monitors/mon_cdn" },
       },
     ],
-    incidents: [
-      {
-        id: "INC-42",
-        severity: "SEV 1",
-        title: "Checkout API unreachable",
-        cause: "Payment gateway timing out from BOM and FRA.",
-        state: "Investigating",
-        assignee: { name: "Arjun R.", initials: "AR" },
-        startedAt: Date.now() - 380_000,
-      },
-    ],
     maintenance: { title: "DB migration", project: "Bluepeak", startsAt: "Tomorrow 02:00" },
     alerts: [
       {

@@ -1,14 +1,20 @@
+import { useQuery } from "@tanstack/react-query";
 import { LuCircleAlert } from "react-icons/lu";
 import { Link, useParams } from "react-router";
+import { incidentsQuery } from "@/api/incidents";
+import { SeverityTag } from "@/components/alerts/SeverityTag";
+import { IncidentDuration } from "@/components/incidents/IncidentDuration";
+import { IncidentStatusPill } from "@/components/incidents/IncidentStatusPill";
 import { MetaSeparator } from "@/components/ui/MetaList";
-import { useNow } from "@/hooks/useNow";
-import { formatDuration } from "@/lib/format";
+import { openIncidentsFor, shortName } from "@/lib/incidents";
 import { paths } from "@/lib/paths";
-import type { MonitorIncident } from "@/types/monitorDetail";
 
-export function IncidentBanner({ incident }: { incident: MonitorIncident }) {
+export function IncidentBanner({ monitorId }: { monitorId: string }) {
   const { orgSlug = "" } = useParams();
-  const now = useNow();
+  const { data: incidents = [] } = useQuery(incidentsQuery(orgSlug));
+  const [incident] = openIncidentsFor(incidents, monitorId);
+
+  if (!incident) return null;
 
   return (
     <div
@@ -19,15 +25,16 @@ export function IncidentBanner({ incident }: { incident: MonitorIncident }) {
       <span className="font-semibold text-ink">
         Incident {incident.id} · {incident.title}
       </span>
-      <span className="text-down">Critical</span>
+      <SeverityTag severity={incident.severity} />
+      <IncidentStatusPill status={incident.status} />
       <MetaSeparator />
-      <span className="text-down">{incident.state}</span>
-      <MetaSeparator />
-      <span className="text-muted">{incident.cause}</span>
-      <MetaSeparator />
-      <span className="text-muted">Assigned to {incident.assignee}</span>
+      <span className="text-muted">
+        {incident.assignee ? `Assigned to ${shortName(incident.assignee)}` : "Unassigned"}
+      </span>
       <span className="ml-auto flex items-center gap-4">
-        <span className="font-mono text-xs text-down">{formatDuration(now - incident.startedAt)}</span>
+        <span className="font-mono text-xs text-down">
+          <IncidentDuration incident={incident} />
+        </span>
         <Link to={paths.incident(orgSlug, incident.id)} className="font-medium">
           View incident →
         </Link>

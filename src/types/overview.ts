@@ -62,7 +62,6 @@ export type Overview = {
   statusCounts: StatusCounts;
   anomalies: string[];
   attention: AttentionItem[];
-  incidents: Incident[];
   maintenance: Maintenance;
   alerts: AlertEvent[];
   responseTime: ResponseSeries;

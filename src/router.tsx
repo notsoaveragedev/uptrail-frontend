@@ -41,6 +41,25 @@ export const router = createBrowserRouter([
         ],
       },
       {
+        path: "status/:slug",
+        ErrorBoundary: RootErrorBoundary,
+        children: [
+          { index: true, lazy: lazyPage(() => import("@/pages/public-status/PublicStatusPage"), "PublicStatusPage") },
+          {
+            path: "incidents/:incidentId",
+            lazy: lazyPage(() => import("@/pages/public-status/PublicIncidentPage"), "PublicIncidentPage"),
+          },
+          {
+            path: "subscribe/confirm",
+            lazy: lazyPage(() => import("@/pages/public-status/SubscribeConfirmPage"), "SubscribeConfirmPage"),
+          },
+          {
+            path: "unsubscribe",
+            lazy: lazyPage(() => import("@/pages/public-status/UnsubscribePage"), "UnsubscribePage"),
+          },
+        ],
+      },
+      {
         path: "o/:orgSlug/dashboards/:dashboardId/tv",
         ErrorBoundary: RootErrorBoundary,
         lazy: lazyPage(() => import("@/pages/dashboards/DashboardTvPage"), "DashboardTvPage"),
@@ -67,6 +86,22 @@ export const router = createBrowserRouter([
                 lazy: lazyPage(() => import("@/pages/monitors/MonitorDetailPage"), "MonitorDetailPage"),
               },
               { path: "logs", lazy: lazyPage(() => import("@/pages/logs/LogsPage"), "LogsPage") },
+              {
+                path: "incidents",
+                lazy: lazyPage(() => import("@/pages/incidents/IncidentsPage"), "IncidentsPage"),
+              },
+              {
+                path: "incidents/:incidentId",
+                lazy: lazyPage(() => import("@/pages/incidents/IncidentPage"), "IncidentPage"),
+              },
+              {
+                path: "status-pages",
+                lazy: lazyPage(() => import("@/pages/status-pages/StatusPagesPage"), "StatusPagesPage"),
+              },
+              {
+                path: "status-pages/:pageId/edit",
+                lazy: lazyPage(() => import("@/pages/status-pages/StatusPageEditorPage"), "StatusPageEditorPage"),
+              },
               {
                 path: "dashboards",
                 lazy: lazyPage(() => import("@/pages/dashboards/DashboardsPage"), "DashboardsPage"),

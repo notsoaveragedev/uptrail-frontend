@@ -50,7 +50,7 @@ export function OverviewPage() {
             </SectionErrorBoundary>
             <div className="flex flex-col gap-4">
               <SectionErrorBoundary>
-                <ActiveIncidentsCard incidents={overview.incidents} maintenance={overview.maintenance} />
+                <ActiveIncidentsCard maintenance={overview.maintenance} />
               </SectionErrorBoundary>
               <SectionErrorBoundary>
                 <RecentAlertsCard alerts={overview.alerts} />

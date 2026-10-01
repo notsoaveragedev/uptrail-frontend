@@ -11,7 +11,7 @@ import {
 } from "@/lib/alertExpression/visual";
 import { gripId, nodeLabel, positionText, type Builder } from "./builderUtils";
 import { ConditionGroup } from "./ConditionGroup";
-import { useRowDrag } from "./useRowDrag";
+import { useRowDrag } from "@/hooks/useRowDrag";
 
 type VisualBuilderProps = {
   tree: VisualGroup;

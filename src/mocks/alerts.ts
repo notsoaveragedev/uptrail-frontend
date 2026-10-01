@@ -176,7 +176,7 @@ function buildEvents(): AlertEvent[] {
       })),
       acknowledgedBy: isAcknowledged ? ACKNOWLEDGERS[Math.floor(random() * ACKNOWLEDGERS.length)] : null,
       acknowledgedAt: isAcknowledged ? firedAt + Math.round(random() * 9 * MINUTE) : null,
-      incidentId: rule.autoIncident && random() > 0.6 ? `INC-${10 + index}` : null,
+      incidentId: rule.autoIncident && random() > 0.6 ? `INC-${12 + (index % 30)}` : null,
       firedAt,
       resolvedAt: firedAt + durationMs,
     });

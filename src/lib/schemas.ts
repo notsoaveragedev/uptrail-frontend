@@ -103,3 +103,51 @@ export const alertChannelSchema = z.discriminatedUnion("type", [
     method: z.enum(["POST", "PUT"]),
   }),
 ]);
+
+export const newStatusPageSchema = z.object({
+  project: z.string().min(1, "Pick a project."),
+  title: z.string().trim().min(1, "Give the page a title.").max(60, "Keep the title under 60 characters."),
+  slug: z
+    .string()
+    .trim()
+    .min(3, "Use at least 3 characters.")
+    .max(40, "Keep the slug under 40 characters.")
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers and single hyphens."),
+});
+
+const idList = z
+  .string()
+  .optional()
+  .transform((value) => value?.split(",").filter(Boolean) ?? []);
+
+export const declareIncidentSchema = z
+  .object({
+    title: z
+      .string()
+      .trim()
+      .min(1, "Give the incident a short title.")
+      .max(120, "Keep the title under 120 characters."),
+    severity: z.enum(["minor", "major", "critical"]),
+    status: z.enum(["investigating", "identified", "monitoring"]),
+    monitorIds: idList,
+    assignee: z
+      .string()
+      .optional()
+      .transform((value) => value || null),
+    message: z.string().trim().max(2000, "Keep the message under 2,000 characters."),
+    publish: checkbox,
+    notify: checkbox,
+    channelIds: idList,
+  })
+  .refine((values) => !values.notify || values.channelIds.length > 0, {
+    message: "Pick at least one channel to notify.",
+    path: ["channelIds"],
+  });
+
+export const incidentUpdateSchema = z.object({
+  status: z.enum(["investigating", "identified", "monitoring", "resolved"]),
+  message: z.string().trim().min(1, "Write an update first.").max(2000, "Keep the update under 2,000 characters."),
+  isPublic: checkbox,
+});
+
+export const subscribeSchema = z.object({ email });

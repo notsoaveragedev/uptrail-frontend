@@ -1,49 +1,68 @@
-import { LuWrench } from "react-icons/lu";
+import { useQuery } from "@tanstack/react-query";
+import { LuCircleCheck, LuWrench } from "react-icons/lu";
 import { Link, useParams } from "react-router";
+import { incidentsQuery } from "@/api/incidents";
+import { SeverityTag } from "@/components/alerts/SeverityTag";
+import { AssigneeAvatar } from "@/components/incidents/AssigneeAvatar";
+import { IncidentDuration } from "@/components/incidents/IncidentDuration";
+import { IncidentStatusPill } from "@/components/incidents/IncidentStatusPill";
 import { Card } from "@/components/ui/Card";
-import { StatusDot } from "@/components/ui/StatusDot";
-import { useNow } from "@/hooks/useNow";
-import { formatDuration } from "@/lib/format";
+import { latestUpdateText, openIncidentsFor, shortName } from "@/lib/incidents";
 import { paths } from "@/lib/paths";
-import { TONE_BADGE } from "@/lib/status";
-import type { Incident, Maintenance } from "@/types/overview";
+import type { IncidentStatus } from "@/types/incident";
+import type { Maintenance } from "@/types/overview";
 
-type ActiveIncidentsCardProps = {
-  incidents: Incident[];
-  maintenance: Maintenance;
+const STATUS_BORDER: Record<IncidentStatus, string> = {
+  investigating: "border-l-down",
+  identified: "border-l-degraded",
+  monitoring: "border-l-maintenance",
+  resolved: "border-l-up",
 };
 
-export function ActiveIncidentsCard({ incidents, maintenance }: ActiveIncidentsCardProps) {
+export function ActiveIncidentsCard({ maintenance }: { maintenance: Maintenance }) {
   const { orgSlug = "" } = useParams();
-  const now = useNow();
+  const { data: incidents = [] } = useQuery(incidentsQuery(orgSlug));
+  const open = openIncidentsFor(incidents);
 
   return (
-    <Card title="Active incidents" meta={incidents.length} extra={<Link to={paths.incidents(orgSlug)}>View all</Link>}>
-      <ul className="flex flex-col gap-3 px-4">
-        {incidents.map((incident) => (
-          <li key={incident.id} className="rounded-md border border-l-2 border-line border-l-down bg-panel p-3">
-            <div className="flex items-center gap-2 font-mono text-xs">
-              <span className={`rounded-sm px-1.5 py-0.5 ${TONE_BADGE.down}`}>{incident.severity}</span>
-              <span className="text-subtle">{incident.id}</span>
-              <span className="ml-auto text-ink">{formatDuration(now - incident.startedAt)}</span>
-            </div>
-            <p className="mt-2 font-semibold">{incident.title}</p>
-            <p className="mt-0.5 text-muted">{incident.cause}</p>
-            <div className="mt-3 flex items-center justify-between text-xs">
-              <span className="flex items-center gap-1.5 text-down">
-                <StatusDot className="animate-pulse" />
-                {incident.state}
-              </span>
-              <span className="flex items-center gap-1.5 text-muted">
-                <span className="flex size-5 items-center justify-center rounded-full bg-hover text-caps font-semibold">
-                  {incident.assignee.initials}
-                </span>
-                {incident.assignee.name}
-              </span>
-            </div>
-          </li>
-        ))}
-      </ul>
+    <Card title="Active incidents" meta={open.length} extra={<Link to={paths.incidents(orgSlug)}>View all</Link>}>
+      {open.length === 0 ? (
+        <p className="flex items-center gap-2 px-4 text-muted">
+          <LuCircleCheck aria-hidden className="size-4 text-up" />
+          All clear · no open incidents
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-3 px-4">
+          {open.map((incident) => {
+            const update = latestUpdateText(incident);
+            return (
+              <li key={incident.id}>
+                <Link
+                  to={paths.incident(orgSlug, incident.id)}
+                  className={`block rounded-md border border-l-2 border-line bg-panel p-3 text-ink transition-colors hover:border-line-strong hover:text-ink ${STATUS_BORDER[incident.status]}`}
+                >
+                  <span className="flex items-center gap-2">
+                    <SeverityTag severity={incident.severity} />
+                    <span className="font-mono text-xs text-subtle">{incident.id}</span>
+                    <span className="ml-auto font-mono text-xs text-ink">
+                      <IncidentDuration incident={incident} />
+                    </span>
+                  </span>
+                  <span className="mt-2 block font-semibold">{incident.title}</span>
+                  {update && <span className="mt-0.5 line-clamp-2 text-muted">{update}</span>}
+                  <span className="mt-3 flex items-center justify-between text-xs">
+                    <IncidentStatusPill status={incident.status} />
+                    <span className="flex items-center gap-1.5 text-muted">
+                      <AssigneeAvatar name={incident.assignee} hasTooltip={false} />
+                      {incident.assignee ? shortName(incident.assignee) : "Unassigned"}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
       <div className="mt-3 flex items-center gap-2 border-t border-line px-4 py-3 text-muted">
         <LuWrench aria-hidden className="size-4 text-maintenance" />
         <span className="text-ink">{maintenance.title}</span>· {maintenance.project}
