@@ -1,10 +1,10 @@
 import { useState } from "react";
+import { useElementWidth } from "@/hooks/useElementWidth";
 import { layoutFor } from "@/lib/dashboards";
 import { rootFontSize } from "@/lib/dom";
 import { breakpointForWidth, GRID_COLS, gridMetrics, gridPixelHeight, itemRect } from "@/lib/gridLayout";
 import type { Dashboard, DashboardRange, DashboardWidget } from "@/types/dashboard";
 import { GridCell } from "./GridCell";
-import { useElementWidth } from "@/hooks/useElementWidth";
 import { WidgetFrame } from "./WidgetFrame";
 import { WidgetFullscreenModal } from "./WidgetFullscreenModal";
 import { WidgetMenu } from "./WidgetMenu";

@@ -5,13 +5,13 @@ import { UptimeValue } from "@/components/monitors/UptimeValue";
 import { Card } from "@/components/ui/Card";
 import { MetaList } from "@/components/ui/MetaList";
 import { usePermission } from "@/hooks/usePermission";
+import { plural } from "@/lib/format";
 import { paths } from "@/lib/paths";
 import type { ProjectHealth } from "@/lib/projects";
 import type { Project } from "@/types/project";
 import { HealthBar } from "./HealthBar";
 import { ProjectMark } from "./ProjectMark";
 import { ProjectStatus } from "./ProjectStatus";
-import { plural } from "@/lib/format";
 
 type ProjectCardProps = {
   project: Project;

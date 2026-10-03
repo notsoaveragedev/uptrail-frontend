@@ -3,11 +3,11 @@ import { LuCopy, LuDownload, LuEllipsis, LuExternalLink, LuTrash2 } from "react-
 import { Link, useParams } from "react-router";
 import { Card } from "@/components/ui/Card";
 import { editedAgo, layoutFor } from "@/lib/dashboards";
+import { plural } from "@/lib/format";
 import { projectLabel } from "@/lib/monitors";
 import { paths } from "@/lib/paths";
 import type { Dashboard } from "@/types/dashboard";
 import { DashboardThumbnail } from "./DashboardThumbnail";
-import { plural } from "@/lib/format";
 
 type DashboardCardProps = {
   dashboard: Dashboard;

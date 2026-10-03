@@ -1,3 +1,5 @@
+import { HOUR_MS } from "@/lib/dates";
+import { currentOccurrence, nextOccurrences } from "@/lib/maintenance";
 import type { Incident } from "@/types/incident";
 import type { Monitor } from "@/types/monitor";
 import type {
@@ -9,10 +11,8 @@ import type {
   StatusPage,
   StatusSnapshot,
 } from "@/types/statusPage";
-import { currentOccurrence, nextOccurrences } from "@/lib/maintenance";
 import { buildMonitorDetail } from "./monitorDetail";
 import { maintenanceStore } from "./settingsStore";
-import { HOUR_MS } from "@/lib/dates";
 
 function overallStatus(statuses: ComponentStatus[]): OverallStatus {
   if (statuses.length > 0 && statuses.every((status) => status === "maintenance")) return "maintenance";

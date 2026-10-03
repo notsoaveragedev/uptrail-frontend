@@ -2,17 +2,17 @@ import { Button } from "antd";
 import { LuPlus } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router";
 import { FacetFilter } from "@/components/monitors-list/FacetFilter";
+import { ResetFiltersButton } from "@/components/ui/ResetFiltersButton";
+import { ToolbarSearch } from "@/components/ui/ToolbarSearch";
 import { useAlertRuleFilters } from "@/hooks/useAlertRuleFilters";
-import { SEVERITIES, SEVERITY_LABELS } from "@/lib/alerts";
 import { RULE_STATES } from "@/lib/alertLists";
+import { SEVERITIES, SEVERITY_LABELS } from "@/lib/alerts";
 import { countBy } from "@/lib/list";
 import { PROJECT_OPTIONS } from "@/lib/monitors";
 import { paths } from "@/lib/paths";
 import type { AlertRule } from "@/types/alerts";
 import { RuleStateLabel } from "./RuleStateLabel";
 import { SeverityTag } from "./SeverityTag";
-import { ResetFiltersButton } from "@/components/ui/ResetFiltersButton";
-import { ToolbarSearch } from "@/components/ui/ToolbarSearch";
 
 export function RulesToolbar({ rules }: { rules: AlertRule[] }) {
   const navigate = useNavigate();

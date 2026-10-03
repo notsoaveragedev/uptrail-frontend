@@ -10,7 +10,7 @@ import { IncidentsTable } from "@/components/incidents/IncidentsTable";
 import { IncidentsToolbar } from "@/components/incidents/IncidentsToolbar";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useIncidentFilters } from "@/hooks/useIncidentFilters";
-import { filterIncidents } from "@/lib/incidents";
+import { filterIncidents, incidentTabCounts } from "@/lib/incidents";
 import { currentUser } from "@/mocks/workspace";
 
 export function ProjectIncidentsPage() {
@@ -25,13 +25,7 @@ export function ProjectIncidentsPage() {
 
   return (
     <div className="flex flex-col gap-3 pb-24">
-      <IncidentsToolbar
-        incidents={scoped}
-        tabCounts={{
-          open: filterIncidents(scoped, "open", filters, currentUser.name).length,
-          resolved: filterIncidents(scoped, "resolved", filters, currentUser.name).length,
-        }}
-      />
+      <IncidentsToolbar incidents={scoped} tabCounts={incidentTabCounts(scoped, filters, currentUser.name)} />
       <SectionErrorBoundary>
         <IncidentsTable
           incidents={visible}

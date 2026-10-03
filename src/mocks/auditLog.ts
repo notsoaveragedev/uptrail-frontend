@@ -1,6 +1,6 @@
+import { MINUTE_MS } from "@/lib/dates";
 import type { AuditActorType, AuditEvent, AuditValue } from "@/types/audit";
 import { seeded } from "./random";
-import { MINUTE_MS } from "@/lib/dates";
 
 const now = Date.now();
 

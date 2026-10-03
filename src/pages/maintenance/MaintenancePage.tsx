@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button, Segmented } from "antd";
-import { lazy, Suspense, useState } from "react";
+import { Suspense, useState } from "react";
 import { LuCalendar, LuList, LuPlus, LuWrench } from "react-icons/lu";
 import { useParams } from "react-router";
 import { maintenanceQuery } from "@/api/maintenance";
 import { monitorsQuery } from "@/api/monitors";
+import { orgSettingsQuery } from "@/api/org";
 import { SectionErrorBoundary } from "@/components/errors/SectionErrorBoundary";
 import { ActiveMaintenanceBanner } from "@/components/maintenance/ActiveMaintenanceBanner";
 import type { MaintenanceDraft } from "@/components/maintenance/MaintenanceDrawer";
@@ -15,32 +16,30 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ListTabs } from "@/components/ui/ListTabs";
 import { MetaList } from "@/components/ui/MetaList";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ResetFiltersButton } from "@/components/ui/ResetFiltersButton";
 import { SkeletonBlock } from "@/components/ui/SkeletonBlock";
 import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
+import { ToolbarSearch } from "@/components/ui/ToolbarSearch";
 import { useMaintenanceFilters } from "@/hooks/useMaintenanceFilters";
 import { useNow } from "@/hooks/useNow";
+import { useProjectOptions } from "@/hooks/useProject";
 import { DAY_MS } from "@/lib/dates";
 import { formatElapsed } from "@/lib/format";
-import { importWithReload } from "@/lib/lazyPage";
+import { lazyComponent } from "@/lib/lazyPage";
 import { countBy } from "@/lib/list";
 import { defaultStart, filterMaintenance, maintenancePhase, MAINTENANCE_TABS, nextStart } from "@/lib/maintenance";
 import type { MaintenancePhase, MaintenanceWindow } from "@/types/maintenance";
 import type { Monitor } from "@/types/monitor";
-import { useProjectOptions } from "@/hooks/useProject";
-import { ResetFiltersButton } from "@/components/ui/ResetFiltersButton";
-import { ToolbarSearch } from "@/components/ui/ToolbarSearch";
 
-const MaintenanceDrawer = lazy(() =>
-  importWithReload(() => import("@/components/maintenance/MaintenanceDrawer")).then((module) => ({
-    default: module.MaintenanceDrawer,
-  })),
+const MaintenanceDrawer = lazyComponent(
+  () => import("@/components/maintenance/MaintenanceDrawer"),
+  "MaintenanceDrawer",
 );
 
-const MaintenanceCalendar = lazy(() =>
-  importWithReload(() => import("@/components/maintenance/MaintenanceCalendar")).then((module) => ({
-    default: module.MaintenanceCalendar,
-  })),
+const MaintenanceCalendar = lazyComponent(
+  () => import("@/components/maintenance/MaintenanceCalendar"),
+  "MaintenanceCalendar",
 );
 
 const TAB_LABELS: Record<MaintenancePhase, string> = { upcoming: "Upcoming", active: "In progress", past: "Past" };
@@ -49,6 +48,7 @@ export function MaintenancePage() {
   const { orgSlug = "" } = useParams();
   const { data: windows } = useQuery(maintenanceQuery(orgSlug));
   const { data: monitors = [] } = useQuery(monitorsQuery(orgSlug));
+  useQuery(orgSettingsQuery(orgSlug));
   const [draft, setDraft] = useState<MaintenanceDraft | null>(null);
   const [hasOpenedDrawer, setHasOpenedDrawer] = useState(false);
 

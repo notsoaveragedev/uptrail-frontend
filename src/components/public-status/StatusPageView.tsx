@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { fakeRequest } from "@/lib/fakeRequest";
 import { MOBILE_STRIP_DAYS, worstStatus } from "@/lib/publicStatus";
 import type { StatusSnapshot } from "@/types/statusPage";
@@ -10,7 +11,6 @@ import { PastIncidents } from "./PastIncidents";
 import { StatusFooter } from "./StatusFooter";
 import { StatusHeader } from "./StatusHeader";
 import { StatusThemeScope } from "./StatusThemeScope";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSnapshotChanges } from "./useSnapshotChanges";
 
 type StatusPageViewProps = {

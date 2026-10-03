@@ -1,10 +1,10 @@
 import { Tooltip } from "antd";
+import { MarkdownText } from "@/components/ui/MarkdownText";
+import { PersonAvatar } from "@/components/ui/PersonAvatar";
 import { formatClock, formatDateTime } from "@/lib/format";
 import { shortName } from "@/lib/people";
 import type { TimelineEntry } from "@/types/incident";
-import { PersonAvatar } from "@/components/ui/PersonAvatar";
 import { IncidentStatusPill } from "./IncidentStatusPill";
-import { MarkdownText } from "@/components/ui/MarkdownText";
 import { PublicBadge } from "./PublicBadge";
 
 export function TimelineUpdateCard({ entry, isNew }: { entry: TimelineEntry; isNew: boolean }) {

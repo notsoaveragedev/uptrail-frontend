@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "antd";
-import { lazy, Suspense, useState } from "react";
+import { Suspense } from "react";
 import { LuKeyRound, LuPlus } from "react-icons/lu";
 import { useParams } from "react-router";
 import { apiKeysQuery } from "@/api/apiKeys";
@@ -13,29 +13,20 @@ import { MetaList } from "@/components/ui/MetaList";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { useApiKeyFilters } from "@/hooks/useApiKeyFilters";
+import { useLazyDisclosure } from "@/hooks/useLazyDisclosure";
 import { useNow } from "@/hooks/useNow";
 import { apiKeyStatus, filterApiKeys } from "@/lib/apiKeys";
 import { DAY_MS, isExpiringSoon } from "@/lib/dates";
 import { formatAgo } from "@/lib/format";
-import { importWithReload } from "@/lib/lazyPage";
+import { lazyComponent } from "@/lib/lazyPage";
 import type { ApiKey } from "@/types/apiKey";
 
-const CreateApiKeyModal = lazy(() =>
-  importWithReload(() => import("@/components/api-keys/CreateApiKeyModal")).then((module) => ({
-    default: module.CreateApiKeyModal,
-  })),
-);
+const CreateApiKeyModal = lazyComponent(() => import("@/components/api-keys/CreateApiKeyModal"), "CreateApiKeyModal");
 
 export function ApiKeysPage() {
   const { orgSlug = "" } = useParams();
   const { data: keys } = useQuery(apiKeysQuery(orgSlug));
-  const [isCreating, setIsCreating] = useState(false);
-  const [hasOpenedCreate, setHasOpenedCreate] = useState(false);
-
-  function openCreate() {
-    setHasOpenedCreate(true);
-    setIsCreating(true);
-  }
+  const createKey = useLazyDisclosure();
 
   return (
     <>
@@ -46,19 +37,19 @@ export function ApiKeysPage() {
         meta={keys && <KeysSummary keys={keys} />}
         actions={
           <Can permission="apikey:manage">
-            <Button type="primary" icon={<LuPlus />} onClick={openCreate}>
+            <Button type="primary" icon={<LuPlus />} onClick={createKey.open}>
               Create key
             </Button>
           </Can>
         }
       />
       {keys ? (
-        <KeysView keys={keys} onCreate={openCreate} />
+        <KeysView keys={keys} onCreate={createKey.open} />
       ) : (
         <TableSkeleton columns={["flex-1", "w-32", "w-24", "w-24", "w-16", "w-16"]} />
       )}
       <Suspense fallback={null}>
-        {hasOpenedCreate && <CreateApiKeyModal open={isCreating} onClose={() => setIsCreating(false)} />}
+        {createKey.hasOpened && <CreateApiKeyModal open={createKey.isOpen} onClose={createKey.close} />}
       </Suspense>
     </>
   );

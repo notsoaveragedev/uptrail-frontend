@@ -2,11 +2,11 @@ import type { Severity } from "@/types/alerts";
 import type { Incident, IncidentStatus, TimelineEntry } from "@/types/incident";
 import type { Monitor } from "@/types/monitor";
 import type { DownBand } from "@/types/monitorDetail";
+import { DAY_MS } from "./dates";
+import { matchesAny } from "./list";
 import { parseMarkdown } from "./markdown";
 import { readList } from "./searchParams";
 import type { Tone } from "./status";
-import { DAY_MS } from "./dates";
-import { matchesAny } from "./list";
 
 export const INCIDENT_STATUSES: IncidentStatus[] = ["investigating", "identified", "monitoring", "resolved"];
 
@@ -99,6 +99,13 @@ export function filterIncidents(incidents: Incident[], tab: IncidentTab, filters
         matchesAny(assignees, incident.assignee ?? UNASSIGNED),
     )
     .sort((a, b) => b.startedAt - a.startedAt);
+}
+
+export function incidentTabCounts(incidents: Incident[], filters: IncidentFilters, me: string) {
+  return {
+    open: filterIncidents(incidents, "open", filters, me).length,
+    resolved: filterIncidents(incidents, "resolved", filters, me).length,
+  };
 }
 
 export function formatSpan(ms: number) {

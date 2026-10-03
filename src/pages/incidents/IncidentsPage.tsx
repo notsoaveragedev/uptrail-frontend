@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { lazy, Suspense, useState } from "react";
+import { Suspense, useState } from "react";
 import { LuTimer, LuWrench } from "react-icons/lu";
 import { useParams } from "react-router";
 import { incidentsQuery } from "@/api/incidents";
@@ -13,35 +13,35 @@ import { IncidentsSkeleton } from "@/components/incidents/IncidentsSkeleton";
 import { IncidentsTable } from "@/components/incidents/IncidentsTable";
 import { IncidentsToolbar } from "@/components/incidents/IncidentsToolbar";
 import { useIncidentFilters } from "@/hooks/useIncidentFilters";
+import { useLazyDisclosure } from "@/hooks/useLazyDisclosure";
 import { useNow } from "@/hooks/useNow";
-import { daysSinceLastIncident, filterIncidents, incidentMetrics, isIncidentOpen } from "@/lib/incidents";
-import { importWithReload } from "@/lib/lazyPage";
+import {
+  daysSinceLastIncident,
+  filterIncidents,
+  incidentTabCounts,
+  incidentMetrics,
+  isIncidentOpen,
+} from "@/lib/incidents";
+import { lazyComponent } from "@/lib/lazyPage";
 import { currentUser } from "@/mocks/workspace";
 import type { Incident } from "@/types/incident";
 
-const DeclareIncidentModal = lazy(() =>
-  importWithReload(() => import("@/components/incidents/DeclareIncidentModal")).then((module) => ({
-    default: module.DeclareIncidentModal,
-  })),
+const DeclareIncidentModal = lazyComponent(
+  () => import("@/components/incidents/DeclareIncidentModal"),
+  "DeclareIncidentModal",
 );
 
 export function IncidentsPage() {
   const { orgSlug = "" } = useParams();
   const { data: incidents } = useQuery(incidentsQuery(orgSlug));
-  const [isDeclareOpen, setIsDeclareOpen] = useState(false);
-  const [hasOpenedDeclare, setHasOpenedDeclare] = useState(false);
-
-  function openDeclare() {
-    setHasOpenedDeclare(true);
-    setIsDeclareOpen(true);
-  }
+  const declare = useLazyDisclosure();
 
   return (
     <>
       <title>Incidents · Uptrail</title>
-      {incidents ? <IncidentsView incidents={incidents} onDeclare={openDeclare} /> : <IncidentsSkeleton />}
+      {incidents ? <IncidentsView incidents={incidents} onDeclare={declare.open} /> : <IncidentsSkeleton />}
       <Suspense fallback={null}>
-        {hasOpenedDeclare && <DeclareIncidentModal open={isDeclareOpen} onClose={() => setIsDeclareOpen(false)} />}
+        {declare.hasOpened && <DeclareIncidentModal open={declare.isOpen} onClose={declare.close} />}
       </Suspense>
     </>
   );
@@ -57,10 +57,7 @@ function IncidentsView({ incidents, onDeclare }: { incidents: Incident[]; onDecl
   const metrics = incidentMetrics(incidents, 30, now);
   const visible = filterIncidents(incidents, tab, filters, currentUser.name);
   const selected = visible.filter((incident) => selectedIds.includes(incident.id));
-  const tabCounts = {
-    open: filterIncidents(incidents, "open", filters, currentUser.name).length,
-    resolved: filterIncidents(incidents, "resolved", filters, currentUser.name).length,
-  };
+  const tabCounts = incidentTabCounts(incidents, filters, currentUser.name);
 
   return (
     <div className="flex flex-col gap-6 pb-24">

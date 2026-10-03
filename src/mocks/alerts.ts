@@ -1,6 +1,6 @@
+import { DAY_MS, HOUR_MS, MINUTE_MS } from "@/lib/dates";
 import type { AlertChannel, AlertEvent, AlertRule } from "@/types/alerts";
 import { seeded } from "./random";
-import { DAY_MS, HOUR_MS, MINUTE_MS } from "@/lib/dates";
 
 const now = Date.now();
 

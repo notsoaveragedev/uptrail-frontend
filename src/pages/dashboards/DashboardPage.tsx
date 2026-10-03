@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "antd";
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { LuPencil } from "react-icons/lu";
 import { useParams, useSearchParams } from "react-router";
 import { dashboardQuery } from "@/api/dashboards";
@@ -8,21 +8,17 @@ import { DashboardGrid } from "@/components/dashboards/DashboardGrid";
 import { DashboardHeader } from "@/components/dashboards/DashboardHeader";
 import { DashboardSkeleton } from "@/components/dashboards/DashboardSkeleton";
 import { useDashboardRefresh } from "@/components/dashboards/useDashboardRefresh";
-import { useInterval } from "@/hooks/useInterval";
 import { ViewControls } from "@/components/dashboards/ViewControls";
 import { SectionErrorBoundary } from "@/components/errors/SectionErrorBoundary";
+import { useInterval } from "@/hooks/useInterval";
 import { useSearchParam } from "@/hooks/useSearchParam";
 import { DASHBOARD_RANGES, refreshSeconds, refreshValue, REFRESH_VALUES } from "@/lib/dashboards";
-import { importWithReload } from "@/lib/lazyPage";
+import { lazyComponent } from "@/lib/lazyPage";
 import { writeParam } from "@/lib/searchParams";
 import { InAppNotFoundPage } from "@/pages/NotFoundPage";
 import type { Dashboard } from "@/types/dashboard";
 
-const DashboardEditor = lazy(() =>
-  importWithReload(() => import("@/components/dashboards/DashboardEditor")).then((module) => ({
-    default: module.DashboardEditor,
-  })),
-);
+const DashboardEditor = lazyComponent(() => import("@/components/dashboards/DashboardEditor"), "DashboardEditor");
 
 export function DashboardPage() {
   const { orgSlug = "", dashboardId = "" } = useParams();

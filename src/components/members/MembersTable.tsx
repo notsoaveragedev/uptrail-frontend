@@ -1,12 +1,12 @@
+import { useQuery } from "@tanstack/react-query";
 import { Button, Dropdown, Table, Tooltip, type TableColumnsType } from "antd";
 import type { ReactNode } from "react";
 import { LuCopy, LuEllipsis, LuFolderLock, LuLogOut, LuUserMinus } from "react-icons/lu";
+import { useParams } from "react-router";
+import { orgSettingsQuery } from "@/api/org";
 import { TimeAgo } from "@/components/monitors/TimeAgo";
 import { PersonCell } from "@/components/ui/PersonCell";
 import { StatusDot } from "@/components/ui/StatusDot";
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router";
-import { orgSettingsQuery } from "@/api/org";
 import { useCopy } from "@/hooks/useCopy";
 import { useLeaveOrganization } from "@/hooks/useLeaveOrganization";
 import { useNow } from "@/hooks/useNow";

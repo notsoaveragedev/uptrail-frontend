@@ -15,6 +15,7 @@ import { FieldShell } from "@/components/ui/FieldShell";
 import { StatusDot } from "@/components/ui/StatusDot";
 import { useForm } from "@/hooks/useForm";
 import { useNow } from "@/hooks/useNow";
+import { useProjectOptions } from "@/hooks/useProject";
 import { useToast } from "@/hooks/useToast";
 import { HOUR_MS } from "@/lib/dates";
 import { formatDateTime, formatElapsed } from "@/lib/format";
@@ -25,7 +26,6 @@ import { formatInZone, localTimezone, timezoneOptions } from "@/lib/timezones";
 import { currentUser } from "@/mocks/workspace";
 import type { MaintenanceWindow } from "@/types/maintenance";
 import { WeekdayPicker } from "./WeekdayPicker";
-import { useProjectOptions } from "@/hooks/useProject";
 
 export type MaintenanceDraft = { entry: MaintenanceWindow | null; copyOf?: MaintenanceWindow; startsAt?: number };
 

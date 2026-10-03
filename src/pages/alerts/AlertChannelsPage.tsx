@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "antd";
-import { lazy, Suspense, useState } from "react";
+import { Suspense, useState } from "react";
 import { LuPlus } from "react-icons/lu";
 import { useParams } from "react-router";
 import { alertChannelsQuery, alertRulesQuery, useDeleteAlertChannel, useSaveAlertChannel } from "@/api/alerts";
@@ -12,15 +12,11 @@ import { MetaList } from "@/components/ui/MetaList";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useToast } from "@/hooks/useToast";
 import { countRulesUsing } from "@/lib/alertLists";
-import { importWithReload } from "@/lib/lazyPage";
-import type { AlertChannel } from "@/types/alerts";
 import { plural } from "@/lib/format";
+import { lazyComponent } from "@/lib/lazyPage";
+import type { AlertChannel } from "@/types/alerts";
 
-const ChannelModal = lazy(() =>
-  importWithReload(() => import("@/components/alerts/ChannelModal")).then((module) => ({
-    default: module.ChannelModal,
-  })),
-);
+const ChannelModal = lazyComponent(() => import("@/components/alerts/ChannelModal"), "ChannelModal");
 
 type ModalState = { isOpen: boolean; channel: AlertChannel | null };
 

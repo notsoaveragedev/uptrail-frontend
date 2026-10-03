@@ -1,25 +1,21 @@
-import { LuBellOff } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
-import { lazy, Suspense, useState } from "react";
+import { Suspense, useState } from "react";
+import { LuBellOff } from "react-icons/lu";
 import { useParams } from "react-router";
 import { alertChannelsQuery, alertEventsQuery, alertRulesQuery } from "@/api/alerts";
 import { monitorsQuery } from "@/api/monitors";
-import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { HistoryBulkBar } from "@/components/alerts/HistoryBulkBar";
 import { HistoryTable } from "@/components/alerts/HistoryTable";
 import { HistoryToolbar } from "@/components/alerts/HistoryToolbar";
 import { SectionErrorBoundary } from "@/components/errors/SectionErrorBoundary";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { useAlertHistoryFilters } from "@/hooks/useAlertHistoryFilters";
 import { useNow } from "@/hooks/useNow";
 import { filterEvents, HISTORY_RANGE_TEXT } from "@/lib/alertLists";
-import { importWithReload } from "@/lib/lazyPage";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { lazyComponent } from "@/lib/lazyPage";
 
-const AlertEventDrawer = lazy(() =>
-  importWithReload(() => import("@/components/alerts/AlertEventDrawer")).then((module) => ({
-    default: module.AlertEventDrawer,
-  })),
-);
+const AlertEventDrawer = lazyComponent(() => import("@/components/alerts/AlertEventDrawer"), "AlertEventDrawer");
 
 const SKELETON_COLUMNS = ["w-4", "w-24", "flex-1", "w-28", "w-20", "w-16", "w-20", "w-14"];
 

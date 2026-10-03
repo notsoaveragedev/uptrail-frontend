@@ -1,7 +1,7 @@
+import { newId } from "@/lib/ids";
 import type { MonitorFormValues } from "@/lib/monitorForm";
 import type { Monitor } from "@/types/monitor";
 import { runFakeTest } from "./monitorTest";
-import { newId } from "@/lib/ids";
 
 export function updatedMonitor(monitor: Monitor, values: MonitorFormValues): Monitor {
   return {

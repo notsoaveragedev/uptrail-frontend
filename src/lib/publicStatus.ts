@@ -1,6 +1,4 @@
 import { palettes } from "@/theme/palette";
-import { DAY_MS, startOfDay } from "./dates";
-import type { Tone } from "./status";
 import type {
   ComponentStatus,
   PublicIncident,
@@ -9,6 +7,8 @@ import type {
   StatusSnapshot,
   StatusTheme,
 } from "@/types/statusPage";
+import { DAY_MS, startOfDay } from "./dates";
+import type { Tone } from "./status";
 
 export const HISTORY_PAGE_DAYS = 7;
 export const MOBILE_STRIP_DAYS = 30;

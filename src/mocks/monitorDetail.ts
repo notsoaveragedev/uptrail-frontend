@@ -1,3 +1,4 @@
+import { DAY_MS, HOUR_MS, MINUTE_MS } from "@/lib/dates";
 import { LATENCY_THRESHOLD_MS } from "@/lib/format";
 import { DEFAULT_TIMEOUT_MS, regionCity } from "@/lib/monitors";
 import { uptimeStatus } from "@/lib/status";
@@ -18,7 +19,6 @@ import type {
 } from "@/types/monitorDetail";
 import type { TimeRange } from "@/types/overview";
 import { hashString, RANGE_BUCKETS, seeded } from "./random";
-import { DAY_MS, HOUR_MS, MINUTE_MS } from "@/lib/dates";
 
 const CHECK_ROUNDS = 12;
 const TYPICAL_MAX_MS = 420;

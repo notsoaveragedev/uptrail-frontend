@@ -1,6 +1,7 @@
 import { Button } from "antd";
 import { useState, type KeyboardEvent } from "react";
 import { LuPlus } from "react-icons/lu";
+import { useElementWidth } from "@/hooks/useElementWidth";
 import { useWindowKeydown } from "@/hooks/useWindowKeydown";
 import { layoutFor } from "@/lib/dashboards";
 import { rootFontSize } from "@/lib/dom";
@@ -20,7 +21,6 @@ import { WIDGETS } from "@/lib/widgets";
 import type { Breakpoint, Dashboard, DashboardRange, LayoutItem } from "@/types/dashboard";
 import { EditableWidget } from "./EditableWidget";
 import { GridCell } from "./GridCell";
-import { useElementWidth } from "@/hooks/useElementWidth";
 import { useGridDrag } from "./useGridDrag";
 
 const EXTRA_ROWS = 2;

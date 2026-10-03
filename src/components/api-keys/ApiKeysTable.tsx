@@ -69,7 +69,7 @@ export function ApiKeysTable({ keys, emptyText }: { keys: ApiKey[]; emptyText: R
     {
       title: "Created by",
       key: "createdBy",
-      width: 140,
+      width: 150,
       render: (_, key) => (
         <Tooltip title={`Created ${formatDay(key.createdAt)}`}>
           <span>
@@ -81,7 +81,7 @@ export function ApiKeysTable({ keys, emptyText }: { keys: ApiKey[]; emptyText: R
     {
       title: "Last used",
       key: "lastUsed",
-      width: 90,
+      width: 104,
       render: (_, key) =>
         key.lastUsedAt ? (
           <Tooltip title={`${formatDateTime(key.lastUsedAt)} · ${key.lastUsedIp}`}>
@@ -125,7 +125,7 @@ export function ApiKeysTable({ keys, emptyText }: { keys: ApiKey[]; emptyText: R
       columns={columns}
       dataSource={keys}
       tableLayout="fixed"
-      scroll={{ x: 860 }}
+      scroll={{ x: 880 }}
       rowClassName="group"
       pagination={false}
       locale={{ emptyText }}

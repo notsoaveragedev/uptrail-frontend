@@ -3,13 +3,13 @@ import { useState } from "react";
 import { LuPlus, LuX } from "react-icons/lu";
 import { RoleSelect } from "@/components/settings/RoleSelect";
 import { CustomSelect } from "@/components/ui/CustomSelect";
+import { useProjectOptions } from "@/hooks/useProject";
 import { useToast } from "@/hooks/useToast";
 import { roleName } from "@/lib/members";
 import { projectLabel } from "@/lib/monitors";
 import type { Member, ProjectOverride } from "@/types/member";
 import type { Role } from "@/types/rbac";
 import { useMemberActions } from "./useMemberActions";
-import { useProjectOptions } from "@/hooks/useProject";
 
 type OverridesModalProps = {
   member: Member | null;

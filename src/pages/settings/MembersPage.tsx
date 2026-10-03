@@ -1,11 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "antd";
-import { lazy, Suspense, useState } from "react";
+import { Suspense, useState } from "react";
 import { LuMailPlus, LuUserPlus, LuUsers } from "react-icons/lu";
 import { useParams } from "react-router";
 import { invitationsQuery, membersQuery } from "@/api/members";
 import { rolesQuery } from "@/api/roles";
-import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { SectionErrorBoundary } from "@/components/errors/SectionErrorBoundary";
 import { InvitationsTable } from "@/components/members/InvitationsTable";
 import { MemberBulkBar } from "@/components/members/MemberBulkBar";
@@ -16,19 +15,17 @@ import { Can } from "@/components/rbac/Can";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { MetaList } from "@/components/ui/MetaList";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { TableSkeleton } from "@/components/ui/TableSkeleton";
+import { useLazyDisclosure } from "@/hooks/useLazyDisclosure";
 import { useMemberFilters } from "@/hooks/useMemberFilters";
 import { useNow } from "@/hooks/useNow";
-import { importWithReload } from "@/lib/lazyPage";
+import { lazyComponent } from "@/lib/lazyPage";
 import { filterInvitations, filterMembers, OWNER_ROLE_ID, pendingInvitations, seatsUsed } from "@/lib/members";
 import { SEAT_LIMIT } from "@/mocks/workspace";
 import type { Invitation, Member } from "@/types/member";
 import type { Role } from "@/types/rbac";
 
-const InviteMembersModal = lazy(() =>
-  importWithReload(() => import("@/components/members/InviteMembersModal")).then((module) => ({
-    default: module.InviteMembersModal,
-  })),
-);
+const InviteMembersModal = lazyComponent(() => import("@/components/members/InviteMembersModal"), "InviteMembersModal");
 
 const COLUMNS = ["w-4", "flex-1", "w-28", "w-20", "w-16", "w-16", "w-6"];
 
@@ -37,13 +34,7 @@ export function MembersPage() {
   const { data: members } = useQuery(membersQuery(orgSlug));
   const { data: invitations } = useQuery(invitationsQuery(orgSlug));
   const { data: roles } = useQuery(rolesQuery(orgSlug));
-  const [isInviting, setIsInviting] = useState(false);
-  const [hasOpenedInvite, setHasOpenedInvite] = useState(false);
-
-  function openInvite() {
-    setHasOpenedInvite(true);
-    setIsInviting(true);
-  }
+  const invite = useLazyDisclosure();
 
   return (
     <>
@@ -54,19 +45,19 @@ export function MembersPage() {
         meta={members && invitations && <MembersSummary members={members} invitations={invitations} />}
         actions={
           <Can permission="member:invite">
-            <Button type="primary" icon={<LuUserPlus />} onClick={openInvite}>
+            <Button type="primary" icon={<LuUserPlus />} onClick={invite.open}>
               Invite members
             </Button>
           </Can>
         }
       />
       {members && invitations && roles ? (
-        <MembersView members={members} invitations={invitations} roles={roles} onInvite={openInvite} />
+        <MembersView members={members} invitations={invitations} roles={roles} onInvite={invite.open} />
       ) : (
         <TableSkeleton columns={COLUMNS} />
       )}
       <Suspense fallback={null}>
-        {hasOpenedInvite && <InviteMembersModal open={isInviting} onClose={() => setIsInviting(false)} />}
+        {invite.hasOpened && <InviteMembersModal open={invite.isOpen} onClose={invite.close} />}
       </Suspense>
     </>
   );

@@ -1,7 +1,7 @@
+import { HOUR_MS } from "@/lib/dates";
 import { statusTrail } from "@/lib/status";
 import type { HttpMethod, Monitor, MonitorStatus, MonitorType, RegionCode } from "@/types/monitor";
 import { seeded } from "./random";
-import { HOUR_MS } from "@/lib/dates";
 
 const CHECK_COUNT = 30;
 const HISTORY_COUNT = 24;

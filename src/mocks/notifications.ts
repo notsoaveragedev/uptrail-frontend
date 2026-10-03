@@ -1,7 +1,7 @@
+import { HOUR_MS, MINUTE_MS } from "@/lib/dates";
 import { LATENCY_THRESHOLD_MS } from "@/lib/format";
 import type { AppNotification } from "@/types/workspace";
 import { seeded } from "./random";
-import { HOUR_MS, MINUTE_MS } from "@/lib/dates";
 
 const now = Date.now();
 

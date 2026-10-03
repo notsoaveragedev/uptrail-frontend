@@ -1,8 +1,8 @@
+import { DAY_MS, MINUTE_MS } from "@/lib/dates";
 import type { Severity } from "@/types/alerts";
 import type { Incident, IncidentStatus, TimelineEntry } from "@/types/incident";
 import { MONITORS } from "./monitors";
 import { seeded } from "./random";
-import { DAY_MS, MINUTE_MS } from "@/lib/dates";
 
 const now = Date.now();
 

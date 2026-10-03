@@ -1,30 +1,21 @@
 import { Drawer } from "antd";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router";
 import { SectionErrorBoundary } from "@/components/errors/SectionErrorBoundary";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
+import { useLazyDisclosure } from "@/hooks/useLazyDisclosure";
 import { useSearchShortcut } from "@/hooks/useSearchShortcut";
-import { importWithReload } from "@/lib/lazyPage";
+import { lazyComponent } from "@/lib/lazyPage";
 
-const CommandPalette = lazy(() =>
-  importWithReload(() => import("@/components/layout/CommandPalette")).then((module) => ({
-    default: module.CommandPalette,
-  })),
-);
+const CommandPalette = lazyComponent(() => import("@/components/layout/CommandPalette"), "CommandPalette");
 
 export function AppLayout() {
   const { pathname } = useLocation();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [hasOpenedSearch, setHasOpenedSearch] = useState(false);
+  const search = useLazyDisclosure();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  function toggleSearch() {
-    setHasOpenedSearch(true);
-    setIsSearchOpen((open) => !open);
-  }
-
-  useSearchShortcut(toggleSearch);
+  useSearchShortcut(search.toggle);
 
   useEffect(() => {
     document.querySelector("main")?.scrollTo({ top: 0 });
@@ -52,7 +43,7 @@ export function AppLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <SectionErrorBoundary>
-          <TopBar onOpenSearch={toggleSearch} onOpenMenu={() => setIsMenuOpen(true)} />
+          <TopBar onOpenSearch={search.toggle} onOpenMenu={() => setIsMenuOpen(true)} />
         </SectionErrorBoundary>
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-360 px-4 py-6 lg:px-8">
@@ -62,7 +53,7 @@ export function AppLayout() {
       </div>
 
       <Suspense fallback={null}>
-        {hasOpenedSearch && <CommandPalette open={isSearchOpen} onClose={() => setIsSearchOpen(false)} />}
+        {search.hasOpened && <CommandPalette open={search.isOpen} onClose={search.close} />}
       </Suspense>
     </div>
   );

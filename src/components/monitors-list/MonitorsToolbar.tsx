@@ -1,9 +1,11 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { Button, Dropdown, Segmented } from "antd";
 import { LuArrowUpDown, LuLayoutGrid, LuList, LuRefreshCw } from "react-icons/lu";
-import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { monitorsKey } from "@/api/monitors";
 import { StatusIcon } from "@/components/monitors/StatusIcon";
+import { ResetFiltersButton } from "@/components/ui/ResetFiltersButton";
+import { ToolbarSearch } from "@/components/ui/ToolbarSearch";
 import { useMonitorFilters } from "@/hooks/useMonitorFilters";
 import { countBy } from "@/lib/list";
 import { SORT_LABELS, type SortKey } from "@/lib/monitorList";
@@ -11,8 +13,6 @@ import { MONITOR_TYPE_LABELS, MONITOR_TYPE_VALUES, PROJECT_OPTIONS, TAGS } from 
 import { STATUS_LABELS, STATUSES } from "@/lib/status";
 import type { Monitor } from "@/types/monitor";
 import { FacetFilter } from "./FacetFilter";
-import { ResetFiltersButton } from "@/components/ui/ResetFiltersButton";
-import { ToolbarSearch } from "@/components/ui/ToolbarSearch";
 
 export function MonitorsToolbar({ monitors }: { monitors: Monitor[] }) {
   const { orgSlug = "" } = useParams();

@@ -10,13 +10,13 @@ import { useForm } from "@/hooks/useForm";
 import { useNow } from "@/hooks/useNow";
 import { useToast } from "@/hooks/useToast";
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
+import { plural } from "@/lib/format";
 import { orgSettingsSchema } from "@/lib/schemas";
 import { formatInZone, timezoneOptions } from "@/lib/timezones";
 import type { OrgSettings } from "@/types/workspace";
 import { OrgDangerZone } from "./OrgDangerZone";
 import { SettingsSection } from "./SettingsSection";
 import { SlugField } from "./SlugField";
-import { plural } from "@/lib/format";
 
 const FORM_ID = "org-settings";
 

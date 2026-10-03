@@ -1,5 +1,6 @@
 import { useId, useLayoutEffect, useState } from "react";
 import { useConfirm } from "@/hooks/useConfirm";
+import { useRowDrag } from "@/hooks/useRowDrag";
 import {
   countConditions,
   moveNode,
@@ -9,10 +10,9 @@ import {
   type VisualGroup,
   type VisualNode,
 } from "@/lib/alertExpression/visual";
+import { plural } from "@/lib/format";
 import { gripId, nodeLabel, positionText, type Builder } from "./builderUtils";
 import { ConditionGroup } from "./ConditionGroup";
-import { useRowDrag } from "@/hooks/useRowDrag";
-import { plural } from "@/lib/format";
 
 type VisualBuilderProps = {
   tree: VisualGroup;

@@ -3,22 +3,22 @@ import { useState } from "react";
 import { LuLock } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router";
 import { useSaveRole } from "@/api/roles";
+import { Card } from "@/components/ui/Card";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { SaveBar } from "@/components/ui/SaveBar";
 import { useCurrentRole, usePermission } from "@/hooks/usePermission";
 import { useToast } from "@/hooks/useToast";
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
+import { plural } from "@/lib/format";
 import { membersWithRole } from "@/lib/members";
 import { paths } from "@/lib/paths";
 import { canGrantRole, expandPermissions, permissionDiff } from "@/lib/permissions";
 import { isRoleNameTaken } from "@/lib/roles";
 import type { Member } from "@/types/member";
 import type { Role } from "@/types/rbac";
-import { Card } from "@/components/ui/Card";
 import { PermissionMatrix } from "./PermissionMatrix";
 import { RoleDiffModal } from "./RoleDiffModal";
 import { RoleSummary } from "./RoleSummary";
-import { plural } from "@/lib/format";
 
 type RoleEditorProps = {
   role: Role;

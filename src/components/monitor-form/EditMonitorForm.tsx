@@ -10,7 +10,7 @@ import { useMonitorForm } from "@/hooks/useMonitorForm";
 import { useSearchParam } from "@/hooks/useSearchParam";
 import { useToast } from "@/hooks/useToast";
 import { useUnsavedChangesGuard } from "@/hooks/useUnsavedChangesGuard";
-import { displayUrl } from "@/lib/monitors";
+import { plural } from "@/lib/format";
 import {
   changedFields,
   configFromMonitor,
@@ -19,13 +19,13 @@ import {
   MONITOR_TYPES,
   type StepKey,
 } from "@/lib/monitorForm";
+import { displayUrl } from "@/lib/monitors";
 import { paths } from "@/lib/paths";
 import { updatedMonitor } from "@/mocks/monitorFactory";
 import type { Monitor } from "@/types/monitor";
 import { ChangeSummaryModal } from "./ChangeSummaryModal";
 import { StepFields } from "./StepFields";
 import { TestPanel } from "./TestPanel";
-import { plural } from "@/lib/format";
 
 const EDIT_TAB_KEYS = EDIT_TABS.map((item) => item.key);
 

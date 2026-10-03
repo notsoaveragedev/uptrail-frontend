@@ -1,6 +1,6 @@
+import { DAY_MS } from "@/lib/dates";
 import type { StatusPage, StatusSubscriber } from "@/types/statusPage";
 import { seeded } from "./random";
-import { DAY_MS } from "@/lib/dates";
 
 const now = Date.now();
 

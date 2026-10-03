@@ -2,10 +2,10 @@ import { Button, Segmented, Table, type TableColumnsType } from "antd";
 import { LuArrowLeft, LuCircleAlert, LuCircleCheck } from "react-icons/lu";
 import { MetaList } from "@/components/ui/MetaList";
 import { useSearchParam } from "@/hooks/useSearchParam";
+import { plural } from "@/lib/format";
 import { hasErrors, IMPORT_FIELDS, type ImportField, type ImportRow, type RowErrors } from "@/lib/importMonitors";
 import { ImportCell } from "./ImportCell";
 import { StepFooter } from "./StepFooter";
-import { plural } from "@/lib/format";
 
 const FILTERS = ["all", "valid", "errors"] as const;
 type Filter = (typeof FILTERS)[number];
