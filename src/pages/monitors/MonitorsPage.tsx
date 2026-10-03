@@ -1,5 +1,6 @@
+import { LuActivity } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Empty } from "antd";
+import { Button } from "antd";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { monitorsQuery } from "@/api/monitors";
@@ -14,6 +15,7 @@ import { toggleItem } from "@/lib/list";
 import { filterMonitors } from "@/lib/monitorList";
 import { paths } from "@/lib/paths";
 import type { MonitorStatus } from "@/types/monitor";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export function MonitorsPage() {
   const navigate = useNavigate();
@@ -30,15 +32,18 @@ export function MonitorsPage() {
   }
 
   const emptyState = hasFilters ? (
-    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No monitors match these filters.">
-      <Button onClick={clear}>Reset filters</Button>
-    </Empty>
+    <EmptyState icon={<LuActivity />} title="No monitors match these filters" onClear={clear} />
   ) : (
-    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No monitors yet. Add a URL to start checking it.">
-      <Button type="primary" onClick={() => navigate(paths.monitorNew(orgSlug))}>
-        Create monitor
-      </Button>
-    </Empty>
+    <EmptyState
+      icon={<LuActivity />}
+      title="No monitors yet"
+      description="Add a URL and Uptrail starts checking it from three regions."
+      action={
+        <Button type="primary" onClick={() => navigate(paths.monitorNew(orgSlug))}>
+          Create monitor
+        </Button>
+      }
+    />
   );
 
   return (

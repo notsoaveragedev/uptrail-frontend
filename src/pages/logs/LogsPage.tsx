@@ -1,5 +1,6 @@
+import { LuScrollText } from "react-icons/lu";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Empty } from "antd";
+import { Button } from "antd";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router";
 import { logsQuery } from "@/api/logs";
@@ -19,6 +20,7 @@ import { useStoredState } from "@/hooks/useStoredState";
 import { defaultLogColumnState } from "@/lib/logColumns";
 import { buildLogItems } from "@/lib/logsQuery";
 import type { LogsSortKey } from "@/types/logs";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export function LogsPage() {
   const { orgSlug = "" } = useParams();
@@ -56,13 +58,16 @@ export function LogsPage() {
   }
 
   const emptyState = (
-    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No checks match these filters.">
-      {activeFilterCount > 0 || filters.query ? (
-        <Button onClick={clearFilters}>Reset filters</Button>
-      ) : (
-        <Button onClick={() => setParam("range", "24h")}>Try the last 24 hours</Button>
-      )}
-    </Empty>
+    <EmptyState
+      icon={<LuScrollText />}
+      title="No checks match these filters"
+      onClear={activeFilterCount > 0 || filters.query ? clearFilters : undefined}
+      action={
+        activeFilterCount > 0 || filters.query ? undefined : (
+          <Button onClick={() => setParam("range", "24h")}>Try the last 24 hours</Button>
+        )
+      }
+    />
   );
 
   return (

@@ -3,7 +3,8 @@ import { useId, useState, type KeyboardEvent } from "react";
 import { LuCornerDownLeft, LuPlus, LuSearch, LuSearchX } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router";
 import { StatusIcon } from "@/components/monitors/StatusIcon";
-import { ALL_NAV_ITEMS } from "@/lib/navigation";
+import { useCurrentRole } from "@/hooks/usePermission";
+import { ALL_NAV_ITEMS, canSeeNavItem } from "@/lib/navigation";
 import { paths } from "@/lib/paths";
 import { MONITORS } from "@/mocks/monitors";
 
@@ -34,6 +35,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 function PaletteContent({ onClose }: { onClose: () => void }) {
   const navigate = useNavigate();
   const { orgSlug = "" } = useParams();
+  const { granted } = useCurrentRole();
   const [search, setSearch] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const listId = useId();
@@ -47,7 +49,7 @@ function PaletteContent({ onClose }: { onClose: () => void }) {
       title: "Create monitor",
       path: paths.monitorNew(orgSlug),
     },
-    ...ALL_NAV_ITEMS.map((item) => ({
+    ...ALL_NAV_ITEMS.filter((item) => canSeeNavItem(item, granted)).map((item) => ({
       id: `nav-${item.label}`,
       group: "Go to",
       icon: <item.icon />,

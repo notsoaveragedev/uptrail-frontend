@@ -1,7 +1,7 @@
 import type { StatusPage, StatusSubscriber } from "@/types/statusPage";
 import { seeded } from "./random";
+import { DAY_MS } from "@/lib/dates";
 
-const DAY = 86_400_000;
 const now = Date.now();
 
 const LIGHT = { background: "#FFFFFF", surface: "#F7F7F5", text: "#16171A" };
@@ -69,7 +69,7 @@ export const STATUS_PAGES: StatusPage[] = [
     options: { showUptimeBars: true, showResponseTimes: false, historyDays: 90 },
     customDomain: { host: "status.pixelcraft.io", verified: true },
     published: true,
-    updatedAt: now - 3 * DAY,
+    updatedAt: now - 3 * DAY_MS,
   },
   {
     id: "sp_bluepeak",
@@ -92,7 +92,7 @@ export const STATUS_PAGES: StatusPage[] = [
     options: { showUptimeBars: true, showResponseTimes: false, historyDays: 30 },
     customDomain: null,
     published: false,
-    updatedAt: now - 9 * DAY,
+    updatedAt: now - 9 * DAY_MS,
   },
 ];
 
@@ -107,7 +107,7 @@ function buildSubscribers(): StatusSubscriber[] {
       pageId: page.id,
       email: `${NAMES[Math.floor(random() * NAMES.length)]}${index}@${DOMAINS[Math.floor(random() * DOMAINS.length)]}`,
       confirmed: random() > 0.15,
-      createdAt: now - Math.round(random() * 120 * DAY),
+      createdAt: now - Math.round(random() * 120 * DAY_MS),
     })),
   );
 }

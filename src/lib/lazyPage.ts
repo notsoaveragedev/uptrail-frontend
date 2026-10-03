@@ -1,4 +1,4 @@
-import type { ComponentType } from "react";
+import { lazy, type ComponentType } from "react";
 
 const RELOAD_FLAG = "uptrail:chunk-reload";
 
@@ -31,4 +31,8 @@ export function lazyPage<Module, Name extends keyof Module>(load: () => Promise<
     const module = await importWithReload(load);
     return { Component: module[exportName] as ComponentType };
   };
+}
+
+export function lazyComponent<Module, Name extends keyof Module>(load: () => Promise<Module>, exportName: Name) {
+  return lazy(async () => ({ default: (await importWithReload(load))[exportName] as Module[Name] & ComponentType }));
 }

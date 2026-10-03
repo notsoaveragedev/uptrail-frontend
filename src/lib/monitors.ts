@@ -1,4 +1,5 @@
 import type { HttpMethod, Monitor, MonitorChange, MonitorType, RegionCode } from "@/types/monitor";
+import { newId } from "./ids";
 
 export const MONITOR_TYPE_LABELS: Record<MonitorType, string> = {
   http: "HTTP",
@@ -52,7 +53,7 @@ export function duplicateMonitor(monitor: Monitor): Monitor {
   const now = Date.now();
   return {
     ...monitor,
-    id: `mon_${crypto.randomUUID().slice(0, 8)}`,
+    id: newId("mon"),
     name: `${monitor.name} (copy)`,
     status: "paused",
     statusSince: now,

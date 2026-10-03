@@ -1,8 +1,8 @@
 import { Tooltip } from "antd";
 import { formatClock, formatDateTime } from "@/lib/format";
-import { shortName } from "@/lib/incidents";
+import { shortName } from "@/lib/people";
 import type { TimelineEntry } from "@/types/incident";
-import { AssigneeAvatar } from "./AssigneeAvatar";
+import { PersonAvatar } from "@/components/ui/PersonAvatar";
 import { IncidentStatusPill } from "./IncidentStatusPill";
 import { MarkdownText } from "@/components/ui/MarkdownText";
 import { PublicBadge } from "./PublicBadge";
@@ -13,7 +13,7 @@ export function TimelineUpdateCard({ entry, isNew }: { entry: TimelineEntry; isN
   return (
     <li className="flex gap-3">
       <span className="z-10 mt-2.5 shrink-0 rounded-full ring-4 ring-card">
-        <AssigneeAvatar name={author} hasTooltip={false} />
+        <PersonAvatar name={author} hasTooltip={false} />
       </span>
       <article
         aria-label={`Update from ${author}`}

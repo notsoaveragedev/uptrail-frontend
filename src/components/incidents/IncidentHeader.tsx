@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router";
 import { SeverityTag } from "@/components/alerts/SeverityTag";
 import { formatElapsed } from "@/lib/format";
-import { shortName } from "@/lib/incidents";
+import { shortName } from "@/lib/people";
 import { paths } from "@/lib/paths";
 import type { Incident } from "@/types/incident";
 import { AssigneeMenu } from "./AssigneeMenu";

@@ -1,10 +1,22 @@
-import { createBrowserRouter, Navigate } from "react-router";
+import { createBrowserRouter, Navigate, Outlet, type RouteObject } from "react-router";
 import { LayoutErrorBoundary, RootErrorBoundary } from "@/components/errors/RouteErrorBoundary";
+import { RequirePermission } from "@/components/rbac/RequirePermission";
 import { FullPageLoader } from "@/components/ui/FullPageLoader";
 import { RootLayout } from "@/layouts/RootLayout";
 import { lazyPage } from "@/lib/lazyPage";
 import { DEFAULT_APP_PATH } from "@/lib/safeRedirect";
 import { InAppNotFoundPage, NotFoundPage } from "@/pages/NotFoundPage";
+
+function guarded(permission: string, route: RouteObject): RouteObject {
+  return {
+    element: (
+      <RequirePermission permission={permission}>
+        <Outlet />
+      </RequirePermission>
+    ),
+    children: [route],
+  };
+}
 
 export const router = createBrowserRouter([
   {
@@ -133,6 +145,71 @@ export const router = createBrowserRouter([
               {
                 path: "alerts/rules/:ruleId",
                 lazy: lazyPage(() => import("@/pages/alerts/AlertRulePage"), "AlertRulePage"),
+              },
+              guarded("project:read", {
+                path: "projects",
+                lazy: lazyPage(() => import("@/pages/projects/ProjectsPage"), "ProjectsPage"),
+              }),
+              guarded("project:read", {
+                path: "projects/:projectSlug",
+                lazy: lazyPage(() => import("@/layouts/ProjectLayout"), "ProjectLayout"),
+                children: [
+                  {
+                    index: true,
+                    lazy: lazyPage(() => import("@/pages/projects/ProjectOverviewPage"), "ProjectOverviewPage"),
+                  },
+                  {
+                    path: "monitors",
+                    lazy: lazyPage(() => import("@/pages/projects/ProjectMonitorsPage"), "ProjectMonitorsPage"),
+                  },
+                  {
+                    path: "incidents",
+                    lazy: lazyPage(() => import("@/pages/projects/ProjectIncidentsPage"), "ProjectIncidentsPage"),
+                  },
+                  {
+                    path: "access",
+                    lazy: lazyPage(() => import("@/pages/projects/ProjectAccessPage"), "ProjectAccessPage"),
+                  },
+                ],
+              }),
+              guarded("monitor:update", {
+                path: "maintenance",
+                lazy: lazyPage(() => import("@/pages/maintenance/MaintenancePage"), "MaintenancePage"),
+              }),
+              {
+                path: "notifications",
+                lazy: lazyPage(() => import("@/pages/notifications/NotificationsPage"), "NotificationsPage"),
+              },
+              {
+                path: "settings",
+                lazy: lazyPage(() => import("@/layouts/SettingsLayout"), "SettingsLayout"),
+                children: [
+                  { index: true, lazy: lazyPage(() => import("@/layouts/SettingsLayout"), "SettingsIndexRedirect") },
+                  guarded("org:settings", {
+                    path: "general",
+                    lazy: lazyPage(() => import("@/pages/settings/GeneralSettingsPage"), "GeneralSettingsPage"),
+                  }),
+                  guarded("member:read", {
+                    path: "members",
+                    lazy: lazyPage(() => import("@/pages/settings/MembersPage"), "MembersPage"),
+                  }),
+                  guarded("role:read", {
+                    path: "roles",
+                    lazy: lazyPage(() => import("@/pages/settings/RolesPage"), "RolesPage"),
+                  }),
+                  guarded("role:read", {
+                    path: "roles/:roleId",
+                    lazy: lazyPage(() => import("@/pages/settings/RoleEditorPage"), "RoleEditorPage"),
+                  }),
+                  guarded("apikey:manage", {
+                    path: "api-keys",
+                    lazy: lazyPage(() => import("@/pages/settings/ApiKeysPage"), "ApiKeysPage"),
+                  }),
+                  guarded("auditlog:view", {
+                    path: "audit-log",
+                    lazy: lazyPage(() => import("@/pages/settings/AuditLogPage"), "AuditLogPage"),
+                  }),
+                ],
               },
               {
                 path: "monitors/:monitorId/edit",

@@ -3,11 +3,12 @@ import { LuCircleCheck, LuWrench } from "react-icons/lu";
 import { Link, useParams } from "react-router";
 import { incidentsQuery } from "@/api/incidents";
 import { SeverityTag } from "@/components/alerts/SeverityTag";
-import { AssigneeAvatar } from "@/components/incidents/AssigneeAvatar";
+import { PersonAvatar } from "@/components/ui/PersonAvatar";
 import { IncidentDuration } from "@/components/incidents/IncidentDuration";
 import { IncidentStatusPill } from "@/components/incidents/IncidentStatusPill";
 import { Card } from "@/components/ui/Card";
-import { latestUpdateText, openIncidentsFor, shortName } from "@/lib/incidents";
+import { latestUpdateText, openIncidentsFor } from "@/lib/incidents";
+import { shortName } from "@/lib/people";
 import { paths } from "@/lib/paths";
 import type { IncidentStatus } from "@/types/incident";
 import type { Maintenance } from "@/types/overview";
@@ -53,7 +54,7 @@ export function ActiveIncidentsCard({ maintenance }: { maintenance: Maintenance 
                   <span className="mt-3 flex items-center justify-between text-xs">
                     <IncidentStatusPill status={incident.status} />
                     <span className="flex items-center gap-1.5 text-muted">
-                      <AssigneeAvatar name={incident.assignee} hasTooltip={false} />
+                      <PersonAvatar name={incident.assignee} hasTooltip={false} />
                       {incident.assignee ? shortName(incident.assignee) : "Unassigned"}
                     </span>
                   </span>

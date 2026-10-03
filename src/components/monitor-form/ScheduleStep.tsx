@@ -6,6 +6,7 @@ import { toggleItem } from "@/lib/list";
 import { INTERVALS, monthlyChecks, type MonitorFieldProps } from "@/lib/monitorForm";
 import { formatInterval, PROJECT_OPTIONS, REGIONS, TAGS } from "@/lib/monitors";
 import type { RegionCode } from "@/types/monitor";
+import { plural } from "@/lib/format";
 
 export function ScheduleStep({ values, errors, onChange }: MonitorFieldProps) {
   const intervalLabelId = useId();
@@ -25,7 +26,7 @@ export function ScheduleStep({ values, errors, onChange }: MonitorFieldProps) {
         hint={
           <>
             About <span className="font-mono text-ink">{monthlyChecks(values).toLocaleString()}</span> checks a month
-            across {values.regions.length} {values.regions.length === 1 ? "region" : "regions"}.
+            across {plural(values.regions.length, "region")}.
           </>
         }
       >

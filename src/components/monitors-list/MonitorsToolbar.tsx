@@ -4,7 +4,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { monitorsKey } from "@/api/monitors";
 import { StatusIcon } from "@/components/monitors/StatusIcon";
-import { CustomInput } from "@/components/ui/CustomInput";
 import { useMonitorFilters } from "@/hooks/useMonitorFilters";
 import { countBy } from "@/lib/list";
 import { SORT_LABELS, type SortKey } from "@/lib/monitorList";
@@ -12,6 +11,8 @@ import { MONITOR_TYPE_LABELS, MONITOR_TYPE_VALUES, PROJECT_OPTIONS, TAGS } from 
 import { STATUS_LABELS, STATUSES } from "@/lib/status";
 import type { Monitor } from "@/types/monitor";
 import { FacetFilter } from "./FacetFilter";
+import { ResetFiltersButton } from "@/components/ui/ResetFiltersButton";
+import { ToolbarSearch } from "@/components/ui/ToolbarSearch";
 
 export function MonitorsToolbar({ monitors }: { monitors: Monitor[] }) {
   const { orgSlug = "" } = useParams();
@@ -27,16 +28,13 @@ export function MonitorsToolbar({ monitors }: { monitors: Monitor[] }) {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <div className="w-64">
-        <CustomInput
-          type="search"
-          size="middle"
-          aria-label="Search monitors"
-          placeholder="Search by name or URL"
-          value={filters.query}
-          onChange={(event) => setParam("q", event.target.value)}
-        />
-      </div>
+      <ToolbarSearch
+        label="Search monitors"
+        placeholder="Search by name or URL"
+        value={filters.query}
+        onChange={(value) => setParam("q", value)}
+        className=""
+      />
       <FacetFilter
         label="Status"
         selected={filters.statuses}
@@ -74,11 +72,7 @@ export function MonitorsToolbar({ monitors }: { monitors: Monitor[] }) {
         onChange={(values) => setParam("tag", values)}
         options={TAGS.map((tag) => ({ value: tag, label: tag, count: tagCounts[tag] }))}
       />
-      {hasFilters && (
-        <Button type="text" onClick={clear}>
-          Reset
-        </Button>
-      )}
+      <ResetFiltersButton isVisible={hasFilters} onClick={clear} />
 
       <div className="ml-auto flex items-center gap-2">
         <Dropdown

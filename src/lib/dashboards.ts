@@ -24,11 +24,13 @@ import {
   scaleLayout,
   type Layout,
 } from "./gridLayout";
-import { formatAgo } from "./format";
+import { formatAgo, slugify } from "./format";
 import { PROJECT_OPTIONS } from "./monitors";
 import { readList } from "./searchParams";
 import { MAX_CHART_MONITORS, widgetTitleSchema } from "./widgetConfig";
 import { WIDGET_TYPES, WIDGETS } from "./widgets";
+import { newId } from "./ids";
+import { DAY_MS } from "./dates";
 
 export const DASHBOARD_RANGES: DashboardRange[] = ["15m", "1h", "24h", "7d", "30d"];
 
@@ -72,12 +74,8 @@ export function refreshSeconds(value: RefreshValue) {
   return REFRESH_OPTIONS.find((option) => option.value === value)?.seconds ?? null;
 }
 
-function randomId(prefix: string) {
-  return `${prefix}_${crypto.randomUUID().slice(0, 8)}`;
-}
-
 export function newWidgetId() {
-  return randomId("w");
+  return newId("w");
 }
 
 type NewDashboardValues = { name: string; project: string };
@@ -88,7 +86,7 @@ function emptyLayouts(): DashboardLayouts {
 
 export function blankDashboard({ name, project }: NewDashboardValues): Dashboard {
   return {
-    id: randomId("dash"),
+    id: newId("dash"),
     name,
     description: "",
     project,
@@ -139,7 +137,7 @@ export function createFromStart(values: NewDashboardValues & { template: string 
 export function cloneDashboard(dashboard: Dashboard): Dashboard {
   return {
     ...structuredClone(dashboard),
-    id: randomId("dash"),
+    id: newId("dash"),
     name: `${dashboard.name} (copy)`,
     version: 1,
     updatedBy: currentUser.name,
@@ -152,21 +150,12 @@ export function dashboardToJson(dashboard: Dashboard) {
   return JSON.stringify({ name, description, project, timeRange, refreshSec, widgets, layouts }, null, 2);
 }
 
-function slugify(text: string, fallback: string) {
-  return (
-    text
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "") || fallback
-  );
-}
-
 export function dashboardFileName(dashboard: Dashboard) {
-  return `${slugify(dashboard.name, "dashboard")}.json`;
+  return `${slugify(dashboard.name) || "dashboard"}.json`;
 }
 
 export function widgetCsvFileName(widget: DashboardWidget) {
-  return `${slugify(widget.title, widget.type)}.csv`;
+  return `${slugify(widget.title) || widget.type}.csv`;
 }
 
 export function layoutFor(dashboard: Dashboard, breakpoint: Breakpoint): Layout {
@@ -264,8 +253,6 @@ export const newDashboardSchema = z.object({
   project: z.string().min(1, "Pick a project."),
   template: z.string().default(BLANK_TEMPLATE_ID),
 });
-
-const DAY_MS = 86_400_000;
 
 export function editedAgo(timestamp: number, now: number) {
   if (now - timestamp < DAY_MS) return formatAgo(timestamp, now);

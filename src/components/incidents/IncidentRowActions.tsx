@@ -10,7 +10,7 @@ export function IncidentRowActions({ incident }: { incident: Incident }) {
   if (!isIncidentOpen(incident)) return null;
 
   return (
-    <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+    <div className="row-actions flex items-center justify-end gap-1">
       {!incident.acknowledgedAt && (
         <Tooltip title="Acknowledge">
           <Button

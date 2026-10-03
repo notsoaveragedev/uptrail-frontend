@@ -3,7 +3,7 @@ import { fakeRequest } from "@/lib/fakeRequest";
 import { dashboardStore } from "@/mocks/dashboardStore";
 import { currentUser } from "@/mocks/workspace";
 import type { Dashboard } from "@/types/dashboard";
-import { useCollectionMutation } from "./optimistic";
+import { useRemoveMutation, useUpsertMutation } from "./optimistic";
 
 export class VersionConflictError extends Error {
   latest: Dashboard;
@@ -75,17 +75,9 @@ export function useCreateDashboard(orgSlug: string) {
 }
 
 export function useDeleteDashboard(orgSlug: string) {
-  return useCollectionMutation<Dashboard, string>({
-    queryKey: dashboardsKey(orgSlug),
-    apply: (dashboards, id) => dashboards.filter((dashboard) => dashboard.id !== id),
-    commit: (id) => dashboardStore.remove(id),
-  });
+  return useRemoveMutation<Dashboard>(dashboardsKey(orgSlug), dashboardStore);
 }
 
 export function useRestoreDashboard(orgSlug: string) {
-  return useCollectionMutation<Dashboard, Dashboard>({
-    queryKey: dashboardsKey(orgSlug),
-    apply: (dashboards, dashboard) => [dashboard, ...dashboards.filter((item) => item.id !== dashboard.id)],
-    commit: (dashboard) => dashboardStore.upsert(dashboard),
-  });
+  return useUpsertMutation<Dashboard>(dashboardsKey(orgSlug), dashboardStore);
 }

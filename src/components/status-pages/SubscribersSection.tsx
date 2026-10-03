@@ -37,7 +37,7 @@ export function SubscribersSection({ orgSlug, pageId, slug }: SubscribersSection
       isDanger: true,
     });
     if (!isConfirmed) return;
-    removeSubscriber.mutate(subscriber.id, {
+    removeSubscriber.mutate([subscriber.id], {
       onSuccess: () =>
         toast.success("Subscriber removed", subscriber.email, {
           label: "Undo",

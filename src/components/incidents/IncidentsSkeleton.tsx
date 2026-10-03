@@ -1,4 +1,4 @@
-import { AlertTableSkeleton } from "@/components/alerts/AlertTableSkeleton";
+import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { SkeletonBlock } from "@/components/ui/SkeletonBlock";
 
 const COLUMNS = ["w-4", "w-12", "flex-1", "w-14", "w-20", "w-32", "w-14", "w-6", "w-12"];
@@ -15,7 +15,7 @@ export function IncidentsSkeleton() {
         <SkeletonBlock className="h-40 border border-line" />
       </div>
       <SkeletonBlock isInset className="h-8 w-96" />
-      <AlertTableSkeleton columns={COLUMNS} />
+      <TableSkeleton columns={COLUMNS} />
     </div>
   );
 }

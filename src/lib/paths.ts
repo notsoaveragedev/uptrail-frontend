@@ -37,4 +37,12 @@ export const paths = {
   dashboard: (orgSlug: string, dashboardId: string, search?: Search) =>
     withSearch(`${overview(orgSlug)}/dashboards/${dashboardId}`, search),
   dashboardTv: (orgSlug: string, dashboardId: string) => `${overview(orgSlug)}/dashboards/${dashboardId}/tv`,
+  projects: (orgSlug: string, search?: Search) => withSearch(`${overview(orgSlug)}/projects`, search),
+  project: (orgSlug: string, projectSlug: string, tab = "overview") =>
+    `${overview(orgSlug)}/projects/${projectSlug}${tab === "overview" ? "" : `/${tab}`}`,
+  maintenance: (orgSlug: string, search?: Search) => withSearch(`${overview(orgSlug)}/maintenance`, search),
+  notifications: (orgSlug: string) => `${overview(orgSlug)}/notifications`,
+  settings: (orgSlug: string, page = "general", search?: Search) =>
+    withSearch(`${overview(orgSlug)}/settings/${page}`, search),
+  role: (orgSlug: string, roleId: string) => `${overview(orgSlug)}/settings/roles/${roleId}`,
 };

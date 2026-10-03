@@ -7,6 +7,7 @@ import { projectLabel } from "@/lib/monitors";
 import { paths } from "@/lib/paths";
 import type { Dashboard } from "@/types/dashboard";
 import { DashboardThumbnail } from "./DashboardThumbnail";
+import { plural } from "@/lib/format";
 
 type DashboardCardProps = {
   dashboard: Dashboard;
@@ -41,7 +42,7 @@ export function DashboardCard({ dashboard, now, actions }: DashboardCardProps) {
           <div className="flex flex-col gap-0.5 px-4 pt-3 pb-3.5">
             <span className="truncate pr-8 text-md font-semibold">{dashboard.name}</span>
             <span className="truncate font-mono text-xs text-subtle">
-              {projectLabel(dashboard.project)} · {widgetCount} {widgetCount === 1 ? "widget" : "widgets"}
+              {projectLabel(dashboard.project)} · {plural(widgetCount, "widget")}
             </span>
           </div>
           <footer className="border-t border-line px-4 py-2.5 text-xs text-muted">
@@ -49,7 +50,7 @@ export function DashboardCard({ dashboard, now, actions }: DashboardCardProps) {
           </footer>
         </Card>
       </Link>
-      <div className="absolute right-3 bottom-13 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+      <div className="row-actions absolute right-3 bottom-13">
         <Dropdown trigger={["click"]} menu={{ items }} placement="bottomRight">
           <Button size="small" type="text" aria-label={`Actions for ${dashboard.name}`} icon={<LuEllipsis />} />
         </Dropdown>

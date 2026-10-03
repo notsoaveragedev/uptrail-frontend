@@ -1,4 +1,4 @@
-import { initials } from "@/lib/statusPages";
+import { initials } from "@/lib/people";
 
 type PageLogoProps = {
   title: string;

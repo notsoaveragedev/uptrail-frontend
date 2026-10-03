@@ -1,8 +1,8 @@
 import { Button, Drawer, Timeline } from "antd";
-import type { ReactNode } from "react";
 import { LuX } from "react-icons/lu";
 import { Link, useParams } from "react-router";
 import { DrawerSection } from "@/components/logs/drawer/DrawerSection";
+import { Fact } from "@/components/ui/Fact";
 import { eventTimeline, type TimelineEntry } from "@/lib/alertLists";
 import { formatClock, formatDateTime, formatElapsed } from "@/lib/format";
 import { paths } from "@/lib/paths";
@@ -126,15 +126,6 @@ function EventDetail({ event, rule, monitor, channels, onClose }: EventDetailPro
         />
       </DrawerSection>
     </div>
-  );
-}
-
-function Fact({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <>
-      <dt className="text-muted">{label}</dt>
-      <dd className="min-w-0">{children}</dd>
-    </>
   );
 }
 

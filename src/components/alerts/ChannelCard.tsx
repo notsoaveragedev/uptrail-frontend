@@ -6,10 +6,11 @@ import { Card } from "@/components/ui/Card";
 import { MetaList } from "@/components/ui/MetaList";
 import { useChannelTest } from "@/hooks/useChannelTest";
 import { useToast } from "@/hooks/useToast";
-import { channelTargetText, pluralRules } from "@/lib/alertLists";
+import { channelTargetText } from "@/lib/alertLists";
 import { TONE_BADGE } from "@/lib/status";
 import type { AlertChannel } from "@/types/alerts";
 import { ChannelIcon } from "./ChannelIcon";
+import { plural } from "@/lib/format";
 
 type ChannelCardProps = {
   channel: AlertChannel;
@@ -56,9 +57,9 @@ export function ChannelCard({ channel, usedBy, onEdit, onDelete }: ChannelCardPr
               "Never tested"
             )}
           </span>
-          <span>Used by {pluralRules(usedBy)}</span>
+          <span>Used by {plural(usedBy, "rule")}</span>
         </MetaList>
-        <span className="flex items-center opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+        <span className="row-actions flex items-center">
           <Tooltip title="Send test">
             <Button
               type="text"

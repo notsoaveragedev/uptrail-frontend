@@ -11,9 +11,10 @@ import { SectionErrorBoundary } from "@/components/errors/SectionErrorBoundary";
 import { MetaList } from "@/components/ui/MetaList";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useToast } from "@/hooks/useToast";
-import { countRulesUsing, pluralRules } from "@/lib/alertLists";
+import { countRulesUsing } from "@/lib/alertLists";
 import { importWithReload } from "@/lib/lazyPage";
 import type { AlertChannel } from "@/types/alerts";
+import { plural } from "@/lib/format";
 
 const ChannelModal = lazy(() =>
   importWithReload(() => import("@/components/alerts/ChannelModal")).then((module) => ({
@@ -41,13 +42,13 @@ export function AlertChannelsPage() {
       title: `Delete ${channel.name}?`,
       description:
         usedBy > 0
-          ? `Used by ${pluralRules(usedBy)}. They will stop notifying this channel.`
+          ? `Used by ${plural(usedBy, "rule")}. They will stop notifying this channel.`
           : "No rules use this channel.",
       confirmLabel: "Delete",
       isDanger: true,
     });
     if (!isConfirmed) return;
-    deleteChannel.mutate(channel.id);
+    deleteChannel.mutate([channel.id]);
     toast.success("Channel deleted", channel.name, { label: "Undo", onClick: () => saveChannel.mutate(channel) });
   }
 

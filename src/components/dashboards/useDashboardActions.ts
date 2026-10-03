@@ -46,7 +46,7 @@ export function useDashboardActions() {
     });
     if (!isConfirmed) return;
 
-    deleteDashboard.mutate(dashboard.id, {
+    deleteDashboard.mutate([dashboard.id], {
       onSuccess: () =>
         toast.success("Dashboard deleted", dashboard.name, {
           label: "Undo",

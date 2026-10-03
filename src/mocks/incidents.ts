@@ -2,9 +2,8 @@ import type { Severity } from "@/types/alerts";
 import type { Incident, IncidentStatus, TimelineEntry } from "@/types/incident";
 import { MONITORS } from "./monitors";
 import { seeded } from "./random";
+import { DAY_MS, MINUTE_MS } from "@/lib/dates";
 
-const MINUTE = 60_000;
-const DAY = 24 * 60 * MINUTE;
 const now = Date.now();
 
 const PEOPLE = ["Arjun Rao", "Meera Iyer", "Kabir Shah", "Ananya Das"];
@@ -42,9 +41,9 @@ function resolvedIncident(number: number, random: () => number): Incident {
   const monitor = MONITORS[Math.floor(random() * 12)];
   const story = STORIES[Math.floor(random() * STORIES.length)];
   const severity = SEVERITIES[Math.floor(random() * SEVERITIES.length)];
-  const startedAt = now - Math.round((2 + random() * 86) * DAY);
-  const ackAfter = Math.round((1 + random() * 9) * MINUTE);
-  const resolveAfter = Math.round((12 + random() * 90) * MINUTE);
+  const startedAt = now - Math.round((2 + random() * 86) * DAY_MS);
+  const ackAfter = Math.round((1 + random() * 9) * MINUTE_MS);
+  const resolveAfter = Math.round((12 + random() * 90) * MINUTE_MS);
   const assignee = PEOPLE[Math.floor(random() * PEOPLE.length)];
   const id = `INC-${number}`;
   const at = (offset: number) => startedAt + offset;
@@ -107,8 +106,8 @@ function resolvedIncident(number: number, random: () => number): Incident {
         author: assignee,
         at: at(ackAfter),
       }),
-      statusAt("identified", ackAfter + 6 * MINUTE, story.identified, true),
-      statusAt("monitoring", resolveAfter - 8 * MINUTE, story.monitoring, true),
+      statusAt("identified", ackAfter + 6 * MINUTE_MS, story.identified, true),
+      statusAt("monitoring", resolveAfter - 8 * MINUTE_MS, story.monitoring, true),
       entry(`${id}-recovered`, {
         kind: "auto",
         event: "recovered",
@@ -150,7 +149,7 @@ const LIVE_INCIDENT: Incident = {
         "Payment gateway is timing out from **BOM** and **FRA**. IAD is healthy, so we're failing over to the secondary provider.",
       isPublic: true,
       author: "Arjun Rao",
-      at: liveStart + 3 * MINUTE,
+      at: liveStart + 3 * MINUTE_MS,
     }),
     entry("INC-42-declared", {
       kind: "update",
@@ -184,7 +183,7 @@ const LIVE_INCIDENT: Incident = {
   acknowledgedAt: null,
   acknowledgedBy: null,
   resolvedAt: null,
-  updatedAt: liveStart + 3 * MINUTE,
+  updatedAt: liveStart + 3 * MINUTE_MS,
 };
 
 function buildIncidents() {

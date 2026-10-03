@@ -1,9 +1,9 @@
+import { LuBell } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Empty } from "antd";
 import { useState } from "react";
 import { useParams } from "react-router";
 import { alertChannelsQuery, alertRulesQuery } from "@/api/alerts";
-import { AlertTableSkeleton } from "@/components/alerts/AlertTableSkeleton";
+import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { RuleBulkBar } from "@/components/alerts/RuleBulkBar";
 import { RulesEmptyState } from "@/components/alerts/RulesEmptyState";
 import { RulesTable } from "@/components/alerts/RulesTable";
@@ -11,6 +11,7 @@ import { RulesToolbar } from "@/components/alerts/RulesToolbar";
 import { SectionErrorBoundary } from "@/components/errors/SectionErrorBoundary";
 import { useAlertRuleFilters } from "@/hooks/useAlertRuleFilters";
 import { filterRules } from "@/lib/alertLists";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const SKELETON_COLUMNS = ["w-4", "w-14", "w-40", "flex-1", "w-16", "w-12", "w-14", "w-12", "w-8"];
 
@@ -25,9 +26,7 @@ export function AlertRulesPage() {
   const selected = rules.filter((rule) => selectedIds.includes(rule.id));
 
   const emptyState = hasFilters ? (
-    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rules match these filters.">
-      <Button onClick={clear}>Reset filters</Button>
-    </Empty>
+    <EmptyState icon={<LuBell />} title="No rules match these filters" onClear={clear} />
   ) : (
     <RulesEmptyState />
   );
@@ -39,7 +38,7 @@ export function AlertRulesPage() {
         <RulesToolbar rules={rules} />
         <SectionErrorBoundary>
           {isPending ? (
-            <AlertTableSkeleton columns={SKELETON_COLUMNS} />
+            <TableSkeleton columns={SKELETON_COLUMNS} />
           ) : (
             <RulesTable
               rules={visible}

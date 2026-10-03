@@ -1,5 +1,6 @@
 import type { PointerEvent } from "react";
 import { countConditions, nodePosition, type VisualGroup, type VisualNode } from "@/lib/alertExpression/visual";
+import { plural } from "@/lib/format";
 
 export type Builder = {
   root: VisualGroup;
@@ -25,7 +26,7 @@ export function gripId(id: string) {
 export function nodeLabel(node: VisualNode) {
   if (node.kind === "condition") return `condition ${node.metric} ${node.op} ${node.value ?? "empty"}`;
   const count = countConditions(node);
-  return `group with ${count} ${count === 1 ? "condition" : "conditions"}`;
+  return `group with ${plural(count, "condition")}`;
 }
 
 export function positionText(root: VisualGroup, id: string) {

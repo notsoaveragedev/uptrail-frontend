@@ -1,9 +1,7 @@
 import type { AlertChannel, AlertEvent, AlertRule } from "@/types/alerts";
 import { seeded } from "./random";
+import { DAY_MS, HOUR_MS, MINUTE_MS } from "@/lib/dates";
 
-const MINUTE = 60_000;
-const HOUR = 60 * MINUTE;
-const DAY = 24 * HOUR;
 const now = Date.now();
 
 export const ALERT_CHANNELS: AlertChannel[] = [
@@ -13,7 +11,7 @@ export const ALERT_CHANNELS: AlertChannel[] = [
     name: "On-call team",
     target: "oncall@pixelcraft.io",
     verified: true,
-    lastTestAt: now - 3 * DAY,
+    lastTestAt: now - 3 * DAY_MS,
   },
   {
     id: "ch_slack",
@@ -21,7 +19,7 @@ export const ALERT_CHANNELS: AlertChannel[] = [
     name: "#oncall",
     target: "https://hooks.slack.com/services/T024/B07/xyz",
     verified: true,
-    lastTestAt: now - DAY,
+    lastTestAt: now - DAY_MS,
   },
   {
     id: "ch_discord",
@@ -37,7 +35,7 @@ export const ALERT_CHANNELS: AlertChannel[] = [
     name: "PagerDuty bridge",
     target: "https://events.pagerduty.com/integration/e93/enqueue",
     verified: true,
-    lastTestAt: now - 9 * DAY,
+    lastTestAt: now - 9 * DAY_MS,
   },
 ];
 
@@ -55,8 +53,8 @@ export const ALERT_RULES: AlertRule[] = [
     autoIncident: true,
     enabled: true,
     state: "firing",
-    lastFiredAt: now - 6 * MINUTE,
-    updatedAt: now - 12 * DAY,
+    lastFiredAt: now - 6 * MINUTE_MS,
+    updatedAt: now - 12 * DAY_MS,
   },
   {
     id: "rule_p95_latency",
@@ -71,8 +69,8 @@ export const ALERT_RULES: AlertRule[] = [
     autoIncident: false,
     enabled: true,
     state: "firing",
-    lastFiredAt: now - 12 * MINUTE,
-    updatedAt: now - 20 * DAY,
+    lastFiredAt: now - 12 * MINUTE_MS,
+    updatedAt: now - 20 * DAY_MS,
   },
   {
     id: "rule_ssl_expiry",
@@ -87,8 +85,8 @@ export const ALERT_RULES: AlertRule[] = [
     autoIncident: false,
     enabled: true,
     state: "pending",
-    lastFiredAt: now - 2 * HOUR,
-    updatedAt: now - 40 * DAY,
+    lastFiredAt: now - 2 * HOUR_MS,
+    updatedAt: now - 40 * DAY_MS,
   },
   {
     id: "rule_keyword",
@@ -103,8 +101,8 @@ export const ALERT_RULES: AlertRule[] = [
     autoIncident: false,
     enabled: true,
     state: "ok",
-    lastFiredAt: now - 38 * MINUTE,
-    updatedAt: now - 7 * DAY,
+    lastFiredAt: now - 38 * MINUTE_MS,
+    updatedAt: now - 7 * DAY_MS,
   },
   {
     id: "rule_eu_latency",
@@ -119,8 +117,8 @@ export const ALERT_RULES: AlertRule[] = [
     autoIncident: true,
     enabled: false,
     state: "ok",
-    lastFiredAt: now - 9 * DAY,
-    updatedAt: now - 3 * DAY,
+    lastFiredAt: now - 9 * DAY_MS,
+    updatedAt: now - 3 * DAY_MS,
   },
   {
     id: "rule_error_rate",
@@ -135,8 +133,8 @@ export const ALERT_RULES: AlertRule[] = [
     autoIncident: true,
     enabled: true,
     state: "ok",
-    lastFiredAt: now - 4 * DAY,
-    updatedAt: now - 30 * DAY,
+    lastFiredAt: now - 4 * DAY_MS,
+    updatedAt: now - 30 * DAY_MS,
   },
 ];
 
@@ -158,8 +156,8 @@ function buildEvents(): AlertEvent[] {
   for (let index = 0; index < 90; index++) {
     const rule = ALERT_RULES[Math.floor(random() * ALERT_RULES.length)];
     const monitors = EVENT_MONITORS[rule.id];
-    const firedAt = now - Math.round(random() * 30 * DAY) - HOUR;
-    const durationMs = Math.round((3 + random() * 55) * MINUTE);
+    const firedAt = now - Math.round(random() * 30 * DAY_MS) - HOUR_MS;
+    const durationMs = Math.round((3 + random() * 55) * MINUTE_MS);
     const isAcknowledged = random() > 0.3;
     events.push({
       id: `evt_${index.toString(36).padStart(3, "0")}`,
@@ -175,7 +173,7 @@ function buildEvents(): AlertEvent[] {
         escalationStep: 0,
       })),
       acknowledgedBy: isAcknowledged ? ACKNOWLEDGERS[Math.floor(random() * ACKNOWLEDGERS.length)] : null,
-      acknowledgedAt: isAcknowledged ? firedAt + Math.round(random() * 9 * MINUTE) : null,
+      acknowledgedAt: isAcknowledged ? firedAt + Math.round(random() * 9 * MINUTE_MS) : null,
       incidentId: rule.autoIncident && random() > 0.6 ? `INC-${12 + (index % 30)}` : null,
       firedAt,
       resolvedAt: firedAt + durationMs,
@@ -190,13 +188,13 @@ function buildEvents(): AlertEvent[] {
       status: "firing",
       valueSnapshot: { regions_down: 2, latency_p95: 10_000 },
       deliveries: [
-        { channelId: "ch_slack", at: now - 6 * MINUTE, ok: true, error: null, escalationStep: 0 },
-        { channelId: "ch_webhook", at: now - 6 * MINUTE, ok: true, error: null, escalationStep: 0 },
+        { channelId: "ch_slack", at: now - 6 * MINUTE_MS, ok: true, error: null, escalationStep: 0 },
+        { channelId: "ch_webhook", at: now - 6 * MINUTE_MS, ok: true, error: null, escalationStep: 0 },
       ],
       acknowledgedBy: null,
       acknowledgedAt: null,
       incidentId: "INC-42",
-      firedAt: now - 6 * MINUTE,
+      firedAt: now - 6 * MINUTE_MS,
       resolvedAt: null,
     },
     {
@@ -205,11 +203,11 @@ function buildEvents(): AlertEvent[] {
       monitorId: "mon_search",
       status: "firing",
       valueSnapshot: { latency_p95: 1240 },
-      deliveries: [{ channelId: "ch_slack", at: now - 12 * MINUTE, ok: true, error: null, escalationStep: 0 }],
+      deliveries: [{ channelId: "ch_slack", at: now - 12 * MINUTE_MS, ok: true, error: null, escalationStep: 0 }],
       acknowledgedBy: "Meera Iyer",
-      acknowledgedAt: now - 10 * MINUTE,
+      acknowledgedAt: now - 10 * MINUTE_MS,
       incidentId: null,
-      firedAt: now - 12 * MINUTE,
+      firedAt: now - 12 * MINUTE_MS,
       resolvedAt: null,
     },
   ];

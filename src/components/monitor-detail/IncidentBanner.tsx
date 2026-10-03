@@ -6,7 +6,8 @@ import { SeverityTag } from "@/components/alerts/SeverityTag";
 import { IncidentDuration } from "@/components/incidents/IncidentDuration";
 import { IncidentStatusPill } from "@/components/incidents/IncidentStatusPill";
 import { MetaSeparator } from "@/components/ui/MetaList";
-import { openIncidentsFor, shortName } from "@/lib/incidents";
+import { openIncidentsFor } from "@/lib/incidents";
+import { shortName } from "@/lib/people";
 import { paths } from "@/lib/paths";
 
 export function IncidentBanner({ monitorId }: { monitorId: string }) {

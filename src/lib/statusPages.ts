@@ -12,6 +12,7 @@ import { csvRow } from "./csv";
 import { PROJECT_OPTIONS } from "./monitors";
 import type { Tone } from "./status";
 import { contrastRatio, isDarkColor, MIN_PRIMARY_CONTRAST, MIN_TEXT_CONTRAST, suggestReadable } from "./statusTheme";
+import { newId } from "./ids";
 
 export const STATUS_HOST = "uptrail.app";
 export const STATUS_ORIGIN = `https://${STATUS_HOST}`;
@@ -41,14 +42,6 @@ export function pageAddress(page: Pick<StatusPage, "slug" | "customDomain">) {
   return page.customDomain?.verified ? page.customDomain.host : `${STATUS_HOST}/status/${page.slug}`;
 }
 
-export function slugify(text: string) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 40);
-}
-
 export function isSlugTaken(slug: string, pages: StatusPage[]) {
   return RESERVED_SLUGS.includes(slug) || pages.some((page) => page.slug === slug);
 }
@@ -61,7 +54,7 @@ export function pageProjectOptions(pages: StatusPage[]) {
 }
 
 export function newGroupId() {
-  return `grp_${crypto.randomUUID().slice(0, 8)}`;
+  return newId("grp");
 }
 
 function toComponent(monitor: Monitor): StatusComponentConfig {
@@ -73,7 +66,7 @@ type NewPageValues = { project: string; title: string; slug: string };
 export function blankStatusPage({ project, title, slug }: NewPageValues, monitors: Monitor[]): StatusPage {
   const projectMonitors = monitors.filter((monitor) => monitor.project === project);
   return {
-    id: `sp_${crypto.randomUUID().slice(0, 8)}`,
+    id: newId("sp"),
     slug,
     project,
     title,
@@ -240,15 +233,6 @@ export function subscribersCsv(subscribers: StatusSubscriber[]) {
     ]),
   );
   return [csvRow(["email", "status", "subscribed_at"]), ...rows].join("\n");
-}
-
-export function initials(title: string) {
-  const words = title.trim().split(/\s+/).filter(Boolean);
-  return words
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
 }
 
 function uptimesOn(snapshot: StatusSnapshot, index: number) {

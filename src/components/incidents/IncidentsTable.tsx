@@ -10,7 +10,7 @@ import { projectLabel } from "@/lib/monitors";
 import { paths } from "@/lib/paths";
 import type { Incident } from "@/types/incident";
 import type { Monitor } from "@/types/monitor";
-import { AssigneeAvatar } from "./AssigneeAvatar";
+import { PersonAvatar } from "@/components/ui/PersonAvatar";
 import { IncidentDuration } from "./IncidentDuration";
 import { IncidentRowActions } from "./IncidentRowActions";
 import { IncidentStatusPill } from "./IncidentStatusPill";
@@ -85,7 +85,7 @@ export function IncidentsTable({ incidents, monitors, selectedIds, onSelect, emp
       title: "Who",
       key: "assignee",
       width: 64,
-      render: (_, incident) => <AssigneeAvatar name={incident.assignee} />,
+      render: (_, incident) => <PersonAvatar name={incident.assignee} />,
     },
     {
       title: "Started",

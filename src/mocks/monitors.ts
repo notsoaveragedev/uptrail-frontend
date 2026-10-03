@@ -1,10 +1,10 @@
 import { statusTrail } from "@/lib/status";
 import type { HttpMethod, Monitor, MonitorStatus, MonitorType, RegionCode } from "@/types/monitor";
 import { seeded } from "./random";
+import { HOUR_MS } from "@/lib/dates";
 
 const CHECK_COUNT = 30;
 const HISTORY_COUNT = 24;
-const HOUR = 3_600_000;
 
 function history(base: number, seed: number) {
   const random = seeded(seed);
@@ -51,7 +51,7 @@ function monitor(seed: Seed, index: number): Monitor {
     project: seed.project,
     tags: seed.tags,
     status,
-    statusSince: Date.now() - (seed.sinceHours ?? 24 * (index + 3)) * HOUR,
+    statusSince: Date.now() - (seed.sinceHours ?? 24 * (index + 3)) * HOUR_MS,
     latencyMs: seed.latencyMs,
     uptime24h: seed.uptime24h,
     uptime30d: seed.uptime30d,

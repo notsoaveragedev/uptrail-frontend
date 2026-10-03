@@ -78,7 +78,7 @@ function useIncidentMenu(incident: Incident) {
       isDanger: true,
     });
     if (!isConfirmed) return;
-    deleteIncident.mutate(incident.id);
+    deleteIncident.mutate([incident.id]);
     navigate(paths.incidents(orgSlug));
     toast.success(`${incident.id} deleted`, incident.title, {
       label: "Undo",

@@ -2,10 +2,11 @@ import type { Severity } from "@/types/alerts";
 import type { Incident, IncidentStatus, TimelineEntry } from "@/types/incident";
 import type { Monitor } from "@/types/monitor";
 import type { DownBand } from "@/types/monitorDetail";
-import { formatDay } from "./format";
 import { parseMarkdown } from "./markdown";
 import { readList } from "./searchParams";
 import type { Tone } from "./status";
+import { DAY_MS } from "./dates";
+import { matchesAny } from "./list";
 
 export const INCIDENT_STATUSES: IncidentStatus[] = ["investigating", "identified", "monitoring", "resolved"];
 
@@ -23,8 +24,6 @@ export const INCIDENT_STATUS_TONE: Record<IncidentStatus, Tone> = {
   resolved: "up",
 };
 
-const DAY = 86_400_000;
-
 function average(values: number[]) {
   return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
 }
@@ -37,15 +36,15 @@ export function incidentMetrics(incidents: Incident[], windowDays: number, now =
     mttaMs: average(list.flatMap((item) => (item.acknowledgedAt ? [item.acknowledgedAt - item.startedAt] : []))),
     mttrMs: average(list.flatMap((item) => (item.resolvedAt ? [item.resolvedAt - item.startedAt] : []))),
   });
-  const windowMs = windowDays * DAY;
+  const windowMs = windowDays * DAY_MS;
   const current = inWindow(now - windowMs, now);
 
   return {
     current: summarize(current),
     previous: summarize(inWindow(now - 2 * windowMs, now - windowMs)),
     daily: Array.from({ length: windowDays }, (_, index) => {
-      const start = now - (windowDays - index) * DAY;
-      return { date: start, ...summarize(inWindow(start, start + DAY)) };
+      const start = now - (windowDays - index) * DAY_MS;
+      return { date: start, ...summarize(inWindow(start, start + DAY_MS)) };
     }),
   };
 }
@@ -89,36 +88,17 @@ export function readIncidentFilters(params: URLSearchParams): IncidentFilters {
 export function filterIncidents(incidents: Incident[], tab: IncidentTab, filters: IncidentFilters, me: string) {
   const query = filters.query.trim().toLowerCase();
   const assignees = filters.assignees.map((value) => (value === ASSIGNEE_ME ? me : value));
-  const matches = (list: string[], value: string) => list.length === 0 || list.includes(value);
 
   return incidents
     .filter(
       (incident) =>
         isIncidentOpen(incident) === (tab === "open") &&
         `${incident.id} ${incident.title}`.toLowerCase().includes(query) &&
-        matches(filters.severities, incident.severity) &&
-        matches(filters.projects, incident.project) &&
-        matches(assignees, incident.assignee ?? UNASSIGNED),
+        matchesAny(filters.severities, incident.severity) &&
+        matchesAny(filters.projects, incident.project) &&
+        matchesAny(assignees, incident.assignee ?? UNASSIGNED),
     )
     .sort((a, b) => b.startedAt - a.startedAt);
-}
-
-export function pluralIncidents(count: number) {
-  return `${count} incident${count === 1 ? "" : "s"}`;
-}
-
-export function initials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
-
-export function shortName(name: string) {
-  const [first, last] = name.split(" ");
-  return last ? `${first} ${last[0]}.` : first;
 }
 
 export function formatSpan(ms: number) {
@@ -139,33 +119,7 @@ export function formatSpanShort(ms: number) {
 
 export function daysSinceLastIncident(incidents: Incident[], now: number) {
   const lastEnd = Math.max(0, ...incidents.map((incident) => incident.resolvedAt ?? now));
-  return lastEnd === 0 ? null : Math.floor((now - lastEnd) / DAY);
-}
-
-export type TimelineDay = { key: string; label: string; entries: TimelineEntry[] };
-
-function dayLabel(timestamp: number, now: number) {
-  const days = Math.round((startOfDay(now) - startOfDay(timestamp)) / DAY);
-  if (days === 0) return "Today";
-  if (days === 1) return "Yesterday";
-  return formatDay(timestamp);
-}
-
-function startOfDay(timestamp: number) {
-  const date = new Date(timestamp);
-  date.setHours(0, 0, 0, 0);
-  return date.getTime();
-}
-
-export function groupTimelineByDay(entries: TimelineEntry[], now: number): TimelineDay[] {
-  const days: TimelineDay[] = [];
-  for (const entry of [...entries].sort((a, b) => b.at - a.at)) {
-    const key = String(startOfDay(entry.at));
-    const last = days.at(-1);
-    if (last?.key === key) last.entries.push(entry);
-    else days.push({ key, label: dayLabel(entry.at, now), entries: [entry] });
-  }
-  return days;
+  return lastEnd === 0 ? null : Math.floor((now - lastEnd) / DAY_MS);
 }
 
 export type IncidentStage = { status: IncidentStatus; at: number | null; isReached: boolean; isCurrent: boolean };

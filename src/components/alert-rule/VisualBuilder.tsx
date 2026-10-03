@@ -12,6 +12,7 @@ import {
 import { gripId, nodeLabel, positionText, type Builder } from "./builderUtils";
 import { ConditionGroup } from "./ConditionGroup";
 import { useRowDrag } from "@/hooks/useRowDrag";
+import { plural } from "@/lib/format";
 
 type VisualBuilderProps = {
   tree: VisualGroup;
@@ -52,7 +53,7 @@ export function VisualBuilder({ tree, onChange }: VisualBuilderProps) {
     if (count > 0) {
       const isConfirmed = await confirm({
         title: "Remove this group?",
-        description: `The ${count} ${count === 1 ? "condition" : "conditions"} inside it will be removed too.`,
+        description: `The ${plural(count, "condition")} inside it will be removed too.`,
         confirmLabel: "Remove group",
         isDanger: true,
       });

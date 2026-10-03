@@ -1,6 +1,7 @@
 import { Button, Progress } from "antd";
 import { LuCircleCheck } from "react-icons/lu";
 import { useNavigate } from "react-router";
+import { plural } from "@/lib/format";
 
 type ImportStepProps = {
   total: number;
@@ -47,9 +48,7 @@ export function ImportStep({
         <LuCircleCheck aria-hidden className="size-5 text-up" />
       </span>
       <div className="flex flex-col gap-1">
-        <h2 className="text-md font-semibold">
-          {completed} {completed === 1 ? "monitor" : "monitors"} imported
-        </h2>
+        <h2 className="text-md font-semibold">{plural(completed, "monitor")} imported</h2>
         <p className="text-muted">They'll run their first checks within a minute.</p>
       </div>
 

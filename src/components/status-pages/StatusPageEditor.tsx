@@ -10,8 +10,8 @@ import type { Incident } from "@/types/incident";
 import type { Monitor } from "@/types/monitor";
 import type { StatusPage } from "@/types/statusPage";
 import { BrandingSection } from "./BrandingSection";
+import { StatusPageDangerZone } from "./StatusPageDangerZone";
 import { ComponentsSection } from "./ComponentsSection";
-import { DangerZone } from "./DangerZone";
 import { DisplaySection } from "./DisplaySection";
 import { DomainSection } from "./DomainSection";
 import { EditorHeader } from "./EditorHeader";
@@ -78,7 +78,11 @@ export function StatusPageEditor({ orgSlug, page, monitors, incidents }: StatusP
       key: "danger",
       label: <span className="text-down">Danger zone</span>,
       children: (
-        <DangerZone isPublished={editor.isPublished} onUnpublish={editor.togglePublish} onDelete={editor.remove} />
+        <StatusPageDangerZone
+          isPublished={editor.isPublished}
+          onUnpublish={editor.togglePublish}
+          onDelete={editor.remove}
+        />
       ),
     },
   ].map((section) => ({ ...section, children: <SectionErrorBoundary>{section.children}</SectionErrorBoundary> }));

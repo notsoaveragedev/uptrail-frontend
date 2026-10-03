@@ -3,6 +3,7 @@ import { formatInterval, MONITOR_TYPE_LABELS } from "./monitors";
 import { readEnum, readList, readSort, type SortState } from "./searchParams";
 import { STATUS_RANK } from "./status";
 import type { Monitor, MonitorStatus, MonitorType } from "@/types/monitor";
+import { matchesAny } from "./list";
 
 export type SortKey = "status" | "name" | "latency" | "uptime" | "checked";
 
@@ -56,15 +57,14 @@ function sortValue(monitor: Monitor, key: SortKey) {
 
 export function filterMonitors(monitors: Monitor[], filters: MonitorFilters) {
   const query = filters.query.trim().toLowerCase();
-  const matches = (list: string[], value: string) => list.length === 0 || list.includes(value);
 
   return monitors
     .filter(
       (monitor) =>
         `${monitor.name} ${monitor.url}`.toLowerCase().includes(query) &&
-        matches(filters.statuses, monitor.status) &&
-        matches(filters.types, monitor.type) &&
-        matches(filters.projects, monitor.project) &&
+        matchesAny(filters.statuses, monitor.status) &&
+        matchesAny(filters.types, monitor.type) &&
+        matchesAny(filters.projects, monitor.project) &&
         (filters.tags.length === 0 || filters.tags.some((tag) => monitor.tags.includes(tag))),
     )
     .sort((a, b) => {

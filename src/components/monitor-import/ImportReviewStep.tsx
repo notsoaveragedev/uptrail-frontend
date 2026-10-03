@@ -5,6 +5,7 @@ import { useSearchParam } from "@/hooks/useSearchParam";
 import { hasErrors, IMPORT_FIELDS, type ImportField, type ImportRow, type RowErrors } from "@/lib/importMonitors";
 import { ImportCell } from "./ImportCell";
 import { StepFooter } from "./StepFooter";
+import { plural } from "@/lib/format";
 
 const FILTERS = ["all", "valid", "errors"] as const;
 type Filter = (typeof FILTERS)[number];
@@ -155,7 +156,7 @@ export function ImportReviewStep({
           {rows.length - importCount} of {rows.length} rows will be skipped
         </span>
         <Button type="primary" disabled={importCount === 0} onClick={onImport}>
-          Import {importCount} {importCount === 1 ? "monitor" : "monitors"}
+          Import {plural(importCount, "monitor")}
         </Button>
       </StepFooter>
     </>

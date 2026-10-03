@@ -2,7 +2,7 @@ import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query
 import { fakeRequest } from "@/lib/fakeRequest";
 import { statusPageStore, statusSubscriberStore } from "@/mocks/statusPageStore";
 import type { StatusPage, StatusSubscriber } from "@/types/statusPage";
-import { useCollectionMutation } from "./optimistic";
+import { useRemoveMutation, useUpsertMutation } from "./optimistic";
 
 export function statusPagesKey(orgSlug: string) {
   return ["status-pages", orgSlug] as const;
@@ -60,27 +60,15 @@ export function useSaveStatusPage(orgSlug: string) {
 }
 
 export function useDeleteStatusPage(orgSlug: string) {
-  return useCollectionMutation<StatusPage, string>({
-    queryKey: statusPagesKey(orgSlug),
-    apply: (pages, id) => pages.filter((page) => page.id !== id),
-    commit: (id) => statusPageStore.remove(id),
-  });
+  return useRemoveMutation<StatusPage>(statusPagesKey(orgSlug), statusPageStore);
 }
 
 export function useRemoveSubscriber(orgSlug: string, pageId: string) {
-  return useCollectionMutation<StatusSubscriber, string>({
-    queryKey: subscribersKey(orgSlug, pageId),
-    apply: (subscribers, id) => subscribers.filter((subscriber) => subscriber.id !== id),
-    commit: (id) => statusSubscriberStore.remove(id),
-  });
+  return useRemoveMutation<StatusSubscriber>(subscribersKey(orgSlug, pageId), statusSubscriberStore);
 }
 
 export function useRestoreSubscriber(orgSlug: string, pageId: string) {
-  return useCollectionMutation<StatusSubscriber, StatusSubscriber>({
-    queryKey: subscribersKey(orgSlug, pageId),
-    apply: (subscribers, subscriber) => [subscriber, ...subscribers],
-    commit: (subscriber) => statusSubscriberStore.upsert(subscriber),
-  });
+  return useUpsertMutation<StatusSubscriber>(subscribersKey(orgSlug, pageId), statusSubscriberStore);
 }
 
 export async function verifyCustomDomain(host: string) {

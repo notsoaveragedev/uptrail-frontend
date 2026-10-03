@@ -2,7 +2,7 @@ import { useParams } from "react-router";
 import { useIncidentChange, type IncidentChange } from "@/api/incidents";
 import { useToast } from "@/hooks/useToast";
 import { SEVERITY_LABELS } from "@/lib/alerts";
-import { shortName } from "@/lib/incidents";
+import { shortName } from "@/lib/people";
 import { currentUser } from "@/mocks/workspace";
 import type { Severity } from "@/types/alerts";
 import type { Incident } from "@/types/incident";

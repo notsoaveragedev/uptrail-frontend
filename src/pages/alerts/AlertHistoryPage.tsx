@@ -1,10 +1,10 @@
+import { LuBellOff } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Empty } from "antd";
 import { lazy, Suspense, useState } from "react";
 import { useParams } from "react-router";
 import { alertChannelsQuery, alertEventsQuery, alertRulesQuery } from "@/api/alerts";
 import { monitorsQuery } from "@/api/monitors";
-import { AlertTableSkeleton } from "@/components/alerts/AlertTableSkeleton";
+import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { HistoryBulkBar } from "@/components/alerts/HistoryBulkBar";
 import { HistoryTable } from "@/components/alerts/HistoryTable";
 import { HistoryToolbar } from "@/components/alerts/HistoryToolbar";
@@ -13,6 +13,7 @@ import { useAlertHistoryFilters } from "@/hooks/useAlertHistoryFilters";
 import { useNow } from "@/hooks/useNow";
 import { filterEvents, HISTORY_RANGE_TEXT } from "@/lib/alertLists";
 import { importWithReload } from "@/lib/lazyPage";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const AlertEventDrawer = lazy(() =>
   importWithReload(() => import("@/components/alerts/AlertEventDrawer")).then((module) => ({
@@ -42,14 +43,9 @@ export function AlertHistoryPage() {
   const openEvent = events.find((event) => event.id === drawer?.eventId);
 
   const emptyState = hasFilters ? (
-    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No alerts match these filters.">
-      <Button onClick={clear}>Reset filters</Button>
-    </Empty>
+    <EmptyState icon={<LuBellOff />} title="No alerts match these filters" onClear={clear} />
   ) : (
-    <Empty
-      image={Empty.PRESENTED_IMAGE_SIMPLE}
-      description={`All clear · nothing fired in ${HISTORY_RANGE_TEXT[filters.range]}.`}
-    />
+    <EmptyState icon={<LuBellOff />} title={`All clear · nothing fired in ${HISTORY_RANGE_TEXT[filters.range]}`} />
   );
 
   return (
@@ -59,7 +55,7 @@ export function AlertHistoryPage() {
         <HistoryToolbar rules={rules} />
         <SectionErrorBoundary>
           {isPending ? (
-            <AlertTableSkeleton columns={SKELETON_COLUMNS} rows={8} />
+            <TableSkeleton columns={SKELETON_COLUMNS} rows={8} />
           ) : (
             <HistoryTable
               key={`${filters.ruleId}-${filters.status}-${filters.range}`}

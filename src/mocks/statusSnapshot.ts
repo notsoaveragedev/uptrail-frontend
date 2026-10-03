@@ -9,9 +9,10 @@ import type {
   StatusPage,
   StatusSnapshot,
 } from "@/types/statusPage";
+import { currentOccurrence, nextOccurrences } from "@/lib/maintenance";
 import { buildMonitorDetail } from "./monitorDetail";
-
-const HOUR = 3_600_000;
+import { maintenanceStore } from "./settingsStore";
+import { HOUR_MS } from "@/lib/dates";
 
 function overallStatus(statuses: ComponentStatus[]): OverallStatus {
   if (statuses.length > 0 && statuses.every((status) => status === "maintenance")) return "maintenance";
@@ -64,19 +65,25 @@ export function buildStatusSnapshot(page: StatusPage, monitors: Monitor[], incid
     }))
     .filter((group) => group.components.length > 0);
   const related = incidents.filter((incident) => incident.monitorIds.some((id) => names.has(id)));
-  const historyStart = Date.now() - page.options.historyDays * 24 * HOUR;
-  const maintenance: ScheduledMaintenance[] =
-    page.project === "bluepeak" || page.project === "shopnest"
-      ? [
-          {
-            id: `mnt_${page.slug}`,
-            title: "Database migration",
-            components: [...names.values()].slice(0, 2),
-            startsAt: Date.now() + 26 * HOUR,
-            endsAt: Date.now() + 27 * HOUR,
-          },
-        ]
-      : [];
+  const historyStart = Date.now() - page.options.historyDays * 24 * HOUR_MS;
+  const now = Date.now();
+  const maintenance: ScheduledMaintenance[] = maintenanceStore
+    .list()
+    .filter((entry) => entry.project === page.project && entry.showOnStatusPage)
+    .flatMap((entry) => {
+      const occurrence = currentOccurrence(entry, now) ?? nextOccurrences(entry, now, 1)[0];
+      if (!occurrence || occurrence.start - now > 14 * 24 * HOUR_MS) return [];
+      return [
+        {
+          id: entry.id,
+          title: entry.title,
+          components: entry.monitorIds.flatMap((id) => names.get(id) ?? []),
+          startsAt: occurrence.start,
+          endsAt: occurrence.end,
+        },
+      ];
+    })
+    .sort((a, b) => a.startsAt - b.startsAt);
 
   return {
     slug: page.slug,

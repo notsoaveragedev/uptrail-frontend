@@ -151,3 +151,61 @@ export const incidentUpdateSchema = z.object({
 });
 
 export const subscribeSchema = z.object({ email });
+
+const slug = z
+  .string()
+  .trim()
+  .min(3, "Use at least 3 characters.")
+  .max(40, "Keep the slug under 40 characters.")
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers and single hyphens.");
+
+export const orgSettingsSchema = z.object({
+  name: z.string().trim().min(1, "Name your organization.").max(60, "Keep the name under 60 characters."),
+  slug,
+  timezone: z.string().min(1, "Pick a timezone."),
+});
+
+export const projectSchema = z.object({
+  name: z.string().trim().min(1, "Name the project.").max(50, "Keep the name under 50 characters."),
+  slug,
+  description: z.string().trim().max(200, "Keep the description under 200 characters."),
+  tags: idList,
+});
+
+export const roleDetailsSchema = z.object({
+  name: z.string().trim().min(1, "Name the role.").max(40, "Keep the name under 40 characters."),
+  description: z.string().trim().max(140, "Keep the description under 140 characters."),
+});
+
+export const apiKeySchema = z.object({
+  name: z.string().trim().min(1, "Name the key so you can recognise it later.").max(50, "Keep it under 50 characters."),
+  permissions: idList.refine((values) => values.length > 0, "Pick at least one scope."),
+  projects: idList,
+  expiry: z.string(),
+});
+
+export const maintenanceSchema = z
+  .object({
+    title: z.string().trim().min(1, "Give the window a title.").max(80, "Keep the title under 80 characters."),
+    project: z.string().min(1, "Pick a project."),
+    description: z.string().trim().max(1000, "Keep the description under 1,000 characters."),
+    monitorIds: idList.refine((values) => values.length > 0, "Pick at least one monitor."),
+    startsAt: z.coerce.number().positive("Pick a start time."),
+    endsAt: z.coerce.number().positive("Pick an end time."),
+    timezone: z.string().min(1),
+    freq: z.enum(["none", "daily", "weekly"]),
+    weekdays: idList,
+    until: z.coerce.number(),
+    showOnStatusPage: checkbox,
+  })
+  .refine((values) => values.endsAt > values.startsAt, { message: "End must be after the start.", path: ["endsAt"] })
+  .refine((values) => values.freq !== "weekly" || values.weekdays.length > 0, {
+    message: "Pick at least one weekday.",
+    path: ["weekdays"],
+  })
+  .refine((values) => !values.until || values.until > values.startsAt, {
+    message: "Repeat until must be after the start.",
+    path: ["until"],
+  });
+
+export type MaintenanceValues = z.output<typeof maintenanceSchema>;

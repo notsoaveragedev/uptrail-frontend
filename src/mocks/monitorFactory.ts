@@ -1,6 +1,7 @@
 import type { MonitorFormValues } from "@/lib/monitorForm";
 import type { Monitor } from "@/types/monitor";
 import { runFakeTest } from "./monitorTest";
+import { newId } from "@/lib/ids";
 
 export function updatedMonitor(monitor: Monitor, values: MonitorFormValues): Monitor {
   return {
@@ -28,7 +29,7 @@ export function createdMonitor(values: MonitorFormValues): Monitor {
   });
   const status = firstCheck.ok ? "up" : "down";
   const base: Monitor = {
-    id: `mon_${crypto.randomUUID().slice(0, 8)}`,
+    id: newId("mon"),
     name: "",
     url: "",
     type: values.type,

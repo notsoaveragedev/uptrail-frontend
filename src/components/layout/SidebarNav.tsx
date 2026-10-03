@@ -1,9 +1,12 @@
 import { NavLink, useParams } from "react-router";
-import { NAV_GROUPS, SETTINGS_ITEM, type NavItem } from "@/lib/navigation";
+import { useCurrentRole } from "@/hooks/usePermission";
+import { canSeeNavItem, NAV_GROUPS, SETTINGS_ITEM, type NavItem } from "@/lib/navigation";
 import { paths } from "@/lib/paths";
 import { TONE_BADGE } from "@/lib/status";
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+  const { granted } = useCurrentRole();
+
   return (
     <nav aria-label="Main" className="flex flex-col gap-5">
       {NAV_GROUPS.map((group) => (
@@ -11,14 +14,18 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           <span className="px-2.5 pb-1.5 text-caps font-semibold tracking-widest text-subtle uppercase">
             {group.label}
           </span>
-          {group.items.map((item) => (
-            <SidebarLink key={item.label} item={item} onNavigate={onNavigate} />
-          ))}
+          {group.items
+            .filter((item) => canSeeNavItem(item, granted))
+            .map((item) => (
+              <SidebarLink key={item.label} item={item} onNavigate={onNavigate} />
+            ))}
         </div>
       ))}
-      <div className="border-t border-line pt-3">
-        <SidebarLink item={SETTINGS_ITEM} onNavigate={onNavigate} />
-      </div>
+      {canSeeNavItem(SETTINGS_ITEM, granted) && (
+        <div className="border-t border-line pt-3">
+          <SidebarLink item={SETTINGS_ITEM} onNavigate={onNavigate} />
+        </div>
+      )}
     </nav>
   );
 }

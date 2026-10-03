@@ -1,7 +1,8 @@
-import { Button, Empty } from "antd";
-import { LuCircleCheck } from "react-icons/lu";
+import { LuCircleCheck, LuSiren } from "react-icons/lu";
 import { Link, useParams } from "react-router";
 import { paths } from "@/lib/paths";
+import { plural } from "@/lib/format";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 type IncidentsEmptyStateProps = {
   hasFilters: boolean;
@@ -14,11 +15,7 @@ export function IncidentsEmptyState({ hasFilters, isOpenTab, quietDays, onClear 
   const { orgSlug = "" } = useParams();
 
   if (hasFilters) {
-    return (
-      <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No incidents match these filters.">
-        <Button onClick={onClear}>Clear filters</Button>
-      </Empty>
-    );
+    return <EmptyState icon={<LuSiren />} title="No incidents match these filters" onClear={onClear} />;
   }
 
   if (isOpenTab) {
@@ -27,12 +24,12 @@ export function IncidentsEmptyState({ hasFilters, isOpenTab, quietDays, onClear 
         <LuCircleCheck aria-hidden className="size-5 text-up" />
         <p className="text-ink">
           All clear · no open incidents
-          {quietDays !== null && quietDays > 0 && ` for ${quietDays} day${quietDays === 1 ? "" : "s"}`}
+          {quietDays !== null && quietDays > 0 && ` for ${plural(quietDays, "day")}`}
         </p>
         <Link to={paths.incidentsList(orgSlug, { tab: "resolved" })}>View resolved incidents</Link>
       </div>
     );
   }
 
-  return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No resolved incidents yet." />;
+  return <EmptyState icon={<LuSiren />} title="No resolved incidents yet" />;
 }

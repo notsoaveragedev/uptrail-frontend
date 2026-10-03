@@ -1,10 +1,9 @@
 import type { Dashboard, DashboardLayouts, DashboardTemplate, DashboardWidget } from "@/types/dashboard";
+import { HOUR_MS } from "@/lib/dates";
 
 type Box = [x: number, y: number, w: number, h: number];
 
 type Placement = { widget: DashboardWidget; lg: Box; md: Box; sm: Box };
-
-const HOUR = 3_600_000;
 
 function layoutsFrom(placements: Placement[]): DashboardLayouts {
   const items = (breakpoint: "lg" | "md" | "sm") =>
@@ -198,7 +197,7 @@ export const DASHBOARD_SEEDS: Dashboard[] = [
     refreshSec: 60,
     version: 1,
     updatedBy: "Arjun R.",
-    updatedAt: Date.now() - 2 * HOUR,
+    updatedAt: Date.now() - 2 * HOUR_MS,
   },
   {
     id: "dash_api_latency",
@@ -222,7 +221,7 @@ export const DASHBOARD_SEEDS: Dashboard[] = [
     refreshSec: null,
     version: 1,
     updatedBy: "Kabir S.",
-    updatedAt: Date.now() - 26 * HOUR,
+    updatedAt: Date.now() - 26 * HOUR_MS,
   },
 ];
 

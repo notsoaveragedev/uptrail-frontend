@@ -25,6 +25,7 @@ import type { Monitor } from "@/types/monitor";
 import { ChangeSummaryModal } from "./ChangeSummaryModal";
 import { StepFields } from "./StepFields";
 import { TestPanel } from "./TestPanel";
+import { plural } from "@/lib/format";
 
 const EDIT_TAB_KEYS = EDIT_TABS.map((item) => item.key);
 
@@ -82,7 +83,7 @@ export function EditMonitorForm({ orgSlug, monitor }: EditMonitorFormProps) {
             {isDirty && (
               <span role="status" className="mr-2 flex items-center gap-1.5 text-xs text-muted">
                 <StatusDot fill="bg-degraded" />
-                {changes.length} unsaved {changes.length === 1 ? "change" : "changes"}
+                {plural(changes.length, "unsaved change")}
               </span>
             )}
             <Button onClick={() => navigate(detailPath)}>Cancel</Button>

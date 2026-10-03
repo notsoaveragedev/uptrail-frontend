@@ -66,3 +66,16 @@ export function formatDay(timestamp: number) {
 export function formatDateTime(timestamp: number) {
   return `${formatDay(timestamp)}, ${formatTime(timestamp)}`;
 }
+
+export function plural(count: number, noun: string) {
+  if (count === 1) return `${count} ${noun}`;
+  return `${count} ${noun}${noun.endsWith("s") ? "es" : "s"}`;
+}
+
+export function slugify(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+}

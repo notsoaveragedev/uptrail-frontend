@@ -1,15 +1,15 @@
 import { Button } from "antd";
-import type { ReactNode } from "react";
+import { DangerRow, DangerZone } from "@/components/ui/DangerZone";
 
-type DangerZoneProps = {
+type StatusPageDangerZoneProps = {
   isPublished: boolean;
   onUnpublish: () => void;
   onDelete: () => void;
 };
 
-export function DangerZone({ isPublished, onUnpublish, onDelete }: DangerZoneProps) {
+export function StatusPageDangerZone({ isPublished, onUnpublish, onDelete }: StatusPageDangerZoneProps) {
   return (
-    <div className="flex flex-col divide-y divide-line rounded-md border border-down/40">
+    <DangerZone>
       {isPublished && (
         <DangerRow
           title="Unpublish"
@@ -30,18 +30,6 @@ export function DangerZone({ isPublished, onUnpublish, onDelete }: DangerZonePro
           </Button>
         }
       />
-    </div>
-  );
-}
-
-function DangerRow({ title, description, action }: { title: string; description: string; action: ReactNode }) {
-  return (
-    <div className="flex items-center justify-between gap-4 px-3 py-2.5">
-      <div className="flex flex-col">
-        <span className="font-medium text-ink">{title}</span>
-        <span className="text-xs text-muted">{description}</span>
-      </div>
-      {action}
-    </div>
+    </DangerZone>
   );
 }

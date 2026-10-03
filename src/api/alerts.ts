@@ -3,7 +3,7 @@ import { fakeRequest } from "@/lib/fakeRequest";
 import { alertChannelStore, alertEventStore, alertRuleStore } from "@/mocks/alertStore";
 import { currentUser } from "@/mocks/workspace";
 import type { AlertChannel, AlertEvent, AlertRule } from "@/types/alerts";
-import { useCollectionMutation } from "./optimistic";
+import { useCollectionMutation, useRemoveMutation, useUpsertMutation } from "./optimistic";
 
 export function alertRulesKey(orgSlug: string) {
   return ["alert-rules", orgSlug] as const;
@@ -69,19 +69,11 @@ export function useToggleAlertRule(orgSlug: string) {
 }
 
 export function useDeleteAlertRule(orgSlug: string) {
-  return useCollectionMutation<AlertRule, string>({
-    queryKey: alertRulesKey(orgSlug),
-    apply: (rules, id) => rules.filter((rule) => rule.id !== id),
-    commit: (id) => alertRuleStore.remove(id),
-  });
+  return useRemoveMutation<AlertRule>(alertRulesKey(orgSlug), alertRuleStore);
 }
 
 export function useRestoreAlertRule(orgSlug: string) {
-  return useCollectionMutation<AlertRule, AlertRule>({
-    queryKey: alertRulesKey(orgSlug),
-    apply: (rules, rule) => [rule, ...rules.filter((item) => item.id !== rule.id)],
-    commit: (rule) => alertRuleStore.upsert(rule),
-  });
+  return useUpsertMutation<AlertRule>(alertRulesKey(orgSlug), alertRuleStore);
 }
 
 export function useSaveAlertRule(orgSlug: string) {
@@ -113,11 +105,7 @@ export function useSaveAlertChannel(orgSlug: string) {
 }
 
 export function useDeleteAlertChannel(orgSlug: string) {
-  return useCollectionMutation<AlertChannel, string>({
-    queryKey: alertChannelsKey(orgSlug),
-    apply: (channels, id) => channels.filter((channel) => channel.id !== id),
-    commit: (id) => alertChannelStore.remove(id),
-  });
+  return useRemoveMutation<AlertChannel>(alertChannelsKey(orgSlug), alertChannelStore);
 }
 
 export async function sendTestMessage(channel: AlertChannel) {

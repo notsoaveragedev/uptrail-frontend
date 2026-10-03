@@ -1,8 +1,8 @@
 import { Button, Tooltip } from "antd";
-import type { ReactNode } from "react";
 import { LuArrowRight, LuChevronDown, LuChevronUp, LuX } from "react-icons/lu";
 import { Link } from "react-router";
 import { StatusBadge } from "@/components/monitors/StatusBadge";
+import { KbdButton } from "@/components/ui/KbdButton";
 import { formatBytes, formatClockMs, latencyText } from "@/lib/format";
 import { paths } from "@/lib/paths";
 import type { CheckResultDetail } from "@/types/logs";
@@ -21,30 +21,6 @@ function metaLine(detail: CheckResultDetail) {
   return detail.sizeBytes === null ? parts : [...parts, formatBytes(detail.sizeBytes)];
 }
 
-function NavButton({
-  label,
-  hint,
-  icon,
-  onClick,
-}: {
-  label: string;
-  hint: string;
-  icon: ReactNode;
-  onClick?: () => void;
-}) {
-  return (
-    <Tooltip
-      title={
-        <span className="flex items-center gap-2">
-          {label} <kbd className="kbd">{hint}</kbd>
-        </span>
-      }
-    >
-      <Button type="text" size="small" aria-label={label} icon={icon} disabled={!onClick} onClick={onClick} />
-    </Tooltip>
-  );
-}
-
 export function DetailHeader({ detail, orgSlug, onClose, onPrev, onNext }: DetailHeaderProps) {
   return (
     <header className="flex flex-col gap-2 border-b border-line px-5 pt-4 pb-3">
@@ -56,8 +32,8 @@ export function DetailHeader({ detail, orgSlug, onClose, onPrev, onNext }: Detai
           </h2>
         </div>
         <div className="flex shrink-0 items-center gap-0.5">
-          <NavButton label="Previous check" hint="↑" icon={<LuChevronUp />} onClick={onPrev} />
-          <NavButton label="Next check" hint="↓" icon={<LuChevronDown />} onClick={onNext} />
+          <KbdButton label="Previous check" hint="↑" icon={<LuChevronUp />} onClick={onPrev} />
+          <KbdButton label="Next check" hint="↓" icon={<LuChevronDown />} onClick={onNext} />
           <Tooltip
             title={
               <span className="flex items-center gap-2">

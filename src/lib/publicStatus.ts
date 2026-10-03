@@ -1,4 +1,5 @@
 import { palettes } from "@/theme/palette";
+import { DAY_MS, startOfDay } from "./dates";
 import type { Tone } from "./status";
 import type {
   ComponentStatus,
@@ -22,8 +23,6 @@ export const DEFAULT_STATUS_THEME: StatusTheme = {
   text: palettes.light.ink,
   mode: "light",
 };
-
-const DAY = 86_400_000;
 
 export const COMPONENT_STATUS_LABELS: Record<ComponentStatus, string> = {
   up: "Operational",
@@ -75,16 +74,10 @@ export function averageUptime(days: SnapshotDay[]) {
   return known.length ? known.reduce((sum, value) => sum + value, 0) / known.length : null;
 }
 
-export function startOfDay(timestamp: number) {
-  const date = new Date(timestamp);
-  date.setHours(0, 0, 0, 0);
-  return date.getTime();
-}
-
 export function historyByDay(history: PublicIncident[], dayCount: number, now: number) {
   const today = startOfDay(now);
   return Array.from({ length: dayCount }, (_, index) => {
-    const date = today - index * DAY;
+    const date = today - index * DAY_MS;
     return {
       date,
       incidents: history

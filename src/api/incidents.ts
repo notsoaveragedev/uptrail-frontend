@@ -3,7 +3,7 @@ import { fakeRequest } from "@/lib/fakeRequest";
 import { incidentStore } from "@/mocks/incidentStore";
 import { currentUser } from "@/mocks/workspace";
 import type { Incident, IncidentStatus, TimelineEntry } from "@/types/incident";
-import { useCollectionMutation } from "./optimistic";
+import { useRemoveMutation, useUpsertMutation } from "./optimistic";
 
 export function incidentsKey(orgSlug: string) {
   return ["incidents", orgSlug] as const;
@@ -166,17 +166,9 @@ export function useDeclareIncident(orgSlug: string) {
 }
 
 export function useDeleteIncident(orgSlug: string) {
-  return useCollectionMutation<Incident, string>({
-    queryKey: incidentsKey(orgSlug),
-    apply: (incidents, id) => incidents.filter((incident) => incident.id !== id),
-    commit: (id) => incidentStore.remove(id),
-  });
+  return useRemoveMutation<Incident>(incidentsKey(orgSlug), incidentStore);
 }
 
 export function useRestoreIncident(orgSlug: string) {
-  return useCollectionMutation<Incident, Incident>({
-    queryKey: incidentsKey(orgSlug),
-    apply: (incidents, incident) => [incident, ...incidents.filter((item) => item.id !== incident.id)],
-    commit: (incident) => incidentStore.upsert(incident),
-  });
+  return useUpsertMutation<Incident>(incidentsKey(orgSlug), incidentStore);
 }

@@ -2,18 +2,18 @@ import { Button, Dropdown } from "antd";
 import { LuFolderInput, LuPause, LuPlay, LuTag, LuTrash2 } from "react-icons/lu";
 import { useParams } from "react-router";
 import { useMonitorChange } from "@/api/monitors";
-import { SelectionBar, SelectionBarDivider } from "@/components/ui/SelectionBar";
+import { SelectionBar } from "@/components/ui/SelectionBar";
+import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useToast } from "@/hooks/useToast";
 import { PROJECT_OPTIONS, TAGS } from "@/lib/monitors";
 import type { MonitorChange } from "@/types/monitor";
+import { plural } from "@/lib/format";
 
 type BulkActionBarProps = {
   selectedIds: string[];
   onClear: () => void;
 };
-
-const plural = (count: number) => `${count} monitor${count === 1 ? "" : "s"}`;
 
 export function BulkActionBar({ selectedIds, onClear }: BulkActionBarProps) {
   const { orgSlug = "" } = useParams();
@@ -24,13 +24,13 @@ export function BulkActionBar({ selectedIds, onClear }: BulkActionBarProps) {
 
   function runWithUndo(message: string, change: MonitorChange) {
     const undo = changeWithUndo(change);
-    toast.success(message, plural(count), { label: "Undo", onClick: undo });
+    toast.success(message, plural(count, "monitor"), { label: "Undo", onClick: undo });
     onClear();
   }
 
   async function remove() {
     const isConfirmed = await confirm({
-      title: `Delete ${plural(count)}?`,
+      title: `Delete ${plural(count, "monitor")}?`,
       description: "Their check history, alert rules and status page components will be removed.",
       confirmLabel: "Delete",
       isDanger: true,
@@ -76,7 +76,7 @@ export function BulkActionBar({ selectedIds, onClear }: BulkActionBarProps) {
           Add tag
         </Button>
       </Dropdown>
-      <SelectionBarDivider />
+      <ToolbarDivider />
       <Button type="text" danger icon={<LuTrash2 />} onClick={remove}>
         Delete
       </Button>

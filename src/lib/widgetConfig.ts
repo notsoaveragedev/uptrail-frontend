@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { DashboardRange, DashboardWidget } from "@/types/dashboard";
 import type { MonitorStatus } from "@/types/monitor";
-import { LATENCY_THRESHOLD_MS } from "./format";
+import { LATENCY_THRESHOLD_MS, plural } from "./format";
 
 export const LATENCY_METRICS = ["p50", "p95", "p99", "avg"] as const;
 export type LatencyMetric = (typeof LATENCY_METRICS)[number];
@@ -184,7 +184,7 @@ export function thresholdStatus(value: number, thresholds: Thresholds, isHigherB
 
 export function monitorCountText(monitorIds: string[]) {
   if (monitorIds.length === 0) return "all monitors";
-  return `${monitorIds.length} monitor${monitorIds.length === 1 ? "" : "s"}`;
+  return plural(monitorIds.length, "monitor");
 }
 
 export function configEditor<Schema extends z.ZodType<Record<string, unknown>>>(

@@ -1,8 +1,7 @@
-import { Button, Segmented } from "antd";
 import { SeverityTag } from "@/components/alerts/SeverityTag";
 import { FacetFilter } from "@/components/monitors-list/FacetFilter";
-import { CountBadge } from "@/components/ui/CountBadge";
-import { CustomInput } from "@/components/ui/CustomInput";
+import { ListTabs } from "@/components/ui/ListTabs";
+import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 import { useIncidentFilters } from "@/hooks/useIncidentFilters";
 import { SEVERITIES, SEVERITY_LABELS } from "@/lib/alerts";
 import { ASSIGNEE_ME, INCIDENT_TABS, UNASSIGNED, type IncidentTab } from "@/lib/incidents";
@@ -11,7 +10,9 @@ import { PROJECT_OPTIONS } from "@/lib/monitors";
 import { INCIDENT_PEOPLE } from "@/mocks/incidents";
 import { currentUser } from "@/mocks/workspace";
 import type { Incident } from "@/types/incident";
-import { AssigneeAvatar } from "./AssigneeAvatar";
+import { PersonAvatar } from "@/components/ui/PersonAvatar";
+import { ResetFiltersButton } from "@/components/ui/ResetFiltersButton";
+import { ToolbarSearch } from "@/components/ui/ToolbarSearch";
 
 type IncidentsToolbarProps = {
   incidents: Incident[];
@@ -31,21 +32,13 @@ export function IncidentsToolbar({ incidents, tabCounts }: IncidentsToolbarProps
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Segmented
-        aria-label="Incident status"
+      <ListTabs
+        label="Incident status"
         value={tab}
         onChange={setTab}
-        options={INCIDENT_TABS.map((value) => ({
-          value,
-          label: (
-            <span className="flex items-center gap-2">
-              {TAB_LABELS[value]}
-              <CountBadge count={tabCounts[value]} isMuted={value !== tab} />
-            </span>
-          ),
-        }))}
+        tabs={INCIDENT_TABS.map((value) => ({ value, label: TAB_LABELS[value], count: tabCounts[value] }))}
       />
-      <span className="mx-1 h-5 w-px bg-line" aria-hidden />
+      <ToolbarDivider />
       <FacetFilter
         label="Severity"
         selected={filters.severities}
@@ -81,21 +74,13 @@ export function IncidentsToolbar({ incidents, tabCounts }: IncidentsToolbarProps
           },
         ]}
       />
-      {hasFilters && (
-        <Button type="text" onClick={clear}>
-          Reset
-        </Button>
-      )}
-      <div className="ml-auto w-64">
-        <CustomInput
-          type="search"
-          size="middle"
-          aria-label="Search incidents"
-          placeholder="Search by ID or title"
-          value={filters.query}
-          onChange={(event) => setParam("q", event.target.value)}
-        />
-      </div>
+      <ResetFiltersButton isVisible={hasFilters} onClick={clear} />
+      <ToolbarSearch
+        label="Search incidents"
+        placeholder="Search by ID or title"
+        value={filters.query}
+        onChange={(value) => setParam("q", value)}
+      />
     </div>
   );
 }
@@ -103,7 +88,7 @@ export function IncidentsToolbar({ incidents, tabCounts }: IncidentsToolbarProps
 function PersonLabel({ name, suffix }: { name: string; suffix?: string }) {
   return (
     <span className="flex items-center gap-2">
-      <AssigneeAvatar name={name} hasTooltip={false} />
+      <PersonAvatar name={name} hasTooltip={false} />
       {name}
       {suffix && <span className="text-subtle">{suffix}</span>}
     </span>

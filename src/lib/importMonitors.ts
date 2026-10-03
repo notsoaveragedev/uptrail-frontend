@@ -2,6 +2,7 @@ import { z } from "zod";
 import { parseCsv } from "@/lib/csv";
 import { HTTP_METHODS, MONITOR_TYPE_LABELS, MONITOR_TYPE_VALUES, PROJECT_OPTIONS, REGIONS } from "@/lib/monitors";
 import type { Monitor, MonitorType, RegionCode } from "@/types/monitor";
+import { newId } from "./ids";
 
 const MAX_IMPORT_BYTES = 1024 * 1024;
 
@@ -304,7 +305,7 @@ export function hasErrors(errors: RowErrors | undefined) {
 export function toMonitor(values: ImportValues): Monitor {
   const status = "up" as const;
   return {
-    id: `mon_${crypto.randomUUID().slice(0, 8)}`,
+    id: newId("mon"),
     name: values.name.trim(),
     url: values.url.trim(),
     type: parseType(values.type) ?? "http",

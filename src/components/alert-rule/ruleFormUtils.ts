@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { ParseResult } from "@/lib/alertExpression/parse";
 import { fitsVisual, MAX_DEPTH } from "@/lib/alertExpression/visual";
 import type { AlertRule, EscalationStep, Severity } from "@/types/alerts";
+import { newId } from "@/lib/ids";
 
 export type ConditionMode = "visual" | "text";
 
@@ -47,10 +48,6 @@ const ruleDraftSchema = z.object({
     }),
   ),
 });
-
-function newId(prefix: string) {
-  return `${prefix}_${crypto.randomUUID().slice(0, 8)}`;
-}
 
 export function newEscalationStep(afterMinutes = 15): EscalationDraft {
   return { id: newId("step"), afterMinutes, channelIds: [] };

@@ -2,7 +2,6 @@ import { Button } from "antd";
 import { LuPlus } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router";
 import { FacetFilter } from "@/components/monitors-list/FacetFilter";
-import { CustomInput } from "@/components/ui/CustomInput";
 import { useAlertRuleFilters } from "@/hooks/useAlertRuleFilters";
 import { SEVERITIES, SEVERITY_LABELS } from "@/lib/alerts";
 import { RULE_STATES } from "@/lib/alertLists";
@@ -12,6 +11,8 @@ import { paths } from "@/lib/paths";
 import type { AlertRule } from "@/types/alerts";
 import { RuleStateLabel } from "./RuleStateLabel";
 import { SeverityTag } from "./SeverityTag";
+import { ResetFiltersButton } from "@/components/ui/ResetFiltersButton";
+import { ToolbarSearch } from "@/components/ui/ToolbarSearch";
 
 export function RulesToolbar({ rules }: { rules: AlertRule[] }) {
   const navigate = useNavigate();
@@ -24,16 +25,13 @@ export function RulesToolbar({ rules }: { rules: AlertRule[] }) {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <div className="w-64">
-        <CustomInput
-          type="search"
-          size="middle"
-          aria-label="Search rules"
-          placeholder="Search by name or expression"
-          value={filters.query}
-          onChange={(event) => setParam("q", event.target.value)}
-        />
-      </div>
+      <ToolbarSearch
+        label="Search rules"
+        placeholder="Search by name or expression"
+        value={filters.query}
+        onChange={(value) => setParam("q", value)}
+        className=""
+      />
       <FacetFilter
         label="Project"
         selected={filters.projects}
@@ -61,11 +59,7 @@ export function RulesToolbar({ rules }: { rules: AlertRule[] }) {
           count: severityCounts[severity],
         }))}
       />
-      {hasFilters && (
-        <Button type="text" onClick={clear}>
-          Reset
-        </Button>
-      )}
+      <ResetFiltersButton isVisible={hasFilters} onClick={clear} />
       <Button
         type="primary"
         icon={<LuPlus />}

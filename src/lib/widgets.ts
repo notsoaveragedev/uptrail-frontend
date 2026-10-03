@@ -47,6 +47,7 @@ import {
   textCsv,
   timelineRows,
 } from "./widgetCsv";
+import { newId } from "./ids";
 
 export { widgetRange } from "./widgetConfig";
 
@@ -256,7 +257,7 @@ export const WIDGET_TYPES = Object.keys(WIDGETS) as WidgetType[];
 export function createWidget(type: WidgetType): DashboardWidget {
   const definition = WIDGETS[type];
   return {
-    id: `w_${crypto.randomUUID().slice(0, 8)}`,
+    id: newId("w"),
     type,
     title: definition.defaultTitle,
     config: structuredClone(definition.defaultConfig),

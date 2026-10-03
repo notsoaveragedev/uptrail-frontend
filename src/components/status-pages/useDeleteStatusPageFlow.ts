@@ -29,7 +29,7 @@ export function useDeleteStatusPageFlow() {
     });
     if (!isConfirmed) return false;
 
-    deletePage.mutate(page.id, {
+    deletePage.mutate([page.id], {
       onSuccess: () =>
         toast.success("Status page deleted", page.title, { label: "Undo", onClick: () => restore(page) }),
       onError: () => toast.error("Couldn't delete the page", "It's back in the list. Try again."),

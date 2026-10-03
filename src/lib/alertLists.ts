@@ -1,6 +1,7 @@
 import type { AlertChannel, AlertEvent, AlertRule, AlertRuleState, ChannelType, Severity } from "@/types/alerts";
 import { maskTarget } from "./alerts";
 import { readList } from "./searchParams";
+import { matchesAny } from "./list";
 
 export type RuleFilters = {
   query: string;
@@ -30,14 +31,13 @@ export function readRuleFilters(params: URLSearchParams): RuleFilters {
 
 export function filterRules(rules: AlertRule[], filters: RuleFilters) {
   const query = filters.query.trim().toLowerCase();
-  const matches = (list: string[], value: string) => list.length === 0 || list.includes(value);
 
   return rules.filter(
     (rule) =>
       `${rule.name} ${rule.expression}`.toLowerCase().includes(query) &&
-      matches(filters.projects, rule.project) &&
-      matches(filters.states, rule.state) &&
-      matches(filters.severities, rule.severity),
+      matchesAny(filters.projects, rule.project) &&
+      matchesAny(filters.states, rule.state) &&
+      matchesAny(filters.severities, rule.severity),
   );
 }
 
@@ -47,10 +47,6 @@ export function ruleChannelIds(rule: AlertRule) {
 
 export function countRulesUsing(rules: AlertRule[], channelId: string) {
   return rules.filter((rule) => ruleChannelIds(rule).includes(channelId)).length;
-}
-
-export function pluralRules(count: number) {
-  return `${count} rule${count === 1 ? "" : "s"}`;
 }
 
 export type HistoryStatus = "all" | "firing" | "resolved" | "unacked";

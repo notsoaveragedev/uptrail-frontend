@@ -2,13 +2,16 @@ import { Button, Dropdown } from "antd";
 import { LuCircleCheck, LuUserPlus } from "react-icons/lu";
 import { useParams } from "react-router";
 import { useIncidentChange } from "@/api/incidents";
-import { SelectionBar, SelectionBarDivider } from "@/components/ui/SelectionBar";
+import { SelectionBar } from "@/components/ui/SelectionBar";
+import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useToast } from "@/hooks/useToast";
-import { isIncidentOpen, pluralIncidents, shortName, UNASSIGNED } from "@/lib/incidents";
+import { isIncidentOpen, UNASSIGNED } from "@/lib/incidents";
+import { shortName } from "@/lib/people";
 import { INCIDENT_PEOPLE } from "@/mocks/incidents";
 import { currentUser } from "@/mocks/workspace";
 import type { Incident } from "@/types/incident";
+import { plural } from "@/lib/format";
 
 type IncidentBulkBarProps = {
   selected: Incident[];
@@ -25,13 +28,13 @@ export function IncidentBulkBar({ selected, onClear }: IncidentBulkBarProps) {
   function assign(key: string) {
     const assignee = key === UNASSIGNED ? null : key;
     selected.forEach((incident) => change.mutate({ incidentId: incident.id, change: { type: "assign", assignee } }));
-    toast.success(assignee ? `Assigned to ${shortName(assignee)}` : "Unassigned", pluralIncidents(selected.length));
+    toast.success(assignee ? `Assigned to ${shortName(assignee)}` : "Unassigned", plural(selected.length, "incident"));
     onClear();
   }
 
   async function resolve() {
     const isConfirmed = await confirm({
-      title: `Resolve ${pluralIncidents(open.length)}?`,
+      title: `Resolve ${plural(open.length, "incident")}?`,
       description: "Each incident gets a resolved update on its timeline. You can reopen them later.",
       confirmLabel: "Resolve",
     });
@@ -39,7 +42,7 @@ export function IncidentBulkBar({ selected, onClear }: IncidentBulkBarProps) {
     open.forEach((incident) =>
       change.mutate({ incidentId: incident.id, change: { type: "resolve", isPublic: false } }),
     );
-    toast.success("Incidents resolved", pluralIncidents(open.length));
+    toast.success("Incidents resolved", plural(open.length, "incident"));
     onClear();
   }
 
@@ -62,7 +65,7 @@ export function IncidentBulkBar({ selected, onClear }: IncidentBulkBarProps) {
           Assign
         </Button>
       </Dropdown>
-      <SelectionBarDivider />
+      <ToolbarDivider />
       <Button type="text" icon={<LuCircleCheck />} disabled={open.length === 0} onClick={resolve}>
         Resolve
       </Button>

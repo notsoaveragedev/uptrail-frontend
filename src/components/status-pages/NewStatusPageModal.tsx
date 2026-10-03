@@ -13,7 +13,8 @@ import { useForm } from "@/hooks/useForm";
 import { useToast } from "@/hooks/useToast";
 import { paths } from "@/lib/paths";
 import { newStatusPageSchema } from "@/lib/schemas";
-import { blankStatusPage, isSlugTaken, pageProjectOptions, slugify } from "@/lib/statusPages";
+import { slugify } from "@/lib/format";
+import { blankStatusPage, isSlugTaken, pageProjectOptions } from "@/lib/statusPages";
 
 type NewStatusPageModalProps = {
   open: boolean;

@@ -3,16 +3,13 @@ import type { ReactNode } from "react";
 import { LuX } from "react-icons/lu";
 import { useWindowKeydown } from "@/hooks/useWindowKeydown";
 import { CountBadge } from "./CountBadge";
+import { ToolbarDivider } from "./ToolbarDivider";
 
 type SelectionBarProps = {
   count: number;
   onClear: () => void;
   children: ReactNode;
 };
-
-export function SelectionBarDivider() {
-  return <span className="mx-1 h-5 w-px bg-line" />;
-}
 
 export function SelectionBar({ count, onClear, children }: SelectionBarProps) {
   useWindowKeydown((event) => {
@@ -31,7 +28,7 @@ export function SelectionBar({ count, onClear, children }: SelectionBarProps) {
         <CountBadge count={count} />
         selected
       </span>
-      <SelectionBarDivider />
+      <ToolbarDivider />
       {children}
       <kbd className="kbd ml-1">Esc</kbd>
       <Button type="text" aria-label="Clear selection" icon={<LuX />} onClick={onClear} />

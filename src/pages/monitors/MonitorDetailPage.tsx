@@ -13,7 +13,7 @@ import { MonitorDetailSkeleton } from "@/components/monitor-detail/MonitorDetail
 import { MonitorHeader } from "@/components/monitor-detail/MonitorHeader";
 import { OverviewTab } from "@/components/monitor-detail/OverviewTab";
 import { SettingsTab } from "@/components/monitor-detail/SettingsTab";
-import { CountBadge } from "@/components/ui/CountBadge";
+import { TabLabel } from "@/components/ui/TabLabel";
 import { useSearchParam } from "@/hooks/useSearchParam";
 import { DETAIL_TABS } from "@/lib/monitorDetail";
 import { TIME_RANGES } from "@/lib/timeRange";
@@ -87,14 +87,5 @@ function MonitorDetail({ monitor }: { monitor: Monitor }) {
         </div>
       )}
     </>
-  );
-}
-
-function TabLabel({ label, count }: { label: string; count: number }) {
-  return (
-    <span className="flex items-center gap-2">
-      {label}
-      <CountBadge count={count} isMuted />
-    </span>
   );
 }

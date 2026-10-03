@@ -18,10 +18,8 @@ import type {
 } from "@/types/monitorDetail";
 import type { TimeRange } from "@/types/overview";
 import { hashString, RANGE_BUCKETS, seeded } from "./random";
+import { DAY_MS, HOUR_MS, MINUTE_MS } from "@/lib/dates";
 
-const MINUTE = 60_000;
-const HOUR = 60 * MINUTE;
-const DAY = 24 * HOUR;
 const CHECK_ROUNDS = 12;
 const TYPICAL_MAX_MS = 420;
 
@@ -51,9 +49,9 @@ function averageLatency(monitor: Monitor) {
 
 function downBands(monitor: Monitor, rangeStart: number, now: number): DownBand[] {
   if (monitor.status !== "down") return [];
-  const pastStart = now - 16 * HOUR;
+  const pastStart = now - 16 * HOUR_MS;
   const bands = [
-    { start: pastStart, end: pastStart + 32 * MINUTE, label: "Down 32m" },
+    { start: pastStart, end: pastStart + 32 * MINUTE_MS, label: "Down 32m" },
     { start: monitor.statusSince, end: now, label: "Down" },
   ];
   return bands
@@ -67,7 +65,7 @@ export function buildResponseHistory(monitor: Monitor, range: TimeRange): Respon
   const now = Date.now();
   const end = Math.floor(now / 1000);
   const base = averageLatency(monitor);
-  const bands = downBands(monitor, now - count * stepMinutes * MINUTE, now);
+  const bands = downBands(monitor, now - count * stepMinutes * MINUTE_MS, now);
   const isInBand = (timestamp: number) => bands.some((band) => timestamp >= band.start && timestamp <= band.end);
   const anomalyIndexes =
     monitor.status === "up" ? [Math.floor(count * 0.42)] : [0.22, 0.59, 0.82].map((at) => Math.floor(count * at));
@@ -135,7 +133,7 @@ function buildDays(monitor: Monitor, random: () => number): UptimeDay[] {
   const special = new Map(DIPS.map((uptime) => [Math.floor(random() * dipWindow), uptime]));
 
   return Array.from({ length: 90 }, (_, index) => {
-    const date = today.getTime() - (89 - index) * DAY;
+    const date = today.getTime() - (89 - index) * DAY_MS;
     if (index === 89) return { date, uptime: monitor.uptime24h, incidents: monitor.status === "down" ? 1 : 0 };
     const uptime = special.get(index) ?? 100;
     return { date, uptime, incidents: uptime < 99.9 ? (uptime < 99 ? 2 : 1) : 0 };
@@ -183,7 +181,7 @@ function buildIncidents(monitor: Monitor, days: UptimeDay[], seed: number): Moni
     .slice(0, 3)
     .map((day, index) => {
       const template = PAST_INCIDENTS[(seed + index) % PAST_INCIDENTS.length];
-      const startedAt = day.date + (9 + index * 3) * HOUR;
+      const startedAt = day.date + (9 + index * 3) * HOUR_MS;
       return {
         id: `INC-${38 - index * 4}`,
         severity: uptimeStatus(day.uptime) === "down" ? ("SEV 1" as const) : ("SEV 2" as const),
@@ -191,7 +189,7 @@ function buildIncidents(monitor: Monitor, days: UptimeDay[], seed: number): Moni
         cause: template.cause,
         state: "Resolved" as const,
         startedAt,
-        resolvedAt: startedAt + (12 + index * 9) * MINUTE,
+        resolvedAt: startedAt + (12 + index * 9) * MINUTE_MS,
         assignee: ASSIGNEES[(seed + index) % ASSIGNEES.length],
       };
     });
@@ -255,7 +253,7 @@ function buildAlertHistory(monitor: Monitor, incidents: MonitorIncident[]): Aler
     {
       id: `${incident.id}-fired`,
       rule: "Monitor down",
-      firedAt: incident.startedAt + MINUTE,
+      firedAt: incident.startedAt + MINUTE_MS,
       state: incident.resolvedAt === null ? "firing" : "resolved",
       detail: incident.cause,
     },
@@ -266,7 +264,7 @@ function buildAlertHistory(monitor: Monitor, incidents: MonitorIncident[]): Aler
           {
             id: "slow-p95",
             rule: "Slow p95",
-            firedAt: monitor.statusSince - 20 * MINUTE,
+            firedAt: monitor.statusSince - 20 * MINUTE_MS,
             state: monitor.status === "degraded" ? "firing" : "acknowledged",
             detail: `p95 crossed ${LATENCY_THRESHOLD_MS} ms for 5 minutes`,
           },
@@ -275,7 +273,7 @@ function buildAlertHistory(monitor: Monitor, incidents: MonitorIncident[]): Aler
   const burn: AlertHistoryItem = {
     id: "slo-burn",
     rule: "Uptime SLO burn",
-    firedAt: Date.now() - 9 * DAY,
+    firedAt: Date.now() - 9 * DAY_MS,
     state: "resolved",
     detail: "Hourly uptime dipped to 99.52%",
   };

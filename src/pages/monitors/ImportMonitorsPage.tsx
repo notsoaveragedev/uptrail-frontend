@@ -27,6 +27,7 @@ import {
 } from "@/lib/importMonitors";
 import { paths } from "@/lib/paths";
 import type { Monitor } from "@/types/monitor";
+import { plural } from "@/lib/format";
 
 type Step = "upload" | "map" | "review" | "import";
 
@@ -148,7 +149,7 @@ export function ImportMonitorsPage() {
     await addMonitors(queryClient, orgSlug, imported);
     setProgress((current) => ({ ...current, isDone: true }));
     toast.success(
-      `${imported.length} ${imported.length === 1 ? "monitor" : "monitors"} imported`,
+      `${plural(imported.length, "monitor")} imported`,
       `From ${file?.fileName}. First checks run within a minute.`,
     );
   }
