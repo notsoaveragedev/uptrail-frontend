@@ -1,7 +1,6 @@
 import { Button, Progress, Upload } from "antd";
-import { useEffect, useRef, useState } from "react";
 import { LuImageUp, LuTrash2 } from "react-icons/lu";
-import { useToast } from "@/hooks/useToast";
+import { useImageUpload } from "@/hooks/useImageUpload";
 import { PageLogo } from "./PageLogo";
 
 type LogoUploadProps = {
@@ -14,27 +13,7 @@ type LogoUploadProps = {
 const MAX_BYTES = 1024 * 1024;
 
 export function LogoUpload({ title, logoUrl, color, onChange }: LogoUploadProps) {
-  const toast = useToast();
-  const [progress, setProgress] = useState<number | null>(null);
-  const timerRef = useRef<number>(undefined);
-
-  useEffect(() => () => window.clearInterval(timerRef.current), []);
-
-  function upload(file: File) {
-    if (!file.type.startsWith("image/")) return toast.error("That file isn't an image", "Use a PNG, SVG or JPG.");
-    if (file.size > MAX_BYTES) return toast.error("Logo is too large", "Keep it under 1 MB.");
-    window.clearInterval(timerRef.current);
-    let percent = 0;
-    setProgress(percent);
-    timerRef.current = window.setInterval(() => {
-      percent += 20;
-      if (percent < 100) return setProgress(percent);
-      window.clearInterval(timerRef.current);
-      setProgress(null);
-      onChange(URL.createObjectURL(file));
-      toast.success("Logo uploaded", file.name);
-    }, 150);
-  }
+  const { progress, upload } = useImageUpload({ label: "Logo", maxBytes: MAX_BYTES, onUploaded: onChange });
 
   return (
     <div className="flex items-center gap-3">

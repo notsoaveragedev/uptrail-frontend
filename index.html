@@ -11,7 +11,9 @@
     <title>Uptrail</title>
     <script>
       try {
-        if (JSON.parse(localStorage.getItem("uptrail:theme")) === "light")
+        var preference = JSON.parse(localStorage.getItem("uptrail:theme"));
+        var prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        if (preference === "light" || (preference === "system" && prefersLight))
           document.documentElement.dataset.theme = "light";
       } catch {}
     </script>

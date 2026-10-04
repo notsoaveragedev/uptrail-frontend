@@ -3,7 +3,7 @@ import { LuMenu, LuSearch } from "react-icons/lu";
 import { Link, useLocation, useParams } from "react-router";
 import { findNavItem } from "@/lib/navigation";
 import { paths } from "@/lib/paths";
-import { organizations } from "@/mocks/workspace";
+import { findOrganization } from "@/lib/currentOrg";
 import { NotificationsMenu } from "./NotificationsMenu";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -15,7 +15,7 @@ type TopBarProps = {
 export function TopBar({ onOpenSearch, onOpenMenu }: TopBarProps) {
   const { orgSlug = "" } = useParams();
   const { pathname } = useLocation();
-  const org = organizations.find((item) => item.slug === orgSlug) ?? organizations[0];
+  const org = findOrganization(orgSlug);
   const page = findNavItem(pathname, orgSlug);
 
   return (

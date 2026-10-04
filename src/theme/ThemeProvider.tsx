@@ -1,30 +1,41 @@
 import { App as AntApp, ConfigProvider } from "antd";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import { Loader } from "@/components/ui/Loader";
-import { writeJson } from "@/lib/storage";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useStoredState } from "@/hooks/useStoredState";
+import { readJson } from "@/lib/storage";
 import { getAntdTheme } from "./antdTheme";
-import { THEME_STORAGE_KEY, ThemeContext } from "./ThemeContext";
+import { THEME_STORAGE_KEY, ThemeContext, type ThemePreference } from "./ThemeContext";
 import type { ThemeMode } from "./palette";
 
-function readInitialMode(): ThemeMode {
-  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+const LIGHT_QUERY = "(prefers-color-scheme: light)";
+
+function readPreference(): ThemePreference {
+  const stored = readJson<string>(THEME_STORAGE_KEY, "dark");
+  return stored === "light" || stored === "system" ? stored : "dark";
+}
+
+function resolve(preference: ThemePreference, prefersLight: boolean): ThemeMode {
+  if (preference !== "system") return preference;
+  return prefersLight ? "light" : "dark";
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [mode, setMode] = useState<ThemeMode>(readInitialMode);
+  const [preference, setStoredPreference] = useStoredState(THEME_STORAGE_KEY, readPreference());
+  const prefersLight = useMediaQuery(LIGHT_QUERY);
+  const mode = resolve(preference, prefersLight);
 
   useEffect(() => {
-    writeJson(THEME_STORAGE_KEY, mode);
+    document.documentElement.dataset.theme = mode;
   }, [mode]);
 
   const value = useMemo(() => {
-    function toggleMode() {
-      const next = mode === "dark" ? "light" : "dark";
-      document.documentElement.dataset.theme = next;
-      setMode(next);
+    function setPreference(next: ThemePreference) {
+      document.documentElement.dataset.theme = resolve(next, prefersLight);
+      setStoredPreference(next);
     }
-    return { mode, toggleMode };
-  }, [mode]);
+    return { mode, preference, setPreference, toggleMode: () => setPreference(mode === "dark" ? "light" : "dark") };
+  }, [mode, preference, prefersLight, setStoredPreference]);
   const antdTheme = useMemo(() => getAntdTheme(mode), [mode]);
 
   return (

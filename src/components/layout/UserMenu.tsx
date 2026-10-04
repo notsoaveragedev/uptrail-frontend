@@ -1,28 +1,16 @@
 import { Dropdown } from "antd";
 import { LuCircleUser, LuEllipsisVertical, LuKeyboard, LuLogOut } from "react-icons/lu";
 import { useNavigate } from "react-router";
-import { useConfirm } from "@/hooks/useConfirm";
-import { useToast } from "@/hooks/useToast";
+import { useLogOut } from "@/hooks/useLogOut";
+import { paths } from "@/lib/paths";
 import { currentUser } from "@/mocks/workspace";
 
 export function UserMenu() {
   const navigate = useNavigate();
-  const confirm = useConfirm();
-  const toast = useToast();
-
-  async function logOut() {
-    const isConfirmed = await confirm({
-      title: "Log out of Uptrail?",
-      description: "You'll need to sign in again to see your monitors.",
-      confirmLabel: "Log out",
-    });
-    if (!isConfirmed) return;
-    navigate("/login");
-    toast.info("You're signed out", "See you soon.");
-  }
+  const logOut = useLogOut();
 
   const items = [
-    { key: "account", icon: <LuCircleUser />, label: "Account settings" },
+    { key: "account", icon: <LuCircleUser />, label: "Account settings", onClick: () => navigate(paths.account()) },
     { key: "shortcuts", icon: <LuKeyboard />, label: "Keyboard shortcuts" },
     { type: "divider" as const },
     { key: "logout", icon: <LuLogOut />, label: "Log out", danger: true },

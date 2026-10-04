@@ -1,3 +1,4 @@
+import { ACCOUNT_ORGANIZATIONS, SESSIONS } from "./account";
 import { API_KEYS } from "./apiKeys";
 import { AUDIT_EVENTS } from "./auditLog";
 import { createCollectionStore } from "./collectionStore";
@@ -14,3 +15,5 @@ export const auditStore = createCollectionStore(AUDIT_EVENTS);
 export const projectStore = createCollectionStore(PROJECTS);
 export const maintenanceStore = createCollectionStore(MAINTENANCE_WINDOWS);
 export const notificationStore = createCollectionStore(NOTIFICATIONS);
+export const sessionStore = createCollectionStore(SESSIONS);
+export const accountOrgStore = createCollectionStore(ACCOUNT_ORGANIZATIONS);

@@ -7,6 +7,7 @@ import { useForm } from "@/hooks/useForm";
 import { fakeFailure, fakeRequest } from "@/lib/fakeRequest";
 import { safeRedirect } from "@/lib/safeRedirect";
 import { loginSchema } from "@/lib/schemas";
+import { startSession } from "@/lib/session";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ export function LoginPage() {
         navigate({ pathname: "/login/2fa", search: searchParams.toString() }, { state: { email } });
         return;
       }
+      startSession();
       navigate(safeRedirect(searchParams.get("next")));
     },
   });

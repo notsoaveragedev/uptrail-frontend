@@ -45,4 +45,5 @@ export const paths = {
   settings: (orgSlug: string, page = "general", search?: Search) =>
     withSearch(`${overview(orgSlug)}/settings/${page}`, search),
   role: (orgSlug: string, roleId: string) => `${overview(orgSlug)}/settings/roles/${roleId}`,
+  account: (page = "profile") => `/account/${page}`,
 };

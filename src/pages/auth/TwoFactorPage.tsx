@@ -8,6 +8,7 @@ import { useForm } from "@/hooks/useForm";
 import { fakeFailure, fakeRequest } from "@/lib/fakeRequest";
 import { safeRedirect } from "@/lib/safeRedirect";
 import { backupCodeSchema, twoFactorSchema } from "@/lib/schemas";
+import { startSession } from "@/lib/session";
 
 export function TwoFactorPage() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ export function TwoFactorPage() {
     onSubmit: async ({ code }) => {
       if (code === "000000") await fakeFailure("That code didn't match. Codes refresh every 30 seconds.");
       await fakeRequest();
+      startSession();
       navigate(safeRedirect(searchParams.get("next")));
     },
   });

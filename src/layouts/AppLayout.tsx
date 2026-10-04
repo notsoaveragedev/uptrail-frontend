@@ -1,26 +1,27 @@
 import { Drawer } from "antd";
 import { Suspense, useEffect, useState } from "react";
-import { Outlet, useLocation } from "react-router";
+import { Outlet, useParams } from "react-router";
 import { SectionErrorBoundary } from "@/components/errors/SectionErrorBoundary";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { useLazyDisclosure } from "@/hooks/useLazyDisclosure";
+import { useRouteFocus } from "@/hooks/useRouteFocus";
 import { useSearchShortcut } from "@/hooks/useSearchShortcut";
+import { rememberOrg } from "@/lib/currentOrg";
 import { lazyComponent } from "@/lib/lazyPage";
 
 const CommandPalette = lazyComponent(() => import("@/components/layout/CommandPalette"), "CommandPalette");
 
 export function AppLayout() {
-  const { pathname } = useLocation();
+  const { orgSlug = "" } = useParams();
   const search = useLazyDisclosure();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useSearchShortcut(search.toggle);
 
-  useEffect(() => {
-    document.querySelector("main")?.scrollTo({ top: 0 });
-    document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true });
-  }, [pathname]);
+  useRouteFocus();
+
+  useEffect(() => rememberOrg(orgSlug), [orgSlug]);
 
   return (
     <div className="flex h-dvh bg-canvas">

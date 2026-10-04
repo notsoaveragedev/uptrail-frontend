@@ -1,10 +1,3 @@
-export type Organization = {
-  slug: string;
-  name: string;
-  initials: string;
-  role: string;
-};
-
 export type OrgSettings = {
   name: string;
   slug: string;

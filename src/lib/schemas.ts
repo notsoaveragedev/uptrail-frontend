@@ -49,7 +49,7 @@ export const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
-export const linkAccountSchema = z.object({
+export const currentPasswordSchema = z.object({
   password: z.string().min(1, "Enter your password."),
 });
 
@@ -209,3 +209,36 @@ export const maintenanceSchema = z
   });
 
 export type MaintenanceValues = z.output<typeof maintenanceSchema>;
+
+export const profileSchema = z.object({
+  name: z.string().trim().min(1, "Enter your name.").max(80, "Keep your name under 80 characters."),
+  timezone: z.string().min(1, "Pick a timezone."),
+});
+
+export const changeEmailSchema = z.object({
+  email,
+  password: z.string().min(1, "Enter your current password."),
+});
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Enter your current password."),
+    password: newPassword,
+    confirmPassword: z.string(),
+    signOutOthers: checkbox,
+  })
+  .refine((values) => values.confirmPassword === values.password, {
+    message: "Passwords don't match.",
+    path: ["confirmPassword"],
+  })
+  .refine((values) => values.password !== values.currentPassword, {
+    message: "Choose a password you haven't used here.",
+    path: ["password"],
+  });
+
+export const createOrganizationSchema = z.object({
+  name: z.string().trim().min(1, "Name the organization.").max(60, "Keep the name under 60 characters."),
+  slug,
+});
+
+export const totpCodeSchema = twoFactorSchema.pick({ code: true });

@@ -1,16 +1,10 @@
-import type { Organization, OrgSettings } from "@/types/workspace";
+import type { OrgSettings } from "@/types/workspace";
 
 export const currentUser = {
   name: "Meera Iyer",
   email: "meera@pixelcraft.io",
   initials: "MI",
 };
-
-export const organizations: Organization[] = [
-  { slug: "pixelcraft", name: "Pixelcraft Studio", initials: "PS", role: "Admin" },
-  { slug: "bluepeak", name: "Bluepeak Agency", initials: "BA", role: "Editor" },
-  { slug: "shopnest", name: "Shopnest", initials: "SN", role: "Viewer" },
-];
 
 export const ORG_SETTINGS: OrgSettings = {
   name: "Pixelcraft Studio",

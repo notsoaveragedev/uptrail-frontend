@@ -9,10 +9,11 @@ type SlugFieldProps = {
   value: string;
   currentSlug: string;
   error?: string;
+  isNew?: boolean;
   onChange: (slug: string) => void;
 };
 
-export function SlugField({ value, currentSlug, error, onChange }: SlugFieldProps) {
+export function SlugField({ value, currentSlug, error, isNew = false, onChange }: SlugFieldProps) {
   const debounced = useDebouncedValue(value, 400);
   const { data: isAvailable, isFetching } = useQuery(slugAvailabilityQuery(debounced, currentSlug));
   const isChanged = value !== currentSlug;
@@ -28,13 +29,22 @@ export function SlugField({ value, currentSlug, error, onChange }: SlugFieldProp
       error={error ?? (isChanged && debounced === value && isAvailable === false ? `${value} is taken.` : null)}
       hint={
         isChanged &&
-        !error && <Availability isChecking={isFetching || debounced !== value} isAvailable={isAvailable} slug={value} />
+        !error && (
+          <Availability
+            isNew={isNew}
+            isChecking={isFetching || debounced !== value}
+            isAvailable={isAvailable}
+            slug={value}
+          />
+        )
       }
     />
   );
 }
 
-function Availability({ isChecking, isAvailable, slug }: { isChecking: boolean; isAvailable?: boolean; slug: string }) {
+type AvailabilityProps = { isNew: boolean; isChecking: boolean; isAvailable?: boolean; slug: string };
+
+function Availability({ isNew, isChecking, isAvailable, slug }: AvailabilityProps) {
   if (isChecking) {
     return (
       <span className="flex items-center gap-1.5">
@@ -48,7 +58,7 @@ function Availability({ isChecking, isAvailable, slug }: { isChecking: boolean; 
       <span className="flex items-center gap-1.5 text-up">
         <LuCheck aria-hidden className="size-3.5" /> {slug} is available
       </span>
-      <span>Old app links will stop working. Status page URLs don't change.</span>
+      {!isNew && <span>Old app links will stop working. Status page URLs don't change.</span>}
     </span>
   );
 }

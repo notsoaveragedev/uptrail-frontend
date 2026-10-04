@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { Navigate, NavLink, Outlet, useParams } from "react-router";
+import { Navigate, Outlet, useParams } from "react-router";
 import { invitationsQuery, membersQuery } from "@/api/members";
 import { orgSettingsQuery } from "@/api/org";
+import { SubNavLink } from "@/components/layout/SubNavLink";
 import { CountBadge } from "@/components/ui/CountBadge";
 import { MetaList } from "@/components/ui/MetaList";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -70,23 +71,20 @@ export function SettingsLayout() {
 
 function SettingsLink({ item, count }: { item: SettingsNavItem; count?: number }) {
   const { orgSlug = "" } = useParams();
-  const Icon = item.icon;
 
   return (
-    <NavLink
+    <SubNavLink
       to={paths.settings(orgSlug, item.key)}
-      className={({ isActive }) =>
-        `flex h-8 shrink-0 items-center gap-2.5 rounded-md px-2.5 whitespace-nowrap ${isActive ? "bg-hover text-ink" : "text-muted hover:bg-hover hover:text-ink"}`
+      label={item.label}
+      icon={item.icon}
+      badge={
+        count ? (
+          <span title={`${count} pending invitations`}>
+            <CountBadge count={count} isMuted />
+          </span>
+        ) : null
       }
-    >
-      <Icon aria-hidden className="size-4" />
-      <span className="flex-1">{item.label}</span>
-      {count ? (
-        <span title={`${count} pending invitations`}>
-          <CountBadge count={count} isMuted />
-        </span>
-      ) : null}
-    </NavLink>
+    />
   );
 }
 

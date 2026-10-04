@@ -1,5 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fakeRequest } from "@/lib/fakeRequest";
+import { accountOrgStore } from "@/mocks/settingsStore";
 import { ORG_SETTINGS, TAKEN_ORG_SLUGS } from "@/mocks/workspace";
 import type { OrgSettings } from "@/types/workspace";
 
@@ -24,10 +25,11 @@ export function slugAvailabilityQuery(slug: string, currentSlug: string) {
     queryKey: ["org-slug", slug],
     queryFn: async () => {
       await fakeRequest(450);
-      return slug === currentSlug || !TAKEN_ORG_SLUGS.includes(slug);
+      const isUsed = accountOrgStore.list().some((org) => org.slug === slug);
+      return slug === currentSlug || (!TAKEN_ORG_SLUGS.includes(slug) && !isUsed);
     },
     enabled: slug.length >= 3 && slug !== currentSlug,
-    staleTime: Infinity,
+    staleTime: 30_000,
   });
 }
 

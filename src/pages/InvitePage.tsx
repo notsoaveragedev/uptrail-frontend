@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/useToast";
 import { fakeRequest } from "@/lib/fakeRequest";
 import { DEFAULT_APP_PATH } from "@/lib/safeRedirect";
 import { readEnum } from "@/lib/searchParams";
+import { startSession } from "@/lib/session";
 
 const STATES = ["valid", "signed-out", "expired", "revoked", "member", "mismatch"] as const;
 
@@ -26,6 +27,7 @@ export function InvitePage() {
     startAccepting(async () => {
       await fakeRequest();
       toast.success("You joined Pixelcraft Studio", "You're an Editor in 3 projects.");
+      startSession();
       navigate(DEFAULT_APP_PATH);
     });
   }

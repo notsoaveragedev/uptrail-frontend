@@ -7,8 +7,9 @@ import { useForm } from "@/hooks/useForm";
 import { useToast } from "@/hooks/useToast";
 import { fakeRequest } from "@/lib/fakeRequest";
 import { DEFAULT_APP_PATH } from "@/lib/safeRedirect";
+import { currentPasswordSchema } from "@/lib/schemas";
 import { readEnum } from "@/lib/searchParams";
-import { linkAccountSchema } from "@/lib/schemas";
+import { startSession } from "@/lib/session";
 
 const STATES = ["signing-in", "error", "link"] as const;
 
@@ -21,10 +22,11 @@ export function OAuthCallbackPage() {
   const providerName = provider === "google" ? "Google" : "GitHub";
 
   const { formProps, fieldErrors, formError, isPending } = useForm({
-    schema: linkAccountSchema,
+    schema: currentPasswordSchema,
     onSubmit: async () => {
       await fakeRequest();
       toast.success(`${providerName} linked`, `You can now sign in with ${providerName}.`);
+      startSession();
       navigate(DEFAULT_APP_PATH);
     },
   });
@@ -33,7 +35,9 @@ export function OAuthCallbackPage() {
     if (state !== "signing-in") return;
     let isCancelled = false;
     fakeRequest(1200).then(() => {
-      if (!isCancelled) navigate(DEFAULT_APP_PATH, { replace: true });
+      if (isCancelled) return;
+      startSession();
+      navigate(DEFAULT_APP_PATH, { replace: true });
     });
     return () => {
       isCancelled = true;

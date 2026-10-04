@@ -8,8 +8,9 @@ export function useProject() {
   return { project: projects?.find((item) => item.slug === projectSlug), isPending };
 }
 
-export function useProjectOptions() {
-  const { orgSlug = "" } = useParams();
+export function useProjectOptions(scopeOrgSlug?: string) {
+  const { orgSlug: routeOrgSlug = "" } = useParams();
+  const orgSlug = scopeOrgSlug ?? routeOrgSlug;
   const { data: projects = [] } = useQuery(projectsQuery(orgSlug));
   return projects.map((project) => ({ value: project.slug, label: project.name }));
 }
