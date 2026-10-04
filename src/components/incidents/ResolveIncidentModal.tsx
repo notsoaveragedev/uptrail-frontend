@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { LuGlobe } from "react-icons/lu";
 import { FieldShell } from "@/components/ui/FieldShell";
 import type { Incident } from "@/types/incident";
-import { SwitchField } from "./SwitchField";
+import { SwitchField } from "@/components/ui/SwitchField";
 import { useIncidentActions } from "./useIncidentActions";
 
 type ResolveIncidentModalProps = {

@@ -4,8 +4,8 @@ import { Link, useNavigate, useSearchParams } from "react-router";
 import { AuthNotice } from "@/components/auth/AuthNotice";
 import { useToast } from "@/hooks/useToast";
 import { fakeRequest } from "@/lib/fakeRequest";
-import { DEFAULT_APP_PATH } from "@/lib/safeRedirect";
 import { readEnum } from "@/lib/searchParams";
+import { startSession } from "@/lib/session";
 
 const STATES = ["verifying", "sent", "success", "expired"] as const;
 
@@ -90,8 +90,16 @@ export function VerifyEmailPage() {
       title="You're verified."
       description="Your email is confirmed. Let's add your first monitor."
     >
-      <Button type="primary" size="large" block onClick={() => navigate(DEFAULT_APP_PATH)}>
-        Continue to Uptrail
+      <Button
+        type="primary"
+        size="large"
+        block
+        onClick={() => {
+          startSession();
+          navigate("/onboarding");
+        }}
+      >
+        Set up your workspace
       </Button>
     </AuthNotice>
   );

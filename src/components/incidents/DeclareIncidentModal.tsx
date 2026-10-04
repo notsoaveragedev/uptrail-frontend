@@ -24,7 +24,7 @@ import { currentUser } from "@/mocks/workspace";
 import type { Severity } from "@/types/alerts";
 import type { IncidentStatus } from "@/types/incident";
 import { IncidentStatusPill } from "./IncidentStatusPill";
-import { SwitchField } from "./SwitchField";
+import { SwitchField } from "@/components/ui/SwitchField";
 
 type DeclareIncidentModalProps = {
   open: boolean;

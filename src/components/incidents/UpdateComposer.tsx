@@ -7,7 +7,7 @@ import { INCIDENT_STATUS_LABELS, INCIDENT_STATUSES } from "@/lib/incidents";
 import { incidentUpdateSchema } from "@/lib/schemas";
 import type { Incident, IncidentStatus } from "@/types/incident";
 import { MarkdownText } from "@/components/ui/MarkdownText";
-import { SwitchField } from "./SwitchField";
+import { SwitchField } from "@/components/ui/SwitchField";
 import { useIncidentActions } from "./useIncidentActions";
 
 type UpdateComposerProps = {

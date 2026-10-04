@@ -1,36 +1,45 @@
+import type { ReactNode } from "react";
 import { LuCheck } from "react-icons/lu";
-import { STEPS } from "@/lib/monitorForm";
+
+type Step = { key: string; label: string; hint?: ReactNode };
 
 type StepRailProps = {
+  steps: readonly Step[];
   current: number;
   furthest: number;
+  label: string;
   onSelect: (index: number) => void;
+  className?: string;
 };
 
-export function StepRail({ current, furthest, onSelect }: StepRailProps) {
+export function StepRail({ steps, current, furthest, label, onSelect, className = "" }: StepRailProps) {
   return (
-    <nav aria-label="Wizard steps" className="hidden w-52 shrink-0 border-r border-line px-4 py-5 md:block">
+    <nav aria-label={label} className={className}>
       <ol className="flex flex-col gap-0.5">
-        {STEPS.map((step, index) => {
+        {steps.map((step, index) => {
           const isCurrent = index === current;
           const isDone = !isCurrent && index < furthest;
+          const isReachable = !isCurrent && index <= furthest;
           return (
             <li key={step.key}>
               <button
                 type="button"
-                disabled={!isDone}
+                disabled={!isReachable}
                 aria-current={isCurrent ? "step" : undefined}
                 onClick={() => onSelect(index)}
-                className={`flex h-10 w-full items-center gap-2.5 rounded-md px-2.5 text-left transition-colors ${
+                className={`flex min-h-10 w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left transition-colors ${
                   isCurrent
                     ? "bg-hover font-medium text-ink"
-                    : isDone
+                    : isReachable
                       ? "cursor-pointer text-muted hover:bg-hover hover:text-ink"
                       : "text-subtle"
                 }`}
               >
                 <StepMark index={index} isCurrent={isCurrent} isDone={isDone} />
-                {step.label}
+                <span className="flex min-w-0 flex-col">
+                  {step.label}
+                  {step.hint && <span className="truncate font-mono text-xs font-normal text-subtle">{step.hint}</span>}
+                </span>
               </button>
             </li>
           );

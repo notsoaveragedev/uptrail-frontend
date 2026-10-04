@@ -5,7 +5,7 @@ import { addMonitors, monitorsQuery } from "@/api/monitors";
 import { ReviewStep } from "@/components/monitor-form/ReviewStep";
 import { StepFields } from "@/components/monitor-form/StepFields";
 import { StepHeading } from "@/components/monitor-form/StepHeading";
-import { StepRail } from "@/components/monitor-form/StepRail";
+import { StepRail } from "@/components/ui/StepRail";
 import { TestPanel } from "@/components/monitor-form/TestPanel";
 import { WizardFooter } from "@/components/monitor-form/WizardFooter";
 import { WizardHeader } from "@/components/monitor-form/WizardHeader";
@@ -113,7 +113,14 @@ export function NewMonitorPage() {
         <section className="flex w-full max-w-220 min-w-0 flex-col rounded-lg border border-line bg-card xl:flex-1">
           <WizardHeader step={step} savedAt={draft.savedAt} onClose={() => navigate(monitorsPath)} />
           <div className="flex flex-1">
-            <StepRail current={step} furthest={furthest} onSelect={goToStep} />
+            <StepRail
+              steps={STEPS}
+              label="Wizard steps"
+              current={step}
+              furthest={furthest}
+              onSelect={goToStep}
+              className="hidden w-52 shrink-0 border-r border-line px-4 py-5 md:block"
+            />
             <div className="flex min-w-0 flex-1 flex-col gap-5 px-6 py-5">
               <StepHeading ref={headingRef} title={current.label} description={current.description} />
               {current.key === "review" ? (

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isHttpUrl } from "./monitorForm";
 import { isBreachedPassword, isPasswordValid } from "./password";
 
 const email = z.string().trim().min(1, "Enter your email.").pipe(z.email("Enter a valid email address."));
@@ -242,3 +243,31 @@ export const createOrganizationSchema = z.object({
 });
 
 export const totpCodeSchema = twoFactorSchema.pick({ code: true });
+
+export const onboardingProjectSchema = projectSchema.pick({ name: true, slug: true });
+
+export const onboardingMonitorSchema = z.object({
+  url: z
+    .string()
+    .trim()
+    .min(1, "Paste the URL to check.")
+    .refine(isHttpUrl, "Use a full URL like https://api.acme.com/health."),
+  name: z.string().trim().min(1, "Name the monitor.").max(60, "Keep the name under 60 characters."),
+});
+
+export const onboardingAlertsSchema = z
+  .object({ email, isSlackOn: checkbox, slackUrl: z.string().trim() })
+  .refine((values) => !values.isSlackOn || values.slackUrl.startsWith("https://hooks.slack.com/"), {
+    message: "Use a Slack incoming webhook URL.",
+    path: ["slackUrl"],
+  });
+
+const statusPageDetails = newStatusPageSchema.pick({ title: true, slug: true });
+
+export const onboardingStatusPageSchema = z
+  .object({ isEnabled: checkbox, title: z.string(), slug: z.string() })
+  .superRefine((values, context) => {
+    if (!values.isEnabled) return;
+    const result = statusPageDetails.safeParse(values);
+    result.error?.issues.forEach((issue) => context.addIssue({ ...issue, code: "custom" }));
+  });

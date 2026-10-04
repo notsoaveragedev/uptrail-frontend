@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { sessionsQuery, useRevokeSessions, useSaveSecurity } from "@/api/account";
 import { NewPasswordField } from "@/components/auth/NewPasswordField";
-import { SwitchField } from "@/components/incidents/SwitchField";
+import { SwitchField } from "@/components/ui/SwitchField";
 import { TimeAgo } from "@/components/monitors/TimeAgo";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { useForm } from "@/hooks/useForm";

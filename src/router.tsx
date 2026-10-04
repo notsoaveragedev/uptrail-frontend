@@ -74,6 +74,7 @@ export const router = createBrowserRouter([
       {
         lazy: lazyPage(() => import("@/layouts/SessionLayout"), "SessionLayout"),
         children: [
+          { path: "onboarding", lazy: lazyPage(() => import("@/pages/OnboardingPage"), "OnboardingPage") },
           {
             path: "account",
             lazy: lazyPage(() => import("@/layouts/AccountLayout"), "AccountLayout"),

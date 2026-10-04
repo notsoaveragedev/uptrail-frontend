@@ -7,7 +7,7 @@ import { useParams } from "react-router";
 import { maintenanceQuery, useSaveMaintenance } from "@/api/maintenance";
 import { monitorsQuery } from "@/api/monitors";
 import { orgSettingsQuery } from "@/api/org";
-import { SwitchField } from "@/components/incidents/SwitchField";
+import { SwitchField } from "@/components/ui/SwitchField";
 import { DrawerSection } from "@/components/logs/drawer/DrawerSection";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { CustomSelect } from "@/components/ui/CustomSelect";
