@@ -6,6 +6,7 @@ import { RootLayout } from "@/layouts/RootLayout";
 import { lazyPage } from "@/lib/lazyPage";
 import { DEFAULT_APP_PATH } from "@/lib/safeRedirect";
 import { InAppNotFoundPage, NotFoundPage } from "@/pages/NotFoundPage";
+import { ServerErrorPage } from "@/pages/ServerErrorPage";
 
 function guarded(permission: string, route: RouteObject): RouteObject {
   return {
@@ -257,6 +258,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
+      { path: "500", Component: ServerErrorPage },
       { path: "*", Component: NotFoundPage },
     ],
   },

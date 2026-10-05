@@ -67,6 +67,10 @@ export function formatDateTime(timestamp: number) {
   return `${formatDay(timestamp)}, ${formatTime(timestamp)}`;
 }
 
+export function formatUtc(timestamp: number) {
+  return `${new Date(timestamp).toISOString().slice(0, 16).replace("T", " ")} UTC`;
+}
+
 export function plural(count: number, noun: string) {
   if (count === 1) return `${count} ${noun}`;
   return `${count} ${noun}${noun.endsWith("s") ? "es" : "s"}`;
