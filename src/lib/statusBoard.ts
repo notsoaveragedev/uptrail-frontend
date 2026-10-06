@@ -1,7 +1,7 @@
 import type { MonitorStatus } from "@/types/monitor";
 import { statusTrail } from "./status";
 
-type BoardMonitor = {
+export type BoardMonitor = {
   name: string;
   url: string;
   status: MonitorStatus;

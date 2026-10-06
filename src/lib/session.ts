@@ -21,6 +21,10 @@ export function writeExpiry(expiresAt: number) {
   writeJson(EXPIRY_KEY, expiresAt);
 }
 
+export function hasActiveSession() {
+  return (readExpiry() ?? 0) > Date.now();
+}
+
 export function nextExpiry() {
   return Date.now() + SESSION_IDLE_MS;
 }

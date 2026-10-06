@@ -4,7 +4,6 @@ import { RequirePermission } from "@/components/rbac/RequirePermission";
 import { FullPageLoader } from "@/components/ui/FullPageLoader";
 import { RootLayout } from "@/layouts/RootLayout";
 import { lazyPage } from "@/lib/lazyPage";
-import { DEFAULT_APP_PATH } from "@/lib/safeRedirect";
 import { InAppNotFoundPage, NotFoundPage } from "@/pages/NotFoundPage";
 import { ServerErrorPage } from "@/pages/ServerErrorPage";
 
@@ -25,7 +24,7 @@ export const router = createBrowserRouter([
     ErrorBoundary: RootErrorBoundary,
     HydrateFallback: FullPageLoader,
     children: [
-      { path: "/", element: <Navigate to={DEFAULT_APP_PATH} replace /> },
+      { index: true, lazy: lazyPage(() => import("@/pages/LandingPage"), "LandingPage") },
       {
         lazy: lazyPage(() => import("@/layouts/AuthLayout"), "AuthLayout"),
         children: [

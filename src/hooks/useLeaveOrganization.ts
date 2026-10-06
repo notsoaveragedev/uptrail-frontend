@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+import { DEFAULT_APP_PATH } from "@/lib/safeRedirect";
 import { useConfirm } from "./useConfirm";
 import { useToast } from "./useToast";
 
@@ -18,7 +19,7 @@ export function useLeaveOrganization() {
     });
     if (!isConfirmed) return;
     if (onLeft) onLeft();
-    else navigate("/");
+    else navigate(DEFAULT_APP_PATH);
     toast.info(`You left ${orgName}`);
   };
 }

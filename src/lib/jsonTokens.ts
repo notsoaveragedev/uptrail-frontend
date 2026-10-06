@@ -21,3 +21,10 @@ export function jsonTokens(line: string): JsonToken[] {
   if (lastIndex < line.length) tokens.push({ kind: "plain", text: line.slice(lastIndex) });
   return tokens;
 }
+
+export const TOKEN_TEXT: Record<JsonTokenKind, string> = {
+  key: "text-series-2",
+  string: "text-ink",
+  literal: "text-series-4",
+  plain: "text-muted",
+};

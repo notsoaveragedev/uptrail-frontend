@@ -1,12 +1,13 @@
 import { Link, Outlet, useLocation } from "react-router";
 import { StatusBoard } from "@/components/auth/StatusBoard";
+import { SystemStatusLine } from "@/components/layout/SystemStatusLine";
 import { Logo } from "@/components/Logo";
 
 export function AuthLayout() {
   return (
     <div className="grid min-h-dvh grid-cols-1 grid-rows-[auto_1fr_auto] bg-canvas lg:grid-cols-[30rem_1fr]">
       <header className="flex items-center justify-between border-b border-line px-6 py-4 sm:px-12 lg:col-span-2">
-        <Link to="/login" aria-label="Uptrail home" className="rounded-md">
+        <Link to="/" aria-label="Uptrail home" className="rounded-md">
           <Logo />
         </Link>
         <AccountSwitchLink />
@@ -21,11 +22,7 @@ export function AuthLayout() {
       <StatusBoard />
 
       <footer className="flex items-center justify-between gap-4 border-t border-line px-6 py-4 text-xs text-subtle sm:px-12 lg:col-span-2">
-        <p className="flex items-center gap-2">
-          <span className="size-1.5 rounded-full bg-up" />
-          All systems operational
-          <span className="hidden font-mono sm:inline">· 99.98% uptime · 214 ms p95</span>
-        </p>
+        <SystemStatusLine />
         <p>© {new Date().getFullYear()} Uptrail</p>
       </footer>
     </div>

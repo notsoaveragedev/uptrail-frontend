@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isPublicUrl, withScheme } from "./landing";
 import { isHttpUrl } from "./monitorForm";
 import { isBreachedPassword, isPasswordValid } from "./password";
 
@@ -271,3 +272,13 @@ export const onboardingStatusPageSchema = z
     const result = statusPageDetails.safeParse(values);
     result.error?.issues.forEach((issue) => context.addIssue({ ...issue, code: "custom" }));
   });
+
+export const demoCheckSchema = z.object({
+  url: z
+    .string()
+    .trim()
+    .min(1, "Enter a URL to check.")
+    .transform(withScheme)
+    .refine(isHttpUrl, "Enter a URL like https://example.com.")
+    .refine(isPublicUrl, "Use a public URL."),
+});

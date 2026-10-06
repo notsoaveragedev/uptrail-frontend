@@ -1,5 +1,4 @@
-import { CheckTrail } from "@/components/monitors/CheckTrail";
-import { StatusIcon } from "@/components/monitors/StatusIcon";
+import { BoardRow } from "@/components/monitors/BoardRow";
 import { StatusDot } from "@/components/ui/StatusDot";
 import { BOARD_MONITORS } from "@/lib/statusBoard";
 
@@ -20,25 +19,7 @@ export function StatusBoard() {
 
         <ul className="mt-6 divide-y divide-line rounded-lg border border-line bg-card">
           {BOARD_MONITORS.map((monitor) => (
-            <li
-              key={monitor.url}
-              className={`flex items-center gap-4 px-4 py-3 ${monitor.status === "paused" ? "opacity-60" : ""}`}
-            >
-              <StatusIcon status={monitor.status} />
-              <span className="flex w-44 min-w-0 flex-col">
-                <span className="truncate font-medium">{monitor.name}</span>
-                <span className="truncate font-mono text-xs text-subtle">{monitor.url}</span>
-              </span>
-              <span className="flex flex-1 justify-center">
-                <CheckTrail checks={monitor.checks} />
-              </span>
-              <span
-                className={`w-16 text-right font-mono text-xs ${monitor.status === "degraded" ? "text-degraded" : "text-ink"}`}
-              >
-                {monitor.latency}
-              </span>
-              <span className="w-24 text-right font-mono text-xs text-subtle">{monitor.regions}</span>
-            </li>
+            <BoardRow key={monitor.url} monitor={monitor} />
           ))}
         </ul>
       </div>
