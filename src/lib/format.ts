@@ -63,6 +63,10 @@ export function formatDay(timestamp: number) {
   return new Date(timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+export function formatLongDate(timestamp: number) {
+  return new Date(timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
 export function formatDateTime(timestamp: number) {
   return `${formatDay(timestamp)}, ${formatTime(timestamp)}`;
 }

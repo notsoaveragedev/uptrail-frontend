@@ -97,3 +97,32 @@ export function useSaveAccountOrganization() {
 export function useLeaveOrganizations() {
   return useRemoveMutation<AccountOrganization>(ORGANIZATIONS_KEY, accountOrgStore);
 }
+
+type EmailConfirmFailure = "expired" | "invalid" | "already_confirmed";
+
+type EmailConfirmResult =
+  { ok: true; email: string; previousEmail: string } | { ok: false; reason: EmailConfirmFailure; email: string };
+
+const CONFIRM_FAILURES: Record<string, EmailConfirmFailure> = {
+  expired: "expired",
+  invalid: "invalid",
+  used: "already_confirmed",
+};
+
+export function emailConfirmQuery(token: string) {
+  return queryOptions({
+    queryKey: ["account", "email-confirm", token],
+    queryFn: async (): Promise<EmailConfirmResult> => {
+      await fakeRequest(900);
+      const nextEmail = account.pendingEmail ?? "meera.iyer@pixelcraft.io";
+      const failure = token ? CONFIRM_FAILURES[token] : "invalid";
+      if (failure)
+        return { ok: false, reason: failure, email: failure === "already_confirmed" ? nextEmail : account.email };
+      const previousEmail = account.email;
+      account = { ...account, email: nextEmail, pendingEmail: null };
+      return { ok: true, email: nextEmail, previousEmail };
+    },
+    staleTime: Infinity,
+    retry: false,
+  });
+}

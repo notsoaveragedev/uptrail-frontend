@@ -6,6 +6,7 @@ import { MONITORS } from "@/mocks/monitors";
 import { statusPageStore } from "@/mocks/statusPageStore";
 import { buildStatusSnapshot } from "@/mocks/statusSnapshot";
 import { STATUS_PAGES } from "@/mocks/statusPages";
+import { PLAN_NAMES, planHighlights, PRO_PRICE_CENTS } from "./plans";
 import { statusTrail } from "./status";
 import { BOARD_MONITORS, type BoardMonitor } from "./statusBoard";
 
@@ -188,33 +189,19 @@ export const DEVELOPER_POINTS = [
 
 export const PLANS = [
   {
-    name: "Free",
+    name: PLAN_NAMES.free,
     price: "$0",
     period: "",
     summary: "For side projects and small teams.",
-    limits: [
-      "20 monitors",
-      "1 minute checks",
-      "3 members",
-      "30 days of history",
-      "Every alert channel",
-      "A status page per project",
-    ],
+    limits: planHighlights("free"),
     cta: "signup",
   },
   {
-    name: "Pro",
-    price: "$19",
+    name: PLAN_NAMES.pro,
+    price: `$${PRO_PRICE_CENTS.monthly / 100}`,
     period: "per month, per organization",
     summary: "For teams that go on call.",
-    limits: [
-      "200 monitors",
-      "30 second checks",
-      "Unlimited members",
-      "1 year of history",
-      "Custom roles and audit log",
-      "Custom status page domain",
-    ],
+    limits: planHighlights("pro"),
     cta: "pro",
   },
 ] as const;

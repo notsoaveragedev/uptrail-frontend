@@ -42,6 +42,9 @@ export const paths = {
     `${overview(orgSlug)}/projects/${projectSlug}${tab === "overview" ? "" : `/${tab}`}`,
   maintenance: (orgSlug: string, search?: Search) => withSearch(`${overview(orgSlug)}/maintenance`, search),
   notifications: (orgSlug: string) => `${overview(orgSlug)}/notifications`,
+  billing: (orgSlug: string) => `${overview(orgSlug)}/settings/billing`,
+  upgrade: (orgSlug: string, search?: Search) => withSearch(`${overview(orgSlug)}/upgrade`, search),
+  emailConfirm: (token: string) => `/account/email/confirm?token=${token}`,
   settings: (orgSlug: string, page = "general", search?: Search) =>
     withSearch(`${overview(orgSlug)}/settings/${page}`, search),
   role: (orgSlug: string, roleId: string) => `${overview(orgSlug)}/settings/roles/${roleId}`,

@@ -1,5 +1,5 @@
 import type { IconType } from "react-icons";
-import { LuBuilding2, LuKeyRound, LuScrollText, LuShieldCheck, LuUsers } from "react-icons/lu";
+import { LuBuilding2, LuCreditCard, LuKeyRound, LuScrollText, LuShieldCheck, LuUsers } from "react-icons/lu";
 
 export type SettingsNavItem = { key: string; label: string; icon: IconType; permission: string };
 
@@ -10,6 +10,7 @@ export const SETTINGS_NAV: { label: string; items: SettingsNavItem[] }[] = [
       { key: "general", label: "General", icon: LuBuilding2, permission: "org:settings" },
       { key: "members", label: "Members", icon: LuUsers, permission: "member:read" },
       { key: "roles", label: "Roles", icon: LuShieldCheck, permission: "role:read" },
+      { key: "billing", label: "Usage & billing", icon: LuCreditCard, permission: "billing:read" },
     ],
   },
   {

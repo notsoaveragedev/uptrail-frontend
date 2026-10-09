@@ -19,9 +19,9 @@ import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { useLazyDisclosure } from "@/hooks/useLazyDisclosure";
 import { useMemberFilters } from "@/hooks/useMemberFilters";
 import { useNow } from "@/hooks/useNow";
+import { usePlan } from "@/hooks/usePlan";
 import { lazyComponent } from "@/lib/lazyPage";
 import { filterInvitations, filterMembers, OWNER_ROLE_ID, pendingInvitations, seatsUsed } from "@/lib/members";
-import { SEAT_LIMIT } from "@/mocks/workspace";
 import type { Invitation, Member } from "@/types/member";
 import type { Role } from "@/types/rbac";
 
@@ -65,6 +65,7 @@ export function MembersPage() {
 
 function MembersSummary({ members, invitations }: { members: Member[]; invitations: Invitation[] }) {
   const now = useNow(60_000);
+  const { memberLimit } = usePlan();
   const pending = pendingInvitations(invitations, now).length;
   const owners = members.filter((member) => member.roleId === OWNER_ROLE_ID).length;
 
@@ -80,7 +81,8 @@ function MembersSummary({ members, invitations }: { members: Member[]; invitatio
         <span className="font-mono text-ink">{owners}</span> {owners === 1 ? "owner" : "owners"}
       </span>
       <span>
-        <span className="font-mono text-ink">{seatsUsed(members, invitations, now)}</span> of {SEAT_LIMIT} seats used
+        <span className="font-mono text-ink">{seatsUsed(members, invitations, now)}</span>{" "}
+        {memberLimit === null ? "seats used, no limit on your plan" : `of ${memberLimit} seats used`}
       </span>
     </MetaList>
   );

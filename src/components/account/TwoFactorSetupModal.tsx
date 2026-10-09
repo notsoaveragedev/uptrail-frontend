@@ -51,7 +51,7 @@ export function TwoFactorSetupModal({ open, email, onClose, onEnabled }: TwoFact
       title="Turn on two-factor authentication"
       footer={null}
       destroyOnHidden
-      maskClosable={false}
+      mask={{ closable: false }}
       width="32rem"
       afterClose={() => {
         setStep(0);

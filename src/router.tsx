@@ -49,6 +49,10 @@ const routes: RouteObject[] = [
                 lazy: lazyPage(() => import("@/pages/auth/OAuthCallbackPage"), "OAuthCallbackPage"),
               },
               { path: "invite/:token", lazy: lazyPage(() => import("@/pages/InvitePage"), "InvitePage") },
+              {
+                path: "account/email/confirm",
+                lazy: lazyPage(() => import("@/pages/account/ConfirmEmailChangePage"), "ConfirmEmailChangePage"),
+              },
             ],
           },
         ],
@@ -76,6 +80,7 @@ const routes: RouteObject[] = [
         lazy: lazyPage(() => import("@/layouts/SessionLayout"), "SessionLayout"),
         children: [
           { path: "onboarding", lazy: lazyPage(() => import("@/pages/OnboardingPage"), "OnboardingPage") },
+          { path: "upgrade", lazy: lazyPage(() => import("@/pages/billing/UpgradePage"), "UpgradeRedirect") },
           {
             path: "account",
             lazy: lazyPage(() => import("@/layouts/AccountLayout"), "AccountLayout"),
@@ -237,6 +242,10 @@ const routes: RouteObject[] = [
                         path: "roles/:roleId",
                         lazy: lazyPage(() => import("@/pages/settings/RoleEditorPage"), "RoleEditorPage"),
                       }),
+                      guarded("billing:read", {
+                        path: "billing",
+                        lazy: lazyPage(() => import("@/pages/settings/BillingPage"), "BillingPage"),
+                      }),
                       guarded("apikey:manage", {
                         path: "api-keys",
                         lazy: lazyPage(() => import("@/pages/settings/ApiKeysPage"), "ApiKeysPage"),
@@ -251,6 +260,10 @@ const routes: RouteObject[] = [
                     path: "monitors/:monitorId/edit",
                     lazy: lazyPage(() => import("@/pages/monitors/EditMonitorPage"), "EditMonitorPage"),
                   },
+                  guarded("billing:manage", {
+                    path: "upgrade",
+                    lazy: lazyPage(() => import("@/pages/billing/UpgradePage"), "UpgradePage"),
+                  }),
                   { path: "*", Component: InAppNotFoundPage },
                 ],
               },

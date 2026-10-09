@@ -115,7 +115,7 @@ function BackupCodesRow({ security }: { security: SecurityState }) {
         open={codes !== null}
         title="Your new backup codes"
         closable={false}
-        maskClosable={false}
+        mask={{ closable: false }}
         width="32rem"
         footer={
           <Button

@@ -26,7 +26,7 @@ export function SessionGuard() {
       <Modal
         open={session.status === "expiring"}
         closable={false}
-        maskClosable={false}
+        mask={{ closable: false }}
         onCancel={session.extend}
         width="26rem"
         title={
@@ -63,7 +63,7 @@ export function SessionGuard() {
       <Modal
         open={isLocked}
         closable={false}
-        maskClosable={false}
+        mask={{ closable: false }}
         keyboard={false}
         footer={null}
         width="26rem"

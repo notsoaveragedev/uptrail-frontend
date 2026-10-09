@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isFutureExpiry, isLuhnValid, parseExpiry } from "./billing";
 import { isPublicUrl, withScheme } from "./landing";
 import { isHttpUrl } from "./monitorForm";
 import { isBreachedPassword, isPasswordValid } from "./password";
@@ -281,4 +282,43 @@ export const demoCheckSchema = z.object({
     .transform(withScheme)
     .refine(isHttpUrl, "Enter a URL like https://example.com.")
     .refine(isPublicUrl, "Use a public URL."),
+});
+
+const card = {
+  cardNumber: z
+    .string()
+    .trim()
+    .min(1, "Enter your card number.")
+    .refine(isLuhnValid, "Check your card number. It doesn't look right."),
+  expiry: z
+    .string()
+    .trim()
+    .min(1, "Enter the expiry date.")
+    .refine((value) => parseExpiry(value) !== null, "Use MM/YY, like 08/28.")
+    .refine((value) => isFutureExpiry(value), "This card has expired."),
+  cvc: z
+    .string()
+    .trim()
+    .regex(/^\d{3,4}$/, "Enter the 3 or 4 digit code."),
+  cardName: z.string().trim().min(1, "Enter the name on the card."),
+};
+
+export const paymentCardSchema = z.object(card);
+
+const billingDetails = {
+  billingEmail: email,
+  company: z.string().trim().min(1, "Enter a company or your full name."),
+  line1: z.string().trim().optional().default(""),
+  city: z.string().trim().min(1, "Enter a city."),
+  postalCode: z.string().trim().optional().default(""),
+  country: z.string().min(1, "Choose a country."),
+  taxId: z.string().trim().optional().default(""),
+};
+
+export const billingDetailsSchema = z.object(billingDetails);
+
+export const checkoutSchema = z.object({
+  ...card,
+  billingEmail: email,
+  country: billingDetails.country,
 });

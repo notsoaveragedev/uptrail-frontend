@@ -114,7 +114,7 @@ export const ACCOUNT_ORGANIZATIONS: AccountOrganization[] = [
     name: "Meera's side projects",
     initials: "ML",
     roleId: "role_owner",
-    memberCount: 1,
+    memberCount: 3,
     ownerCount: 1,
     joinedAt: now - 30 * DAY_MS,
   },

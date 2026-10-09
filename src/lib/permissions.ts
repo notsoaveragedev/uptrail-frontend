@@ -48,6 +48,7 @@ export const PERMISSION_RESOURCES: PermissionResource[] = [
     label: "Org settings",
     actions: { update: "org:settings", delete: "org:delete", manage: "org:transfer" },
   },
+  { key: "billing", label: "Billing", actions: { read: "billing:read", manage: "billing:manage" } },
 ];
 
 export const ALL_PERMISSIONS = PERMISSION_RESOURCES.flatMap((resource) => Object.values(resource.actions));
@@ -66,6 +67,8 @@ const PERMISSION_LABELS: Record<string, string> = {
   "statuspage:publish": "publish status pages",
   "statuspage:edit": "edit status pages",
   "dashboard:edit": "edit dashboards",
+  "billing:read": "view usage and billing",
+  "billing:manage": "manage billing",
 };
 
 export function permissionLabel(permission: string) {

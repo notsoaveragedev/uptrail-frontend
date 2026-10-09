@@ -30,7 +30,9 @@ export function AuthLayout() {
 }
 
 function AccountSwitchLink() {
-  const isSignup = useLocation().pathname === "/signup";
+  const { pathname } = useLocation();
+  const isSignup = pathname === "/signup";
+  if (pathname.startsWith("/account/")) return null;
 
   return (
     <p className="text-muted">

@@ -8,10 +8,11 @@ import { RoleSelect } from "@/components/settings/RoleSelect";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { FieldShell } from "@/components/ui/FieldShell";
 import { useNow } from "@/hooks/useNow";
+import { usePlan } from "@/hooks/usePlan";
 import { useToast } from "@/hooks/useToast";
-import { checkInviteEmails, findRole, newInvitation, seatsUsed } from "@/lib/members";
-import { currentUser, SEAT_LIMIT } from "@/mocks/workspace";
 import { plural } from "@/lib/format";
+import { checkInviteEmails, findRole, newInvitation, seatsUsed } from "@/lib/members";
+import { currentUser } from "@/mocks/workspace";
 
 type InviteMembersModalProps = { open: boolean; onClose: () => void };
 
@@ -34,23 +35,25 @@ function InviteForm({ onClose }: { onClose: () => void }) {
   const [roleId, setRoleId] = useState("role_viewer");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const now = useNow(60_000);
+  const { memberLimit } = usePlan();
 
   const checks = checkInviteEmails(emails, members, invitations);
   const problems = checks.filter((check) => check.problem);
   const seatsAfter = seatsUsed(members, invitations, now) + emails.length;
+  const isOverLimit = memberLimit !== null && seatsAfter > memberLimit;
   const error = isSubmitted
     ? emails.length === 0
       ? "Add at least one email address."
       : problems.length > 0
         ? `Fix ${plural(problems.length, "address")} before sending.`
-        : seatsAfter > SEAT_LIMIT
-          ? `That's more than your ${SEAT_LIMIT} seats.`
+        : isOverLimit
+          ? `Your plan includes ${memberLimit} members. Upgrade to Pro to invite more.`
           : null
     : null;
 
   function send() {
     setIsSubmitted(true);
-    if (emails.length === 0 || problems.length > 0 || seatsAfter > SEAT_LIMIT) return;
+    if (emails.length === 0 || problems.length > 0 || isOverLimit) return;
     checks.forEach((check) => save.mutate(newInvitation(check.email, roleId, currentUser.name)));
     const role = findRole(roles, roleId)?.name ?? "";
     toast.success(`${plural(emails.length, "invite")} sent`, `As ${role}. Links expire in 7 days.`);
@@ -86,7 +89,9 @@ function InviteForm({ onClose }: { onClose: () => void }) {
         hint={
           problems.length > 0
             ? problems.map((check) => `${check.email}: ${check.problem}`).join(" · ")
-            : `${seatsAfter} of ${SEAT_LIMIT} seats after these invites`
+            : memberLimit === null
+              ? `${seatsAfter} members after these invites. Your plan has no member limit.`
+              : `${seatsAfter} of ${memberLimit} seats after these invites`
         }
       />
       <FieldShell

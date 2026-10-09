@@ -52,7 +52,7 @@ export function CreateApiKeyModal({ open, onClose }: CreateApiKeyModalProps) {
       title={created ? "Copy your new key" : "Create API key"}
       footer={null}
       destroyOnHidden
-      maskClosable={false}
+      mask={{ closable: false }}
       width={created ? "36rem" : "44rem"}
     >
       {created ? (

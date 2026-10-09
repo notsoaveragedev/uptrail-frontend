@@ -35,7 +35,7 @@ export function PricingPlans({ isSignedIn }: { isSignedIn: boolean }) {
               </ul>
               <div className="mt-8 flex">
                 {plan.cta === "pro" ? (
-                  <LinkButton size="large" to="/signup?plan=pro">
+                  <LinkButton size="large" to={isSignedIn ? "/upgrade" : "/signup?plan=pro"}>
                     Choose Pro
                   </LinkButton>
                 ) : (

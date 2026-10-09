@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Navigate, Outlet, useParams } from "react-router";
-import { invitationsQuery, membersQuery } from "@/api/members";
+import { invitationsQuery } from "@/api/members";
 import { orgSettingsQuery } from "@/api/org";
 import { SubNavLink } from "@/components/layout/SubNavLink";
 import { CountBadge } from "@/components/ui/CountBadge";
@@ -8,18 +8,21 @@ import { MetaList } from "@/components/ui/MetaList";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { useNow } from "@/hooks/useNow";
 import { useCurrentRole } from "@/hooks/usePermission";
-import { pendingInvitations, seatsUsed } from "@/lib/members";
+import { usePlan } from "@/hooks/usePlan";
+import { findOrganization } from "@/lib/currentOrg";
+import { pendingInvitations } from "@/lib/members";
 import { paths } from "@/lib/paths";
+import { PLAN_NAMES } from "@/lib/plans";
 import { SETTINGS_NAV, type SettingsNavItem } from "@/lib/settingsNav";
-import { SEAT_LIMIT } from "@/mocks/workspace";
 
 export function SettingsLayout() {
   const { orgSlug = "" } = useParams();
   const { role, granted } = useCurrentRole();
   const { data: settings } = useQuery(orgSettingsQuery(orgSlug));
-  const { data: members } = useQuery(membersQuery(orgSlug));
   const { data: invitations } = useQuery(invitationsQuery(orgSlug));
   const now = useNow(60_000);
+  const { plan, memberLimit, memberCount } = usePlan();
+  const isAtMemberLimit = memberLimit !== null && memberCount !== null && memberCount >= memberLimit;
   const pendingInvites = invitations && pendingInvitations(invitations, now).length;
   const groups = SETTINGS_NAV.map((group) => ({
     ...group,
@@ -32,12 +35,15 @@ export function SettingsLayout() {
         title="Settings"
         meta={
           <MetaList>
-            <span className="text-ink">{settings?.name ?? "…"}</span>
+            <span className="text-ink">
+              {settings?.slug === orgSlug ? settings.name : findOrganization(orgSlug).name}
+            </span>
             <span>
-              <span className="font-mono text-ink">
-                {members && invitations ? seatsUsed(members, invitations, now) : "—"}
-              </span>{" "}
-              of <span className="font-mono">{SEAT_LIMIT}</span> seats
+              <span className="text-ink">{plan ? PLAN_NAMES[plan] : "…"}</span> plan
+            </span>
+            <span>
+              <span className={`font-mono ${isAtMemberLimit ? "text-down" : "text-ink"}`}>{memberCount ?? "—"}</span>
+              {memberLimit === null ? " members" : ` of ${memberLimit} members`}
             </span>
             <span>
               Your role <span className="text-ink">{role.name}</span>

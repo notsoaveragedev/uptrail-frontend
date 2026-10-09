@@ -13,6 +13,4 @@ export const ORG_SETTINGS: OrgSettings = {
   timezone: "Asia/Kolkata",
 };
 
-export const SEAT_LIMIT = 15;
-
 export const TAKEN_ORG_SLUGS = ["acme", "uptrail", "admin", "bluepeak", "shopnest", "status"];
