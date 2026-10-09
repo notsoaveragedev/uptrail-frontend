@@ -159,7 +159,7 @@ const API_ORIGIN = "https://api.uptrail.dev";
 export const PUBLIC_ORIGIN = "https://uptrail.dev";
 
 export const CURL_SAMPLE = `curl -X POST ${API_ORIGIN}/v1/monitors \\
-  -H "Authorization: Bearer upt_live_8f2c41d9" \\
+  -H "Authorization: Bearer $UPTRAIL_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
     "name": "Checkout API",

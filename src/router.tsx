@@ -4,6 +4,7 @@ import { RequirePermission } from "@/components/rbac/RequirePermission";
 import { FullPageLoader } from "@/components/ui/FullPageLoader";
 import { RootLayout } from "@/layouts/RootLayout";
 import { lazyPage } from "@/lib/lazyPage";
+import { registerRoutes } from "@/lib/preloadRoute";
 import { InAppNotFoundPage, NotFoundPage } from "@/pages/NotFoundPage";
 import { ServerErrorPage } from "@/pages/ServerErrorPage";
 
@@ -18,7 +19,7 @@ function guarded(permission: string, route: RouteObject): RouteObject {
   };
 }
 
-export const router = createBrowserRouter([
+const routes: RouteObject[] = [
   {
     Component: RootLayout,
     ErrorBoundary: RootErrorBoundary,
@@ -257,8 +258,13 @@ export const router = createBrowserRouter([
           },
         ],
       },
+      { path: "403", lazy: lazyPage(() => import("@/pages/ForbiddenPage"), "ForbiddenPage") },
       { path: "500", Component: ServerErrorPage },
       { path: "*", Component: NotFoundPage },
     ],
   },
-]);
+];
+
+registerRoutes(routes);
+
+export const router = createBrowserRouter(routes);

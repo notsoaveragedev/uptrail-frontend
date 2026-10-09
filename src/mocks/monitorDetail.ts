@@ -286,7 +286,7 @@ function buildConfig(monitor: Monitor): MonitorConfig {
     url: monitor.url,
     method: monitor.method,
     headers: [
-      { name: "Authorization", value: "Bearer sk_live_51Hc9f2a71", isSecret: true },
+      { name: "Authorization", value: "Bearer example-token", isSecret: true },
       { name: "Content-Type", value: "application/json", isSecret: false },
       { name: "X-Uptrail-Check", value: "1", isSecret: false },
     ],

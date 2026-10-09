@@ -1,4 +1,6 @@
-import type { CheckStatus, FacetKey, LogsFilters, LogsGroupBy, LogsRange, LogsSortKey } from "@/types/logs";
+import type { CheckStatus, FacetKey, LogsFilters, LogsGroupBy, LogsRange, LogsSortKey, TimeWindow } from "@/types/logs";
+import { DAY_MS } from "./dates";
+import { formatDateTime } from "./format";
 import { readEnum, readList, readSort } from "./searchParams";
 
 export const LOG_RANGES: LogsRange[] = ["15m", "1h", "24h", "7d"];
@@ -49,10 +51,24 @@ const SORT_KEYS: LogsSortKey[] = ["ts", "latency", "statusCode", "monitor", "reg
 
 const GROUP_BY_VALUES = Object.keys(GROUP_BY_LABELS) as LogsGroupBy[];
 
+export const LOG_HISTORY_MS = 7 * DAY_MS;
+
+function readWindow(params: URLSearchParams): TimeWindow | null {
+  const from = Number(params.get("from"));
+  const to = Number(params.get("to"));
+  return params.has("from") && params.has("to") && from < to ? { from, to } : null;
+}
+
+export function logsRangeLabel(filters: LogsFilters) {
+  if (!filters.window) return LOG_RANGE_LABELS[filters.range];
+  return `${formatDateTime(filters.window.from)} to ${formatDateTime(filters.window.to)}`;
+}
+
 export function readLogsFilters(params: URLSearchParams): LogsFilters {
   return {
     query: params.get("q") ?? "",
     range: readEnum(params, "range", LOG_RANGES, DEFAULT_LOG_RANGE),
+    window: readWindow(params),
     statuses: readList(params, "status"),
     regions: readList(params, "region"),
     monitors: readList(params, "monitor"),

@@ -5,13 +5,22 @@ import { useLogOut } from "@/hooks/useLogOut";
 import { paths } from "@/lib/paths";
 import { currentUser } from "@/mocks/workspace";
 
-export function UserMenu() {
+export function UserMenu({ onShowShortcuts }: { onShowShortcuts: () => void }) {
   const navigate = useNavigate();
   const logOut = useLogOut();
 
   const items = [
     { key: "account", icon: <LuCircleUser />, label: "Account settings", onClick: () => navigate(paths.account()) },
-    { key: "shortcuts", icon: <LuKeyboard />, label: "Keyboard shortcuts" },
+    {
+      key: "shortcuts",
+      icon: <LuKeyboard />,
+      label: (
+        <span className="flex items-center justify-between">
+          Keyboard shortcuts <kbd className="kbd">?</kbd>
+        </span>
+      ),
+      onClick: onShowShortcuts,
+    },
     { type: "divider" as const },
     { key: "logout", icon: <LuLogOut />, label: "Log out", danger: true },
   ];

@@ -1,5 +1,6 @@
 import { NavLink, useParams } from "react-router";
 import { useCurrentRole } from "@/hooks/usePermission";
+import { usePreloadOnIntent } from "@/hooks/usePreloadOnIntent";
 import { canSeeNavItem, NAV_GROUPS, SETTINGS_ITEM, type NavItem } from "@/lib/navigation";
 import { paths } from "@/lib/paths";
 import { TONE_BADGE } from "@/lib/status";
@@ -32,11 +33,14 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
 function SidebarLink({ item, onNavigate }: { item: NavItem; onNavigate?: () => void }) {
   const { orgSlug = "" } = useParams();
+  const to = paths.section(orgSlug, item.path);
+  const preloadHandlers = usePreloadOnIntent(to);
   const Icon = item.icon;
 
   return (
     <NavLink
-      to={paths.section(orgSlug, item.path)}
+      to={to}
+      {...preloadHandlers}
       end={!item.path}
       onClick={onNavigate}
       className={({ isActive }) =>

@@ -378,10 +378,7 @@ export function configFromMonitor(monitor: Monitor): MonitorFormValues {
     url: monitor.url,
     method: monitor.method,
     headers: hasBody
-      ? [
-          newHeaderRow("Authorization", "Bearer sk_live_51Hc9x2uEw7Q", true),
-          newHeaderRow("Content-Type", "application/json"),
-        ]
+      ? [newHeaderRow("Authorization", "Bearer example-token", true), newHeaderRow("Content-Type", "application/json")]
       : [newHeaderRow("User-Agent", "Uptrail/1.0 (+https://uptrail.dev/bot)")],
     body: hasBody ? SAMPLE_BODY : "",
     keyword: monitor.type === "keyword" ? "Get started" : "",

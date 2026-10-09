@@ -22,26 +22,27 @@ export type NavItem = {
   count?: number;
   isUrgent?: boolean;
   permissions?: string[];
+  shortcut?: string;
 };
 
 export const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
   {
     label: "Monitoring",
     items: [
-      { label: "Overview", path: "", icon: LuLayoutGrid },
-      { label: "Projects", path: "projects", icon: LuFolder, permissions: ["project:read"] },
-      { label: "Monitors", path: "monitors", icon: LuActivity, count: 42 },
-      { label: "Logs", path: "logs", icon: LuScrollText },
-      { label: "Dashboards", path: "dashboards", icon: LuChartColumn },
+      { label: "Overview", path: "", shortcut: "o", icon: LuLayoutGrid },
+      { label: "Projects", path: "projects", shortcut: "p", icon: LuFolder, permissions: ["project:read"] },
+      { label: "Monitors", path: "monitors", shortcut: "m", icon: LuActivity, count: 42 },
+      { label: "Logs", path: "logs", shortcut: "l", icon: LuScrollText },
+      { label: "Dashboards", path: "dashboards", shortcut: "d", icon: LuChartColumn },
     ],
   },
   {
     label: "Response",
     items: [
-      { label: "Alerts", path: "alerts", icon: LuBell },
-      { label: "Incidents", path: "incidents", icon: LuSiren, count: 1, isUrgent: true },
+      { label: "Alerts", path: "alerts", shortcut: "a", icon: LuBell },
+      { label: "Incidents", path: "incidents", shortcut: "i", icon: LuSiren, count: 1, isUrgent: true },
       { label: "Maintenance", path: "maintenance", icon: LuWrench, permissions: ["monitor:update"] },
-      { label: "Status pages", path: "status-pages", icon: LuGlobe },
+      { label: "Status pages", path: "status-pages", shortcut: "s", icon: LuGlobe },
     ],
   },
 ];
@@ -50,10 +51,11 @@ export const SETTINGS_ITEM: NavItem = {
   label: "Settings",
   path: "settings",
   icon: LuSettings,
+  shortcut: ",",
   permissions: SETTINGS_NAV.flatMap((group) => group.items.map((item) => item.permission)),
 };
 
-const NOTIFICATIONS_ITEM: NavItem = { label: "Notifications", path: "notifications", icon: LuInbox };
+const NOTIFICATIONS_ITEM: NavItem = { label: "Notifications", path: "notifications", shortcut: "n", icon: LuInbox };
 
 export const ALL_NAV_ITEMS = [...NAV_GROUPS.flatMap((group) => group.items), SETTINGS_ITEM, NOTIFICATIONS_ITEM];
 

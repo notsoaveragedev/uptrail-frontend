@@ -22,8 +22,8 @@ function facetValue(result: CheckResult, facet: FacetKey) {
   return codeClass(result.statusCode);
 }
 
-function matchesBase(result: CheckResult, since: number, query: string) {
-  if (result.ts < since) return false;
+function matchesBase(result: CheckResult, since: number, until: number, query: string) {
+  if (result.ts < since || result.ts > until) return false;
   if (!query) return true;
   return `${result.monitorName} ${result.monitorUrl} ${result.error?.message ?? ""} ${result.statusCode ?? ""}`
     .toLowerCase()
@@ -61,13 +61,14 @@ export function percentile(values: number[], fraction: number) {
 }
 
 export function runLogsQuery(results: CheckResult[], filters: LogsFilters, anchor: number) {
-  const since = anchor - RANGE_MS[filters.range];
+  const since = filters.window?.from ?? anchor - RANGE_MS[filters.range];
+  const until = filters.window?.to ?? anchor;
   const query = filters.query.trim().toLowerCase();
   const facets: FacetCounts = { status: {}, region: {}, monitor: {}, code: {} };
   const matched: CheckResult[] = [];
 
   for (const result of results) {
-    if (!matchesBase(result, since, query)) continue;
+    if (!matchesBase(result, since, until, query)) continue;
     const passes = FACET_KEYS.map((facet) => passesFacet(result, filters, facet));
     FACET_KEYS.forEach((facet, index) => {
       if (passes.every((passed, other) => other === index || passed)) {

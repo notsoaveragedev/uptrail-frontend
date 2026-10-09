@@ -7,7 +7,12 @@ import { SidebarNav } from "./SidebarNav";
 import { StatusPageCard } from "./StatusPageCard";
 import { UserMenu } from "./UserMenu";
 
-export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+type SidebarProps = {
+  onNavigate?: () => void;
+  onShowShortcuts: () => void;
+};
+
+export function Sidebar({ onNavigate, onShowShortcuts }: SidebarProps) {
   const { orgSlug = "" } = useParams();
 
   return (
@@ -27,7 +32,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       <SidebarNav onNavigate={onNavigate} />
       <div className="mt-auto flex flex-col gap-3">
         <StatusPageCard />
-        <UserMenu />
+        <UserMenu onShowShortcuts={onShowShortcuts} />
       </div>
     </div>
   );

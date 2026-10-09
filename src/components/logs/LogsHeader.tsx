@@ -3,12 +3,10 @@ import { LatencyValue } from "@/components/monitors/LatencyValue";
 import { MetaList } from "@/components/ui/MetaList";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SkeletonBlock } from "@/components/ui/SkeletonBlock";
-import { LOG_RANGE_LABELS } from "@/lib/logs";
 import { latencyTone } from "@/lib/status";
-import type { LogsRange } from "@/types/logs";
 
 type LogsHeaderProps = {
-  range: LogsRange;
+  rangeLabel: string;
   total: number | null;
   failed: number;
   p95LatencyMs: number;
@@ -16,11 +14,11 @@ type LogsHeaderProps = {
   actions?: ReactNode;
 };
 
-export function LogsHeader({ range, total, failed, p95LatencyMs, onShowFailed, actions }: LogsHeaderProps) {
+export function LogsHeader({ rangeLabel, total, failed, p95LatencyMs, onShowFailed, actions }: LogsHeaderProps) {
   return (
     <PageHeader
       title="Logs"
-      titleSuffix={LOG_RANGE_LABELS[range]}
+      titleSuffix={rangeLabel}
       meta={
         total === null ? (
           <SkeletonBlock isInset className="h-5 w-72" />

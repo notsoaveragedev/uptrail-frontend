@@ -34,9 +34,12 @@ export type LogsGroupBy = "none" | "monitor" | "status" | "region";
 
 export type LogsSortKey = "ts" | "latency" | "statusCode" | "monitor" | "region";
 
+export type TimeWindow = { from: number; to: number };
+
 export type LogsFilters = {
   query: string;
   range: LogsRange;
+  window: TimeWindow | null;
   statuses: string[];
   regions: string[];
   monitors: string[];

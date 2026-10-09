@@ -3,6 +3,10 @@ export function isTypingTarget(target: EventTarget | null) {
   return !!element && (element.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(element.tagName));
 }
 
+export function isInsideDialog(target: EventTarget | null) {
+  return !!(target as HTMLElement | null)?.closest?.("[role=dialog]");
+}
+
 export function readCssVar(name: string) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }

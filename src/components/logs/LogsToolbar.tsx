@@ -1,12 +1,13 @@
-import { Button, Segmented } from "antd";
+import { Button } from "antd";
 import { LuPanelLeftClose, LuPanelLeftOpen, LuRefreshCw } from "react-icons/lu";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { useLogsFilters } from "@/hooks/useLogsFilters";
-import { DEFAULT_LOG_RANGE, GROUP_BY_LABELS, LOG_RANGES } from "@/lib/logs";
+import { GROUP_BY_LABELS } from "@/lib/logs";
 import type { ColumnState } from "@/types/dataGrid";
 import type { LogsGroupBy } from "@/types/logs";
 import { ColumnsMenu } from "./ColumnsMenu";
+import { LogsTimeRange } from "./LogsTimeRange";
 
 type LogsToolbarProps = {
   isSidebarOpen: boolean;
@@ -45,13 +46,7 @@ export function LogsToolbar({
           onChange={(event) => setParam("q", event.target.value, { replace: true })}
         />
       </div>
-      <Segmented
-        aria-label="Time range"
-        value={filters.range}
-        onChange={(range) => setParam("range", range, { fallback: DEFAULT_LOG_RANGE })}
-        options={LOG_RANGES}
-        className="font-mono"
-      />
+      <LogsTimeRange />
       <CustomSelect<LogsGroupBy>
         size="middle"
         aria-label="Group by"

@@ -338,6 +338,7 @@ function buildLiveLog(config: LiveLogConfig): LiveLogData {
     {
       query: "",
       range: "1h",
+      window: null,
       statuses: LOG_STATUSES[config.statusFilter],
       regions: [],
       monitors: config.monitorIds,

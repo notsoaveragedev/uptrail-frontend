@@ -21,11 +21,12 @@ import { defaultLogColumnState } from "@/lib/logColumns";
 import { buildLogItems } from "@/lib/logsQuery";
 import type { LogsSortKey } from "@/types/logs";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { logsRangeLabel } from "@/lib/logs";
 
 export function LogsPage() {
   const { orgSlug = "" } = useParams();
   const queryClient = useQueryClient();
-  const { filters, searchParams, setParam, setSort, clearFilters, activeFilterCount } = useLogsFilters();
+  const { filters, searchParams, setParam, setRange, setSort, clearFilters, activeFilterCount } = useLogsFilters();
   const [columnState, setColumnState] = useStoredState("uptrail:logs-columns", defaultLogColumnState);
   const [isSidebarOpen, setIsSidebarOpen] = useStoredState("uptrail:logs-sidebar", true);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
@@ -64,7 +65,7 @@ export function LogsPage() {
       onClear={activeFilterCount > 0 || filters.query ? clearFilters : undefined}
       action={
         activeFilterCount > 0 || filters.query ? undefined : (
-          <Button onClick={() => setParam("range", "24h")}>Try the last 24 hours</Button>
+          <Button onClick={() => setRange("24h")}>Try the last 24 hours</Button>
         )
       }
     />
@@ -75,7 +76,7 @@ export function LogsPage() {
       <title>Logs · Uptrail</title>
       <div className="flex h-[calc(100dvh-6.5rem)] min-h-[36rem] flex-col gap-4">
         <LogsHeader
-          range={filters.range}
+          rangeLabel={logsRangeLabel(filters)}
           total={summary?.total ?? null}
           failed={summary?.failed ?? 0}
           p95LatencyMs={summary?.p95LatencyMs ?? 0}

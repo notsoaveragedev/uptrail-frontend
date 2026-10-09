@@ -14,6 +14,8 @@ export const MEMBER_FILTER_KEYS = ["q", "role"];
 
 export const OWNER_ROLE_ID = "role_owner";
 
+export const ADMIN_ROLE_ID = "role_admin";
+
 export const INHERIT_ROLE = "inherit";
 
 export const LAST_OWNER_REASON = "An organization needs at least one Owner. Transfer ownership first.";
@@ -111,4 +113,10 @@ export function memberEditCheck(
     return { allowed: false, reason: `${member.name} is ${role.name}, which has more access than your role.` };
   }
   return { allowed: true, reason: null };
+}
+
+export function accessGranters(members: Member[], exceptId: string) {
+  return members.filter(
+    (member) => member.id !== exceptId && (member.roleId === OWNER_ROLE_ID || member.roleId === ADMIN_ROLE_ID),
+  );
 }
